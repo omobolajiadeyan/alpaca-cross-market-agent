@@ -64,7 +64,7 @@ def fmt(value, suffix=""):
 logger = AuditLogger()
 dashboard = logger.get_dashboard_data()
 
-st.markdown('<div class="nav"><div class="brand"><span class="brand-mark">◈</span>CROSSSIGNAL</div><div class="nav-note">ALPACA PAPER TRADING · AUDITABLE BY DESIGN</div></div>', unsafe_allow_html=True)
+st.markdown('<div class="nav"><div class="brand"><span class="brand-mark">◈</span>CROSSSIGNAL</div><div class="nav-note">BUILT BY OMOBOLAJI E ADEYAN · ALPACA PAPER TRADING</div></div>', unsafe_allow_html=True)
 
 st.markdown("""
 <div class="hero">
@@ -198,6 +198,7 @@ with readiness:
         ('Hosted public application URL', 'Missing', 'Deploy with credentials configured privately'),
         ('Pitch video and slide deck', 'Partial', 'Scripts and outlines exist; final assets must be produced'),
         ('Hackathon cover image', 'Met', 'Final 16:9 cover is versioned in assets/'),
+        ('Participant enrollment and team', 'Unverified', 'Omobolaji E Adeyan must enroll and join/create a team on lablab.ai'),
         ('lablab submission form', 'Missing', 'Complete on lablab.ai before the deadline'),
     ]
     readiness_df = pd.DataFrame(requirements, columns=['Requirement', 'Status', 'Evidence / next action'])
@@ -220,4 +221,4 @@ with methodology:
     """)
     st.warning("Educational prototype. Paper trading only. This application does not provide investment advice.")
 
-st.markdown(f'<div class="footer">CROSSSIGNAL · Built for the Alpaca AI Trading Agents Hackathon · Data timestamp {datetime.now().strftime("%Y-%m-%d %H:%M %Z")} · Paper trading only</div>', unsafe_allow_html=True)
+st.markdown(f'<div class="footer">CROSSSIGNAL · Omobolaji E Adeyan · Built for the Alpaca AI Trading Agents Hackathon · Data timestamp {datetime.now().strftime("%Y-%m-%d %H:%M %Z")} · Paper trading only</div>', unsafe_allow_html=True)

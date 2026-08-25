@@ -1,8 +1,10 @@
 # Hackathon submission kit
 
+**Creator and presenter:** Omobolaji E Adeyan
+
 ## Short description
 
-CrossSignal is an auditable AI macro trading agent that detects disagreements across volatility, rates, credit, and positioning, then constructs and preflights a defined-risk Alpaca paper portfolio. Unlike agents that only explain a trade, CrossSignal records every prediction and scores it against what the market does next.
+CrossSignal finds disagreements across volatility, rates, credit and positioning, then uses Claude and Alpaca MCP to build, govern and audit defined-risk paper trades—scoring every thesis against what happens next.
 
 ## The 30-second pitch
 

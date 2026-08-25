@@ -4,6 +4,8 @@
 
 > Markets disagree. We trade the gap.
 
+**Created by Omobolaji E Adeyan**
+
 CrossSignal is an auditable cross-market macro agent built for the **Alpaca AI Trading Agents Hackathon**. It synchronizes six market lenses, asks Claude to identify incomplete repricing, constructs a defined-risk SPY/HYG/TLT options portfolio, and preflights every leg through Alpaca's official MCP server before paper submission.
 
 The differentiator is accountability: every thesis stores the market snapshot that produced it and is later scored against subsequent market data. The dashboard distinguishes live, proxy, and fallback values instead of presenting synthetic certainty.
@@ -82,7 +84,7 @@ compliance/audit_logger.py     SQLite decision and execution ledger
 tests/                         Fast isolated safety tests
 ```
 
-See [ARCHITECTURE.md](ARCHITECTURE.md) for system boundaries and [SUBMISSION.md](SUBMISSION.md) for the pitch and recording checklist.
+See [ARCHITECTURE.md](ARCHITECTURE.md) for system boundaries, [REQUIREMENTS_AUDIT.md](REQUIREMENTS_AUDIT.md) for the source-by-source compliance audit, and [SUBMISSION.md](SUBMISSION.md) for the pitch and recording checklist.
 
 ## Status
 
