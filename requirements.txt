@@ -1,0 +1,9 @@
+alpaca-mcp-server>=2.3
+mcp>=1.29
+httpx>=0.28
+anthropic>=0.40
+python-dotenv>=1.0
+pandas>=2.2
+numpy>=1.26
+pytest>=8.0
+streamlit>=1.48
