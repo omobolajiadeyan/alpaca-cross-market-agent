@@ -314,13 +314,13 @@ class AlpacaTools:
             args['position_intent'] = position_intent
         return self.call("place_option_order", args)
 
-    def place_multileg_option_order(self, legs, qty=1):
+    def place_multileg_option_order(self, legs, qty=1, limit_price=None):
         """Submit a multi-leg (e.g. vertical spread) market options order.
         `legs` is a list of {'symbol', 'side', 'position_intent'} dicts (max 4).
         Raises AlpacaMCPError (or another exception) on rejection."""
         args = {
             'qty': str(qty),
-            'type': 'market',
+            'type': 'limit' if limit_price is not None else 'market',
             'order_class': 'mleg',
             'legs': [
                 {'symbol': leg['symbol'], 'ratio_qty': '1', 'side': leg['side'],
@@ -328,6 +328,8 @@ class AlpacaTools:
                 for leg in legs
             ],
         }
+        if limit_price is not None:
+            args['limit_price'] = str(round(limit_price, 2))
         return self.call("place_option_order", args)
 
     def execute_spread(self, underlying_symbol, option_type, spread_type,
@@ -377,6 +379,7 @@ class AlpacaTools:
                 {'symbol': near['symbol'], 'side': 'buy', 'position_intent': 'buy_to_open'},
                 {'symbol': far['symbol'], 'side': 'sell', 'position_intent': 'sell_to_open'},
             ]
+            signed_limit_price = max(net_price, .01)
         elif spread_type == 'credit':
             net_credit = near_bid - far_ask  # sell near at bid, buy far at ask
             max_loss = max(strike_width - max(net_credit, 0), 0) * multiplier * qty
@@ -384,6 +387,7 @@ class AlpacaTools:
                 {'symbol': near['symbol'], 'side': 'sell', 'position_intent': 'sell_to_open'},
                 {'symbol': far['symbol'], 'side': 'buy', 'position_intent': 'buy_to_open'},
             ]
+            signed_limit_price = -max(net_credit, .01)
         else:
             return {'submitted': False, 'reason': f"unknown spread_type '{spread_type}'"}
 
@@ -402,12 +406,18 @@ class AlpacaTools:
             'max_loss': max_loss,
             'order_legs': legs,
             'qty': qty,
+            'limit_price': round(signed_limit_price, 2),
+            'order_type': 'limit',
+            'quotes': {
+                near['symbol']: {'bid': near_bid, 'ask': near_ask},
+                far['symbol']: {'bid': far_bid, 'ask': far_ask},
+            },
         }
         if not submit:
             return prepared
 
         try:
-            order = self.place_multileg_option_order(legs, qty=qty)
+            order = self.place_multileg_option_order(legs, qty=qty, limit_price=signed_limit_price)
         except Exception as e:
             print(f"[ERROR] Place multi-leg order for {underlying_symbol}: {e}")
             return {
@@ -423,6 +433,8 @@ class AlpacaTools:
             'preflight_passed': True,
             'legs': [near['symbol'], far['symbol']],
             'max_loss': max_loss,
+            'order_type': 'limit',
+            'limit_price': round(signed_limit_price, 2),
             'order': order,
             'order_id': order_id,
             'status': order.get('status', 'submitted') if isinstance(order, dict) else 'submitted',

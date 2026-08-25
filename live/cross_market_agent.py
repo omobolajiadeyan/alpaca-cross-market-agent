@@ -11,6 +11,9 @@ from src.data_feed.cross_market_feed import CrossMarketDataFeed
 from agent.synthesizer import MacroSynthesizer
 from agent.constructor import TradeConstructor
 from agent.thesis_scorer import ThesisScorer
+from agent.signal_protocol import (
+    DisagreementEngine, StabilityTester, DecisionContractBuilder, ContractEvaluator,
+)
 from tools.alpaca_tools import AlpacaTools
 from compliance.audit_logger import AuditLogger
 from config import THESIS_EVALUATION_DAYS, REQUIRE_LIVE_DATA
@@ -38,6 +41,10 @@ class CrossMarketAgent:
         self.synthesizer = MacroSynthesizer()
         self.constructor = TradeConstructor()
         self.scorer = ThesisScorer(logger=self.logger, feed=self.feed)
+        self.disagreement_engine = DisagreementEngine()
+        self.stability_tester = StabilityTester(self.disagreement_engine)
+        self.contract_builder = DecisionContractBuilder()
+        self.contract_evaluator = ContractEvaluator()
 
         print("[INIT] ✓ All components ready\n")
 
@@ -77,12 +84,26 @@ class CrossMarketAgent:
             print("  ✓ Realized volatility")
             print("  ✓ Rate expectations")
             print("  ✓ Market positioning\n")
+            matured_contracts = self.logger.get_pending_contracts(min_age_days=5)
+            for pending_contract in matured_contracts:
+                evaluation = self.contract_evaluator.evaluate(pending_contract, market_state)
+                self.logger.record_contract_evaluation(pending_contract['contract_id'], evaluation)
+            if matured_contracts:
+                print(f"  ✓ Issued verdicts for {len(matured_contracts)} matured Decision Contract(s)\n")
             fallbacks = market_state['data_quality']['fallback_sources']
             if fallbacks:
                 print(f"  ⚠ Fallback data detected: {', '.join(fallbacks)}")
                 if REQUIRE_LIVE_DATA and execute:
                     print("  ✗ Execution disabled: REQUIRE_LIVE_DATA is enabled\n")
                     execute = False
+
+            print("[AGENT] STEP 1B: Quantifying cross-market disagreement...")
+            disagreement = self.disagreement_engine.score(market_state)
+            stability = self.stability_tester.test(market_state, disagreement)
+            print(f"  ✓ Leading case: {disagreement['primary']['title']}")
+            print(f"  ✓ Disagreement score: {disagreement['score']:.0f}/100")
+            print(f"  ✓ Stability: {stability['score']:.0%} "
+                  f"({stability['stable_cases']}/{stability['total_cases']} perturbations)\n")
 
             # STEP 2: Check account
             print("[AGENT] STEP 2: Checking account...")
@@ -105,6 +126,15 @@ class CrossMarketAgent:
                 print(f"     {thesis.get('primary_trade_opportunity', 'N/A')}\n")
                 print(f"  📈 CONFIDENCE: {thesis['confidence_overall']:.0%}\n")
 
+                print("[AGENT] STEP 3B: Falsifying the thesis...")
+                falsification = self.synthesizer.falsify(thesis, market_state, disagreement)
+                adjusted = thesis['confidence_overall'] + falsification.get('confidence_adjustment', 0)
+                print(f"  Challenge: {falsification['strongest_counterargument']}")
+                print(f"  Invalidation: {falsification['invalidation_condition']}")
+                print(f"  Adjusted confidence: {max(0, adjusted):.0%}\n")
+                thesis['confidence_pre_falsification'] = thesis['confidence_overall']
+                thesis['confidence_overall'] = max(0, adjusted)
+
                 # STEP 4: Construct trades
                 print("[AGENT] STEP 4: Constructing asymmetric portfolio...")
                 portfolio = self.constructor.build_portfolio(thesis, market_state)
@@ -122,6 +152,19 @@ class CrossMarketAgent:
                     for check in assessment['checks']:
                         mark = '✓' if check['passed'] else '✗'
                         print(f"  {mark} {check['name']}: {check['detail']}")
+
+                    contract = self.contract_builder.build(
+                        thesis, market_state, disagreement, stability,
+                        falsification, portfolio, assessment,
+                    )
+                    portfolio['decision_contract'] = contract
+                    self.logger.log_decision_contract(contract)
+                    print(f"  {'✓' if contract['authorization'] == 'AUTHORIZED' else '✗'} "
+                          f"Decision contract {contract['contract_id']}: {contract['authorization']}")
+                    print(f"  SHA-256: {contract['decision_hash']}\n")
+                    if contract['authorization'] != 'AUTHORIZED':
+                        execute = False
+                        print("  ABSTAIN — " + '; '.join(contract['authorization_reasons']) + "\n")
 
                     if assessment['passed']:
                         print("  ✓ Portfolio passed implemented risk gates\n")
@@ -175,7 +218,15 @@ class CrossMarketAgent:
                         # STEP 7: Log
                         print("[AGENT] STEP 7: Logging to audit trail...")
                         thesis_id = self.logger.log_thesis(thesis, market_state)
-                        self.logger.log_trade(thesis_id, portfolio)
+                        trade_id = self.logger.log_trade(thesis_id, portfolio)
+                        execution_states = [portfolio[name].get('execution', {}).get('status')
+                                            for name in ('primary_trade', 'secondary_trade', 'hedge')]
+                        contract_status = ('abstained' if contract['authorization'] != 'AUTHORIZED'
+                                           else 'filled' if execution_states and all(s == 'filled' for s in execution_states)
+                                           else 'submitted' if any(portfolio[name].get('execution', {}).get('submitted')
+                                                                   for name in ('primary_trade', 'secondary_trade', 'hedge'))
+                                           else 'preview')
+                        self.logger.link_contract_execution(contract['contract_id'], trade_id, contract_status)
 
                         report = self.logger.get_report()
                         print(f"  ✓ Thesis logged (ID: {thesis_id})")
@@ -185,7 +236,8 @@ class CrossMarketAgent:
                     else:
                         print("  ✗ Portfolio failed risk validation; no orders submitted\n")
                         thesis_id = self.logger.log_thesis(thesis, market_state)
-                        self.logger.log_trade(thesis_id, portfolio)
+                        trade_id = self.logger.log_trade(thesis_id, portfolio)
+                        self.logger.link_contract_execution(contract['contract_id'], trade_id, 'abstained')
 
             else:
                 print("[AGENT] ✗ Failed to generate thesis\n")
@@ -196,7 +248,10 @@ class CrossMarketAgent:
             print("="*70 + "\n")
             return {'market_state': market_state, 'account': account,
                     'thesis': thesis if 'thesis' in locals() else None,
-                    'portfolio': portfolio if 'portfolio' in locals() else None}
+                    'portfolio': portfolio if 'portfolio' in locals() else None,
+                    'disagreement': disagreement, 'stability': stability,
+                    'falsification': falsification if 'falsification' in locals() else None,
+                    'decision_contract': contract if 'contract' in locals() else None}
 
         except Exception as e:
             print(f"\n[ERROR] {e}")

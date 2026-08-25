@@ -72,6 +72,20 @@ class AuditLogger:
             )
         """)
 
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS decision_contracts (
+                contract_id TEXT PRIMARY KEY,
+                decision_hash TEXT NOT NULL,
+                created_at TEXT NOT NULL,
+                authorization TEXT NOT NULL,
+                contract_json TEXT NOT NULL,
+                execution_status TEXT DEFAULT 'not_submitted',
+                trade_id INTEGER,
+                evaluated INTEGER DEFAULT 0,
+                evaluation_json TEXT
+            )
+        """)
+
         conn.commit()
         conn.close()
 
@@ -223,7 +237,9 @@ class AuditLogger:
         ))
 
         conn.commit()
+        trade_id = cursor.lastrowid
         conn.close()
+        return trade_id
 
     def get_report(self):
         """Get audit report"""
@@ -250,6 +266,9 @@ class AuditLogger:
         trades = [dict(row) for row in conn.execute(
             "SELECT * FROM trades ORDER BY id DESC LIMIT ?", (limit,)
         ).fetchall()]
+        contracts = [dict(row) for row in conn.execute(
+            "SELECT * FROM decision_contracts ORDER BY created_at DESC LIMIT ?", (limit,)
+        ).fetchall()]
         conn.close()
         for row in theses:
             for key in ('repricing_signals', 'market_state', 'evaluation_detail'):
@@ -257,4 +276,50 @@ class AuditLogger:
                     row[key] = json.loads(row[key])
         for row in trades:
             row['portfolio'] = json.loads(row['portfolio'])
-        return {'theses': theses, 'trades': trades, 'track_record': self.get_track_record()}
+        for row in contracts:
+            row['contract'] = json.loads(row.pop('contract_json'))
+            if row.get('evaluation_json'):
+                row['evaluation'] = json.loads(row['evaluation_json'])
+        return {'theses': theses, 'trades': trades, 'contracts': contracts,
+                'track_record': self.get_track_record()}
+
+    def log_decision_contract(self, contract):
+        """Persist a sealed decision before any broker submission."""
+        conn = sqlite3.connect(self.db_path)
+        conn.execute("""
+            INSERT INTO decision_contracts
+            (contract_id, decision_hash, created_at, authorization, contract_json)
+            VALUES (?, ?, ?, ?, ?)
+        """, (contract['contract_id'], contract['decision_hash'], contract['created_at'],
+              contract['authorization'], json.dumps(contract)))
+        conn.commit()
+        conn.close()
+        return contract['contract_id']
+
+    def link_contract_execution(self, contract_id, trade_id, status):
+        conn = sqlite3.connect(self.db_path)
+        conn.execute("""
+            UPDATE decision_contracts SET trade_id = ?, execution_status = ?
+            WHERE contract_id = ?
+        """, (trade_id, status, contract_id))
+        conn.commit()
+        conn.close()
+
+    def get_pending_contracts(self, min_age_days=5):
+        conn = sqlite3.connect(self.db_path)
+        cutoff = (datetime.now() - timedelta(days=min_age_days)).isoformat()
+        rows = conn.execute("""
+            SELECT contract_json FROM decision_contracts
+            WHERE evaluated = 0 AND created_at <= ?
+        """, (cutoff,)).fetchall()
+        conn.close()
+        return [json.loads(row[0]) for row in rows]
+
+    def record_contract_evaluation(self, contract_id, evaluation):
+        conn = sqlite3.connect(self.db_path)
+        conn.execute("""
+            UPDATE decision_contracts SET evaluated = 1, evaluation_json = ?
+            WHERE contract_id = ?
+        """, (json.dumps(evaluation), contract_id))
+        conn.commit()
+        conn.close()

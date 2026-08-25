@@ -4,7 +4,7 @@
 
 ## Short description
 
-CrossSignal finds disagreements across volatility, rates, credit and positioning, then uses Claude and Alpaca MCP to build, govern and audit defined-risk paper trades—scoring every thesis against what happens next.
+CrossSignal puts every AI trade under oath: it quantifies cross-market disagreements, challenges and stress-tests the thesis, seals a falsifiable prediction, executes through Alpaca MCP, and proves whether the intelligence—not luck—created value.
 
 ## The 30-second pitch
 

@@ -9,13 +9,18 @@ U.S. Treasury ── yield curve ───────┤
                          + source provenance
                                     │
                                     ▼
+                    Deterministic disagreement score
+                                    │
                          Claude macro synthesis
+                         + falsification review
                                     │
                                     ▼
                     SPY / HYG / TLT trade constructor
                                     │
                                     ▼
-                    Risk gates → all-leg preflight
+                Stability + risk → sealed Decision Contract
+                                    │
+                          all-leg limit preflight
                                     │
                           preview ──┴── paper submit
                                     │
@@ -33,6 +38,8 @@ U.S. Treasury ── yield curve ───────┤
 - Deterministic code maps signals into permitted instruments and risk limits.
 - Fallback market data is visible and blocks submission by default.
 - UI order submission requires a separate explicit confirmation.
+- Every authorized decision is SHA-256 sealed before broker submission.
+- Abstention is a successful policy outcome when evidence is insufficient.
 
 ## Known limitations
 

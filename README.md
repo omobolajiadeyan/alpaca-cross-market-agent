@@ -10,6 +10,19 @@ CrossSignal is an auditable cross-market macro agent built for the **Alpaca AI T
 
 The differentiator is accountability: every thesis stores the market snapshot that produced it and is later scored against subsequent market data. The dashboard distinguishes live, proxy, and fallback values instead of presenting synthetic certainty.
 
+## SIGNAL accountability protocol
+
+Every decision must pass a scientific proof chain:
+
+1. **Source integrity** — verify provenance, freshness, and fallback status.
+2. **Inconsistency quantified** — rank deterministic cross-market disagreement scores.
+3. **Gauntlet** — run a Claude falsification review and bounded stability perturbations.
+4. **Notarized contract** — seal the prediction, invalidation, risk, and evidence with SHA-256.
+5. **Alpaca execution** — submit capped-risk limit orders and reconcile broker lifecycle state.
+6. **Learning ledger** — issue a predetermined verdict and compare agent, inverse, and cash directional proxies.
+
+If confidence, stability, data integrity, disagreement, or deterministic risk is inadequate, `ABSTAIN` is the correct protocol outcome.
+
 ## Judge demo
 
 ```bash
@@ -79,12 +92,13 @@ src/data_feed/                 Cross-market state and provenance
 agent/synthesizer.py           Claude structured reasoning
 agent/constructor.py           Signal mapping and risk assessment
 agent/thesis_scorer.py         Outcome-based forecast scoring
+agent/signal_protocol.py       Disagreement, stability, sealing and verdicts
 tools/alpaca_tools.py          Persistent Alpaca MCP integration
 compliance/audit_logger.py     SQLite decision and execution ledger
 tests/                         Fast isolated safety tests
 ```
 
-See [ARCHITECTURE.md](ARCHITECTURE.md) for system boundaries, [REQUIREMENTS_AUDIT.md](REQUIREMENTS_AUDIT.md) for the source-by-source compliance audit, and [SUBMISSION.md](SUBMISSION.md) for the pitch and recording checklist.
+See [ARCHITECTURE.md](ARCHITECTURE.md) for system boundaries, [REQUIREMENTS_AUDIT.md](REQUIREMENTS_AUDIT.md) for the compliance audit, [SMOKE_TEST.md](SMOKE_TEST.md) for verification evidence, and [SUBMISSION.md](SUBMISSION.md) for the pitch checklist.
 
 ## Status
 

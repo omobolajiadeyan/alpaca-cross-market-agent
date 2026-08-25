@@ -79,9 +79,57 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-live_lab, overview, track_record, readiness, methodology = st.tabs([
-    "Agent Lab", "Executive overview", "Track record", "Readiness", "Methodology"
+case_file, live_lab, overview, track_record, readiness, methodology = st.tabs([
+    "Decision case", "Run agent", "Executive overview", "Track record", "Readiness", "Methodology"
 ])
+
+with case_file:
+    st.markdown('<p class="section-label">SIGNAL protocol · evidence to verdict</p>', unsafe_allow_html=True)
+    st.header("One decision. Every claim inspectable.")
+    contracts = dashboard.get('contracts', [])
+    if not contracts:
+        st.info("Run an agent cycle to create the first sealed Decision Contract.")
+    else:
+        row = contracts[0]
+        contract = row['contract']
+        disagreement = contract['disagreement']
+        stability = contract['stability']
+        prediction = contract['prediction']
+        a, b, c, d = st.columns(4)
+        a.metric("Case", contract['contract_id'])
+        b.metric("Disagreement", f"{disagreement['score']:.0f}/100")
+        c.metric("Stability", f"{stability['score']:.0%}")
+        d.metric("Verdict", contract['authorization'])
+
+        st.markdown(f'<div class="thesis"><span class="confidence">SEALED PREDICTION · {prediction["horizon_trading_days"]} TRADING DAYS</span><h2>{prediction["market"]} → {prediction["direction"]}</h2><p>{contract["thesis"]}</p></div>', unsafe_allow_html=True)
+
+        st.subheader("The proof chain")
+        with st.expander("1 · Source integrity", expanded=True):
+            quality = contract.get('data_quality', {})
+            st.write("All required sources live" if quality.get('all_live') else "Fallback sources detected")
+            source_rows = [{'source': name, **source} for name, source in quality.get('sources', {}).items()]
+            if source_rows:
+                st.dataframe(pd.DataFrame(source_rows), width='stretch', hide_index=True)
+        with st.expander("2 · Quantified inconsistency", expanded=True):
+            st.write(disagreement['primary']['explanation'])
+            st.dataframe(pd.DataFrame([{
+                'case': item['title'], 'score': item['score'],
+                'repricing market': item['repricing_market'], 'direction': item['direction'],
+            } for item in disagreement['candidates']]), width='stretch', hide_index=True)
+        with st.expander("3 · Adversarial challenge", expanded=True):
+            challenge = contract['falsification']
+            st.error(challenge['strongest_counterargument'])
+            st.write(f"**Alternative explanation:** {challenge['alternative_explanation']}")
+            st.write(f"**Invalidation:** {challenge['invalidation_condition']}")
+            st.write(f"**Confidence:** {contract['confidence_before_challenge']:.0%} → {contract['confidence_after_challenge']:.0%}")
+        with st.expander("4 · Decision stability", expanded=True):
+            st.write(f"The leading conclusion survived {stability['stable_cases']} of {stability['total_cases']} bounded perturbations.")
+            st.dataframe(pd.DataFrame(stability['outcomes']), width='stretch', hide_index=True)
+        with st.expander("5 · Sealed contract and execution", expanded=True):
+            st.code(contract['decision_hash'], language=None)
+            st.write(f"**Authorization:** {contract['authorization']}")
+            st.write(f"**Execution lifecycle:** {row['execution_status']}")
+            st.caption("The SHA-256 receipt was persisted before broker submission; changing any sealed claim produces a different hash.")
 
 with overview:
     st.markdown('<p class="section-label">The intelligence stack</p>', unsafe_allow_html=True)
@@ -115,7 +163,7 @@ with live_lab:
         confirmation = st.checkbox("I understand this submits orders to the Alpaca paper account")
     else:
         confirmation = False
-    if st.button("Run cross-market cycle", use_container_width=True,
+    if st.button("Run cross-market cycle", width='stretch',
                  disabled=execute and not confirmation):
         from live.cross_market_agent import CrossMarketAgent
         agent = None
@@ -149,7 +197,7 @@ with live_lab:
         if portfolio:
             st.subheader("Risk decision")
             checks = portfolio.get('risk_assessment', {}).get('checks', [])
-            st.dataframe(pd.DataFrame(checks), use_container_width=True, hide_index=True)
+            st.dataframe(pd.DataFrame(checks), width='stretch', hide_index=True)
             rows = []
             for name in ('primary_trade', 'secondary_trade', 'hedge'):
                 leg = portfolio.get(name, {})
@@ -158,7 +206,7 @@ with live_lab:
                              'strategy': leg.get('strategy'), 'stance': leg.get('stance'),
                              'submitted': execution.get('submitted', False),
                              'status': execution.get('status') or execution.get('reason', 'not evaluated')})
-            st.dataframe(pd.DataFrame(rows), use_container_width=True, hide_index=True)
+            st.dataframe(pd.DataFrame(rows), width='stretch', hide_index=True)
 
 with track_record:
     st.markdown('<p class="section-label">No cherry-picking</p>', unsafe_allow_html=True)
@@ -174,14 +222,14 @@ with track_record:
                             'confidence': row['confidence'], 'evaluated': bool(row['evaluated']),
                             'hit_rate': row['hit_rate']})
     if thesis_rows:
-        st.dataframe(pd.DataFrame(thesis_rows), use_container_width=True, hide_index=True)
+        st.dataframe(pd.DataFrame(thesis_rows), width='stretch', hide_index=True)
     else:
         st.info("The first thesis will appear here after an agent cycle.")
     st.subheader("Execution ledger")
     if dashboard['trades']:
         st.dataframe(pd.DataFrame([{'time': row['timestamp'], 'strategy': row['strategy'],
                                    'status': row['status']} for row in dashboard['trades']]),
-                     use_container_width=True, hide_index=True)
+                     width='stretch', hide_index=True)
 
 with readiness:
     st.markdown('<p class="section-label">Submission assurance</p>', unsafe_allow_html=True)
@@ -202,7 +250,7 @@ with readiness:
         ('lablab submission form', 'Missing', 'Complete on lablab.ai before the deadline'),
     ]
     readiness_df = pd.DataFrame(requirements, columns=['Requirement', 'Status', 'Evidence / next action'])
-    st.dataframe(readiness_df, use_container_width=True, hide_index=True)
+    st.dataframe(readiness_df, width='stretch', hide_index=True)
     completed = sum(status == 'Met' for _, status, _ in requirements)
     st.progress(completed / len(requirements), text=f'{completed} of {len(requirements)} requirements fully met')
     st.info('The software requirements are substantially complete. External proof and final submission assets remain intentionally marked incomplete.')

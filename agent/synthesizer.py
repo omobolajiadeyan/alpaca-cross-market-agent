@@ -100,3 +100,55 @@ Remember: Respond ONLY with valid JSON. No markdown, no extra text.
     def get_thesis_history(self):
         """Get all theses generated so far"""
         return self.thesis_history
+
+    def falsify(self, thesis, market_state, disagreement):
+        """Act as a narrow scientific skeptic and return a structured challenge."""
+        if not self.client:
+            return self._fallback_challenge(disagreement)
+        prompt = f"""
+You are the falsification reviewer for an autonomous paper-trading system.
+Your job is not to write a second market thesis. Identify the strongest concrete
+reason the proposed thesis may be wrong, the missing evidence, an alternative
+explanation, and one measurable invalidation condition.
+
+THESIS: {json.dumps(thesis)}
+QUANTITATIVE DISAGREEMENT: {json.dumps(disagreement)}
+MARKET STATE: {json.dumps(market_state)}
+
+Return JSON only:
+{{
+  "strongest_counterargument": "...",
+  "missing_evidence": "...",
+  "alternative_explanation": "...",
+  "invalidation_condition": "specific measurable condition",
+  "confidence_adjustment": -0.05
+}}
+The confidence adjustment must be between -0.20 and 0.00.
+"""
+        try:
+            response = self.client.messages.create(
+                model="claude-sonnet-5", max_tokens=1200,
+                messages=[{"role": "user", "content": prompt}],
+            )
+            text = next(block.text for block in response.content if block.type == 'text').strip()
+            if '```' in text:
+                text = text.split('```')[1].removeprefix('json').strip()
+            result = json.loads(text)
+            result['confidence_adjustment'] = max(-.20, min(0.0, float(result.get('confidence_adjustment', -.05))))
+            result['source'] = 'claude-falsification-review'
+            return result
+        except Exception as exc:
+            fallback = self._fallback_challenge(disagreement)
+            fallback['note'] = f'Claude review unavailable: {exc}'
+            return fallback
+
+    @staticmethod
+    def _fallback_challenge(disagreement):
+        return {
+            'strongest_counterargument': 'The observed divergence may be temporary market microstructure noise.',
+            'missing_evidence': 'A longer historical sample and event-calendar controls.',
+            'alternative_explanation': 'Positioning may reflect hedging rather than informed directional conviction.',
+            'invalidation_condition': 'The leading disagreement score falls below 55 before entry.',
+            'confidence_adjustment': -.08,
+            'source': 'deterministic-fallback',
+        }

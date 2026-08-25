@@ -27,3 +27,14 @@ def test_preflight_rejects_excess_loss():
     )
     assert result['submitted'] is False
     assert 'exceeds' in result['reason']
+
+
+def test_submission_uses_a_defined_limit_price():
+    tools = fake_tools()
+    captured = {}
+    tools.place_multileg_option_order = lambda legs, qty, limit_price: captured.update(
+        {'legs': legs, 'qty': qty, 'limit_price': limit_price}
+    ) or {'id': 'paper-order', 'status': 'accepted'}
+    result = tools.execute_spread('SPY', 'call', 'debit', max_premium=500, submit=True)
+    assert result['submitted'] is True
+    assert captured['limit_price'] == 1.6

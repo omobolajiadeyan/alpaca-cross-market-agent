@@ -23,6 +23,7 @@ def main():
 
     report = logger.get_report()
     track_record = logger.get_track_record()
+    dashboard = logger.get_dashboard_data()
 
     print(f"Total theses generated: {report['total_theses']}")
     print(f"Total trade cycles logged: {report['total_trades']}\n")
@@ -34,6 +35,16 @@ def main():
     else:
         print("  No theses scored yet (signals need to age past THESIS_EVALUATION_DAYS first)")
     print(f"  Theses pending evaluation: {track_record['theses_pending']}\n")
+
+    contracts = dashboard.get('contracts', [])
+    authorized = sum(row['authorization'] == 'AUTHORIZED' for row in contracts)
+    abstained = sum(row['authorization'] == 'ABSTAIN' for row in contracts)
+    filled_contracts = sum(row['execution_status'] == 'filled' for row in contracts)
+    print("SIGNAL decision contracts:")
+    print(f"  Contracts sealed: {len(contracts)}")
+    print(f"  Authorized: {authorized}")
+    print(f"  Abstained: {abstained}")
+    print(f"  Filled contract portfolios: {filled_contracts}\n")
 
     conn = sqlite3.connect(logger.db_path)
     cursor = conn.cursor()
