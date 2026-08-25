@@ -47,6 +47,9 @@ div.stButton > button:hover { background:var(--navy); color:#fff; }
 .footer { border-top:1px solid var(--line); margin-top:4rem; padding-top:1.5rem; color:var(--muted); font-size:.78rem; }
 [data-testid="stTabs"] [data-baseweb="tab-list"] { gap:.25rem; overflow-x:auto; scrollbar-width:none; }
 [data-testid="stTabs"] [data-baseweb="tab"] { white-space:nowrap; min-width:max-content; }
+[data-testid="stDataFrame"] { border:1px solid var(--line); }
+button:focus-visible,[role="tab"]:focus-visible { outline:3px solid rgba(25,181,216,.45)!important; outline-offset:2px; }
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
 @media(max-width:900px){
   .block-container{padding:1rem 1.25rem 3rem}.proof-grid{grid-template-columns:1fr}.proof{border-right:0;border-bottom:1px solid var(--line)}
   .hero{padding:3.25rem 2rem}.hero:after{width:250px;height:250px;right:-160px;top:-120px}.hero h1{font-size:clamp(2.6rem,11vw,4.4rem)}
@@ -106,9 +109,61 @@ def render_disagreement_map(disagreement):
       cases.forEach((item,index)=>{{
         const button=document.createElement('button');
         button.innerHTML=`<strong>${{item.title}}</strong><span>${{item.repricing_market}} · score ${{Math.round(item.score)}}</span>`;
-        button.onclick=()=>selectCase(item,index); nodes.appendChild(button);
+        button.setAttribute('aria-label',`Inspect ${{item.title}}`);
+        button.onclick=()=>selectCase(item,index);
+        button.onkeydown=(event)=>{{if(event.key==='Enter'||event.key===' '){{event.preventDefault();selectCase(item,index)}}}};
+        nodes.appendChild(button);
       }});
       if(cases.length) selectCase(cases[0],0);
+    </script>
+    """, unsafe_allow_javascript=True)
+
+
+def render_protocol_journey(contract, execution_status):
+    """Interactive JavaScript walkthrough of the sealed decision lifecycle."""
+    quality_ok = contract.get('data_quality', {}).get('all_live', False)
+    stability_ok = contract.get('stability', {}).get('score', 0) >= .60
+    authorized = contract.get('authorization') == 'AUTHORIZED'
+    execution_done = execution_status in ('filled', 'submitted', 'preview', 'abstained')
+    stages = [
+        {'name': 'Sources', 'ok': quality_ok, 'copy': 'Market inputs passed provenance and fallback checks.'},
+        {'name': 'Signal', 'ok': contract['disagreement']['score'] >= 55, 'copy': f"The leading disagreement scored {contract['disagreement']['score']:.0f} out of 100."},
+        {'name': 'Challenge', 'ok': True, 'copy': 'A falsification review challenged the thesis and adjusted confidence.'},
+        {'name': 'Stability', 'ok': stability_ok, 'copy': f"The conclusion survived {contract['stability']['stable_cases']} of {contract['stability']['total_cases']} perturbations."},
+        {'name': 'Contract', 'ok': authorized, 'copy': f"The decision was sealed as {contract['authorization']} before submission."},
+        {'name': 'Execution', 'ok': execution_done, 'copy': f"Broker lifecycle state: {execution_status}."},
+    ]
+    payload = json.dumps(stages).replace('</', '<\\/')
+    decision_hash = contract['decision_hash']
+    st.html(f"""
+    <section id="journey" aria-label="SIGNAL protocol journey">
+      <div class="journey-head"><div><span>SIGNAL PROTOCOL</span><h3>Follow the decision from evidence to execution</h3></div><div class="progress-label" id="progress-label"></div></div>
+      <div class="progress-track"><div id="progress-fill"></div></div>
+      <div id="stage-list" role="tablist"></div>
+      <div id="stage-detail" role="tabpanel" aria-live="polite"></div>
+      <div class="receipt"><div><span>SEALED PROOF</span><code>{decision_hash[:16]}…</code></div><button id="copy-proof" type="button">Copy full SHA-256</button></div>
+    </section>
+    <style>
+      #journey,#journey *{{box-sizing:border-box}}#journey{{font-family:Arial,sans-serif;border:1px solid #d5e0e9;background:#fff;padding:22px;margin:18px 0;color:#071d49}}
+      .journey-head{{display:flex;justify-content:space-between;gap:20px;align-items:flex-end}}.journey-head span,.receipt span{{font-size:10px;font-weight:700;letter-spacing:.12em;color:#007fa8}}
+      .journey-head h3{{font-size:20px;margin:5px 0 0}}.progress-label{{font-size:12px;font-weight:700;color:#53657d}}
+      .progress-track{{height:5px;background:#e5eef4;margin:18px 0}}#progress-fill{{height:100%;background:#19b5d8;width:0;transition:width .5s ease}}
+      #stage-list{{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:7px}}
+      #stage-list button{{position:relative;border:1px solid #c8d7e2;background:#f7fafc;color:#071d49;padding:12px 8px;cursor:pointer;font-weight:700;min-height:52px}}
+      #stage-list button:before{{content:'';display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:7px;background:#a9b7c2}}
+      #stage-list button.pass:before{{background:#19b5d8}}#stage-list button.active{{background:#071d49;color:#fff;border-color:#071d49;transform:translateY(-2px)}}
+      #stage-detail{{background:#f2f7fb;border-left:4px solid #19b5d8;padding:14px 16px;margin-top:10px;font-size:14px;line-height:1.5;min-height:50px}}
+      .receipt{{display:flex;justify-content:space-between;align-items:center;gap:16px;border-top:1px solid #d5e0e9;margin-top:16px;padding-top:14px}}.receipt code{{display:block;margin-top:5px;color:#003b70}}
+      .receipt button{{border:1px solid #003b70;background:#fff;color:#003b70;padding:10px 13px;cursor:pointer;font-weight:700}}.receipt button:hover{{background:#003b70;color:#fff}}
+      @media(max-width:760px){{#journey{{padding:15px}}.journey-head{{display:block}}.progress-label{{margin-top:8px}}#stage-list{{grid-template-columns:repeat(2,1fr)}}.receipt{{align-items:flex-start;flex-direction:column}}.receipt button{{width:100%}}}}
+    </style>
+    <script>
+      const stages={payload}; const list=document.getElementById('stage-list'); const detail=document.getElementById('stage-detail');
+      const passed=stages.filter(stage=>stage.ok).length; document.getElementById('progress-fill').style.width=`${{passed/stages.length*100}}%`;
+      document.getElementById('progress-label').textContent=`${{passed}} of ${{stages.length}} controls complete`;
+      function activate(index){{document.querySelectorAll('#stage-list button').forEach((button,i)=>{{button.classList.toggle('active',i===index);button.setAttribute('aria-selected',i===index)}});detail.innerHTML=`<strong>${{stages[index].name}}</strong><br>${{stages[index].copy}}`;}}
+      stages.forEach((stage,index)=>{{const button=document.createElement('button');button.type='button';button.role='tab';button.textContent=stage.name;button.classList.toggle('pass',stage.ok);button.onclick=()=>activate(index);button.onkeydown=event=>{{if(event.key==='ArrowRight'){{activate((index+1)%stages.length);list.children[(index+1)%stages.length].focus()}}if(event.key==='ArrowLeft'){{activate((index-1+stages.length)%stages.length);list.children[(index-1+stages.length)%stages.length].focus()}}}};list.appendChild(button)}});activate(0);
+      const copyButton=document.getElementById('copy-proof');copyButton.onclick=async()=>{{try{{await navigator.clipboard.writeText('{decision_hash}');copyButton.textContent='Copied'}}catch(error){{copyButton.textContent='Copy unavailable'}}setTimeout(()=>copyButton.textContent='Copy full SHA-256',1600)}};
     </script>
     """, unsafe_allow_javascript=True)
 
@@ -154,6 +209,7 @@ with case_file:
         d.metric("Verdict", contract['authorization'])
 
         st.markdown(f'<div class="thesis"><span class="confidence">SEALED PREDICTION · {prediction["horizon_trading_days"]} TRADING DAYS</span><h2>{prediction["market"]} → {prediction["direction"]}</h2><p>{contract["thesis"]}</p></div>', unsafe_allow_html=True)
+        render_protocol_journey(contract, row['execution_status'])
         render_disagreement_map(disagreement)
 
         st.subheader("The proof chain")
