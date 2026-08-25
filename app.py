@@ -193,11 +193,12 @@ with readiness:
         ('Risk controls', 'Met', 'Defined loss, confidence, buying power, diversification and data-integrity gates'),
         ('Working browser prototype', 'Met', 'Judge-facing application with safe preview mode'),
         ('Public GitHub repository', 'Met', 'Published under the authenticated project owner'),
-        ('Successful paper execution evidence', 'Missing', 'Run during options market hours and capture a confirmed order'),
+        ('Successful paper execution evidence', 'Met', 'Three Alpaca multi-leg paper orders filled on 2026-08-25'),
         ('Forward-scored thesis evidence', 'Partial', 'Scoring works; current theses have not matured yet'),
         ('Hosted public application URL', 'Missing', 'Deploy with credentials configured privately'),
         ('Pitch video and slide deck', 'Partial', 'Scripts and outlines exist; final assets must be produced'),
-        ('Cover image and lablab submission', 'Missing', 'Complete on lablab.ai before the deadline'),
+        ('Hackathon cover image', 'Met', 'Final 16:9 cover is versioned in assets/'),
+        ('lablab submission form', 'Missing', 'Complete on lablab.ai before the deadline'),
     ]
     readiness_df = pd.DataFrame(requirements, columns=['Requirement', 'Status', 'Evidence / next action'])
     st.dataframe(readiness_df, use_container_width=True, hide_index=True)

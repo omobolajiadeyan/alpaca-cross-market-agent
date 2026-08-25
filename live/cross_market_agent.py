@@ -158,9 +158,16 @@ class CrossMarketAgent:
                                 result['reason'] = result.get('reason') or 'preview only; order not submitted'
                             leg['execution'] = result
                             if result.get('submitted'):
+                                order_id = result.get('order_id')
+                                if order_id:
+                                    latest_order = self.alpaca.get_order(order_id)
+                                    result['status'] = latest_order.get('status', result.get('status'))
+                                    result['filled_qty'] = latest_order.get('filled_qty')
+                                    result['filled_avg_price'] = latest_order.get('filled_avg_price')
+                                    result['filled_at'] = latest_order.get('filled_at')
                                 print(f"  ✓ {leg_name}: {leg['spread_type']} {leg['option_type']} spread "
                                       f"{result['legs'][0]} / {result['legs'][1]} "
-                                      f"(max loss ${result['max_loss']:,.0f})")
+                                      f"(max loss ${result['max_loss']:,.0f}, status {result.get('status', 'submitted')})")
                             else:
                                 print(f"  ✗ {leg_name}: not submitted — {result.get('reason', 'unknown error')}")
                         print()

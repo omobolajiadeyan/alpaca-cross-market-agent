@@ -1,5 +1,7 @@
 # CrossSignal
 
+![CrossSignal hackathon cover](assets/crosssignal-hackathon-cover.png)
+
 > Markets disagree. We trade the gap.
 
 CrossSignal is an auditable cross-market macro agent built for the **Alpaca AI Trading Agents Hackathon**. It synchronizes six market lenses, asks Claude to identify incomplete repricing, constructs a defined-risk SPY/HYG/TLT options portfolio, and preflights every leg through Alpaca's official MCP server before paper submission.

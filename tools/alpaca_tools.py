@@ -331,7 +331,7 @@ class AlpacaTools:
         return self.call("place_option_order", args)
 
     def execute_spread(self, underlying_symbol, option_type, spread_type,
-                        max_premium=None, qty=1, width_pct=0.05, submit=True):
+                        max_premium=None, qty=1, width_pct=0.01, submit=True):
         """
         Build and submit a real 2-leg vertical spread (the actual "asymmetric,
         defined-risk" structure the project's thesis narrative describes,
