@@ -35,7 +35,7 @@ Most trading agents stare at one chart and forget yesterday's prediction. CrossS
 - [ ] Push a public GitHub repository with no secrets or database files.
 - [x] Capture at least one successful market-hours paper fill (three spreads filled on 2026-08-25).
 - [x] Verify order status and position in Alpaca; capture the filled workflow in the demo.
-- [ ] Let at least one thesis mature and show its scored outcome.
+- [x] Show forward-scored outcomes (three preliminary short-horizon scores; retain the one-day production horizon).
 - [ ] Deploy the Streamlit application with secrets configured privately.
 - [x] Add the final 16:9 cover image (`assets/crosssignal-hackathon-cover.png`).
 - [ ] Add application URL, repository URL, video, and PDF deck to lablab.ai.

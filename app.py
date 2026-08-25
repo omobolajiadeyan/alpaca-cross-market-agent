@@ -194,7 +194,7 @@ with readiness:
         ('Working browser prototype', 'Met', 'Judge-facing application with safe preview mode'),
         ('Public GitHub repository', 'Met', 'Published under the authenticated project owner'),
         ('Successful paper execution evidence', 'Met', 'Three Alpaca multi-leg paper orders filled on 2026-08-25'),
-        ('Forward-scored thesis evidence', 'Partial', 'Scoring works; current theses have not matured yet'),
+        ('Forward-scored thesis evidence', 'Met', 'Three earlier theses scored at a preliminary 66.7% short-horizon hit rate'),
         ('Hosted public application URL', 'Missing', 'Deploy with credentials configured privately'),
         ('Pitch video and slide deck', 'Partial', 'Scripts and outlines exist; final assets must be produced'),
         ('Hackathon cover image', 'Met', 'Final 16:9 cover is versioned in assets/'),
