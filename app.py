@@ -22,7 +22,7 @@ st.markdown("""
 :root { --ink:#071d49; --muted:#53657d; --canvas:#fff; --ice:#f2f7fb; --cyan:#19b5d8; --blue:#003b70; --navy:#071d49; --line:#d5e0e9; }
 .stApp { background:var(--canvas); color:var(--ink); font-family:'DM Sans',sans-serif; }
 [data-testid="stHeader"] { background:transparent; }
-.block-container { max-width:1280px; padding-top:1.2rem; padding-bottom:4rem; }
+.block-container { max-width:1280px; padding-top:1.2rem; padding-bottom:4rem; overflow-x:hidden; }
 h1,h2,h3 { font-family:'Manrope',sans-serif !important; letter-spacing:-.04em !important; }
 .nav { display:flex; justify-content:space-between; align-items:center; padding:.75rem 0 1.2rem; border-bottom:1px solid var(--line); }
 .brand { font:800 1.1rem Manrope; letter-spacing:-.04em; }.brand-mark { color:var(--cyan); margin-right:.45rem; }
@@ -45,7 +45,18 @@ div.stButton > button { border-radius:2px; border:0; background:var(--blue); col
 div.stButton > button:hover { background:var(--navy); color:#fff; }
 [data-testid="stMetric"] { background:#fff; border:1px solid var(--line); border-top:3px solid var(--cyan); border-radius:2px; padding:1rem; }
 .footer { border-top:1px solid var(--line); margin-top:4rem; padding-top:1.5rem; color:var(--muted); font-size:.78rem; }
-@media(max-width:800px){.proof-grid{grid-template-columns:1fr}.hero{padding:3rem 1.5rem}.nav-note{display:none}}
+[data-testid="stTabs"] [data-baseweb="tab-list"] { gap:.25rem; overflow-x:auto; scrollbar-width:none; }
+[data-testid="stTabs"] [data-baseweb="tab"] { white-space:nowrap; min-width:max-content; }
+@media(max-width:900px){
+  .block-container{padding:1rem 1.25rem 3rem}.proof-grid{grid-template-columns:1fr}.proof{border-right:0;border-bottom:1px solid var(--line)}
+  .hero{padding:3.25rem 2rem}.hero:after{width:250px;height:250px;right:-160px;top:-120px}.hero h1{font-size:clamp(2.6rem,11vw,4.4rem)}
+  .nav-note{display:none}.card{margin-bottom:.5rem}
+}
+@media(max-width:520px){
+  .block-container{padding:.7rem .85rem 2rem}.hero{margin-top:1rem;padding:2.5rem 1.25rem}.hero-copy{font-size:1rem}
+  .proof{padding:1.25rem}.nav{padding:.5rem 0 1rem}[data-testid="stMetric"]{padding:.75rem}
+  h1{font-size:2.25rem!important}h2{font-size:1.65rem!important}.footer{line-height:1.6}
+}
 </style>
 """, unsafe_allow_html=True)
 
@@ -59,6 +70,47 @@ def fmt(value, suffix=""):
     if value is None:
         return "—"
     return f"{value:,.2f}{suffix}" if isinstance(value, (int, float)) else str(value)
+
+
+def render_disagreement_map(disagreement):
+    """Responsive, dependency-free JavaScript evidence explorer."""
+    payload = json.dumps(disagreement['candidates']).replace('</', '<\\/')
+    st.html(f"""
+    <div id="signal-map">
+      <div class="map-title">SELECT A MARKET DISAGREEMENT</div>
+      <div id="nodes"></div>
+      <div id="detail" aria-live="polite"></div>
+    </div>
+    <style>
+      #signal-map,#signal-map *{{box-sizing:border-box}} #signal-map{{font-family:Arial,sans-serif;color:#071d49}}
+      #signal-map{{border:1px solid #d5e0e9;background:#f2f7fb;padding:20px;min-height:245px}}
+      .map-title{{font-size:11px;font-weight:700;letter-spacing:.12em;color:#007fa8;margin-bottom:14px}}
+      #nodes{{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}}
+      #signal-map button{{width:100%;text-align:left;border:1px solid #bfd0dd;background:#fff;color:#071d49;padding:14px;cursor:pointer;transition:.18s ease;min-height:78px}}
+      #signal-map button:hover,#signal-map button.active{{background:#003b70;color:#fff;border-color:#003b70;transform:translateY(-2px)}}
+      #signal-map button strong{{display:block;font-size:15px;margin-bottom:8px}}#signal-map button span{{font-size:12px;opacity:.8}}
+      #detail{{margin-top:12px;background:#071d49;color:#fff;padding:16px;border-left:5px solid #19b5d8;min-height:90px}}
+      .detail-grid{{display:grid;grid-template-columns:100px 1fr 1fr;gap:14px;align-items:start}}
+      .score{{font-size:30px;font-weight:800;color:#72d4e8}}.label{{font-size:10px;letter-spacing:.1em;color:#b9dced}}
+      #signal-map p{{font-size:13px;line-height:1.5;margin:4px 0 0}}
+      @media(max-width:650px){{#signal-map{{padding:12px}}#nodes{{grid-template-columns:1fr}}button{{min-height:auto}}.detail-grid{{grid-template-columns:1fr}}}}
+    </style>
+    <script>
+      const cases={payload};
+      const nodes=document.getElementById('nodes');
+      const detail=document.getElementById('detail');
+      function selectCase(item,index){{
+        document.querySelectorAll('#nodes button').forEach((b,i)=>b.classList.toggle('active',i===index));
+        detail.innerHTML=`<div class="detail-grid"><div><div class="label">SCORE</div><div class="score">${{Math.round(item.score)}}</div></div><div><div class="label">EXPECTED REPRICING</div><p><strong>${{item.repricing_market}}</strong><br>${{item.direction}}</p></div><div><div class="label">WHY IT MATTERS</div><p>${{item.explanation}}</p></div></div>`;
+      }}
+      cases.forEach((item,index)=>{{
+        const button=document.createElement('button');
+        button.innerHTML=`<strong>${{item.title}}</strong><span>${{item.repricing_market}} · score ${{Math.round(item.score)}}</span>`;
+        button.onclick=()=>selectCase(item,index); nodes.appendChild(button);
+      }});
+      if(cases.length) selectCase(cases[0],0);
+    </script>
+    """, unsafe_allow_javascript=True)
 
 
 logger = AuditLogger()
@@ -102,6 +154,7 @@ with case_file:
         d.metric("Verdict", contract['authorization'])
 
         st.markdown(f'<div class="thesis"><span class="confidence">SEALED PREDICTION · {prediction["horizon_trading_days"]} TRADING DAYS</span><h2>{prediction["market"]} → {prediction["direction"]}</h2><p>{contract["thesis"]}</p></div>', unsafe_allow_html=True)
+        render_disagreement_map(disagreement)
 
         st.subheader("The proof chain")
         with st.expander("1 · Source integrity", expanded=True):
@@ -136,12 +189,12 @@ with overview:
     st.header("A complete decision, not another signal")
     cols = st.columns(3)
     items = [
-        ("01", "Observe", "Alpaca market data and public Treasury yields form a provenance-tagged cross-market snapshot."),
-        ("02", "Reason", "Claude identifies the mispricing, direction, confidence, and the clearest expression of the thesis."),
-        ("03", "Govern", "Risk checks and three-leg preflight complete before any paper order can be submitted."),
+        ("Observe", "Alpaca market data and public Treasury yields form a provenance-tagged cross-market snapshot."),
+        ("Reason", "Claude identifies the mispricing, direction, confidence, and the clearest expression of the thesis."),
+        ("Govern", "Risk checks and three-leg preflight complete before any paper order can be submitted."),
     ]
-    for col, (number, title, copy) in zip(cols, items):
-        col.markdown(f'<div class="card"><span class="section-label">{number}</span><h3>{title}</h3><p>{copy}</p></div>', unsafe_allow_html=True)
+    for col, (title, copy) in zip(cols, items):
+        col.markdown(f'<div class="card"><h3>{title}</h3><p>{copy}</p></div>', unsafe_allow_html=True)
 
     st.write("")
     st.markdown('<p class="section-label">Latest evidence</p>', unsafe_allow_html=True)
