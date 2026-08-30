@@ -21,6 +21,16 @@ Every decision must pass a scientific proof chain:
 5. **Alpaca execution** — submit capped-risk limit orders and reconcile broker lifecycle state.
 6. **Learning ledger** — issue a predetermined verdict and compare agent, inverse, and cash directional proxies.
 
+## Judge evidence lab
+
+- **Decision Replay courtroom** reconstructs only the evidence available at decision time.
+- **Alpaca Greeks defense** captures option snapshots at preflight and runs delta/gamma/vega shocks.
+- **Catalyst context** labels relevant Alpaca News without allowing headlines to bypass risk gates.
+- **Recovery state machine** detects partial exposure, blocks silent retries, and proposes paper-safe actions.
+- **Proof of abstention** lets judges weaken evidence and watch authorization fail closed.
+- **Evidence receipts** export a secret-free JSON chain from sealed prediction to later verdict.
+- **Walk-forward verdicts** compare the agent direction with inverse and cash counterfactuals.
+
 If confidence, stability, data integrity, disagreement, or deterministic risk is inadequate, `ABSTAIN` is the correct protocol outcome.
 
 ## Judge demo
@@ -73,7 +83,13 @@ python performance_report.py
 - Explicit UI confirmation for paper orders.
 - Full thesis, risk, and execution audit trail.
 
-This prototype does not yet claim portfolio Greeks, automatic unwind of a fill-time partial portfolio, or investment-grade backtesting. Those limitations are stated deliberately rather than hidden.
+The agent captures Alpaca option Greeks and enforces delta, vega, theta, margin,
+liquidity, bid-ask, drawdown, and snapshot-completeness gates before sealing an
+authorization. Scenario P&L is a transparent delta-gamma-vega approximation,
+not a full volatility-surface repricer. Recovery can cancel approved paper
+orders and close explicitly selected paper positions, but never acts without
+human approval. The walk-forward ledger is not presented as investment-grade
+backtesting.
 
 ## Tests
 
@@ -81,7 +97,10 @@ This prototype does not yet claim portfolio Greeks, automatic unwind of a fill-t
 pytest
 ```
 
-Tests cover metric-aware thesis scoring, fallback-data fail-closed behavior, maximum-loss and buying-power gates, spread preflight, and audit status classification.
+Tests cover metric-aware thesis scoring, fallback-data fail-closed behavior,
+maximum-loss and buying-power gates, spread preflight, Greek/liquidity/margin/
+drawdown enforcement, recovery authorization, receipt verification, and audit
+status classification.
 
 ## Repository map
 
@@ -93,12 +112,16 @@ agent/synthesizer.py           Claude structured reasoning
 agent/constructor.py           Signal mapping and risk assessment
 agent/thesis_scorer.py         Outcome-based forecast scoring
 agent/signal_protocol.py       Disagreement, stability, sealing and verdicts
+agent/evidence_protocol.py     Greeks, stress, catalysts, recovery and receipts
 tools/alpaca_tools.py          Persistent Alpaca MCP integration
 compliance/audit_logger.py     SQLite decision and execution ledger
 tests/                         Fast isolated safety tests
 ```
 
-See [ARCHITECTURE.md](ARCHITECTURE.md) for system boundaries, [REQUIREMENTS_AUDIT.md](REQUIREMENTS_AUDIT.md) for the compliance audit, [SMOKE_TEST.md](SMOKE_TEST.md) for verification evidence, and [SUBMISSION.md](SUBMISSION.md) for the pitch checklist.
+See [ARCHITECTURE.md](ARCHITECTURE.md) for system boundaries, [REQUIREMENTS_AUDIT.md](REQUIREMENTS_AUDIT.md) for the compliance audit, [SMOKE_TEST.md](SMOKE_TEST.md) for verification evidence, [BUILD_LOG.md](BUILD_LOG.md) for transparent event-window provenance, and [SUBMISSION.md](SUBMISSION.md) for the pitch checklist.
+
+See [SECURITY.md](SECURITY.md) for the NIST AI RMF/SSDF-aligned threat model,
+control rationale, residual risks, deployment modes and incident procedure.
 
 ## Status
 

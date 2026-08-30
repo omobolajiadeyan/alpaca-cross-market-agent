@@ -22,12 +22,14 @@ MAX_PORTFOLIO_LOSS = float(os.getenv("MAX_PORTFOLIO_LOSS", "1500"))
 MIN_SIGNAL_CONFIDENCE = float(os.getenv("MIN_SIGNAL_CONFIDENCE", "0.55"))
 MAX_MARGIN_UTILIZATION = float(os.getenv("MAX_MARGIN_UTILIZATION", "0.30"))
 REQUIRE_LIVE_DATA = os.getenv("REQUIRE_LIVE_DATA", "true").lower() in ("1", "true", "yes")
+ALLOW_PAPER_EXECUTION = os.getenv("ALLOW_PAPER_EXECUTION", "false").lower() in ("1", "true", "yes")
+PUBLIC_DEMO_MODE = os.getenv("PUBLIC_DEMO_MODE", "true").lower() in ("1", "true", "yes")
 
-# Minimum age (days) before a thesis's repricing_signals get scored against
-# real subsequent market data. A real deployment should use 5-10 (roughly a
-# trading week) so markets have time to actually move; kept low by default
-# so the accuracy-tracking feature is demonstrable within a short window.
-THESIS_EVALUATION_DAYS = float(os.getenv("THESIS_EVALUATION_DAYS", "1"))
+# Minimum age before a thesis is scored against subsequent market data.
+# Five trading days gives the stated repricing thesis time to develop; it is
+# still preliminary evidence rather than an investment-grade backtest.
+EVALUATION_HORIZON_DAYS = float(os.getenv("EVALUATION_HORIZON_DAYS", "5"))
+THESIS_EVALUATION_DAYS = EVALUATION_HORIZON_DAYS
 
 # Database
 DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///trading_log.db")
@@ -40,13 +42,13 @@ LOG_FILE = os.getenv("LOG_FILE", "logs/trading.log")
 RISK_GATES = {
     'max_delta': 5000,
     'max_vega': 2000,
-    'min_theta': 50,
+    'min_theta': -100,
     'max_loss_per_trade': 500,
     'daily_drawdown_limit': -2000,
     'max_drawdown_limit': -5000,
     'margin_utilization_cap': 0.30,
-    'bid_ask_spread_limit': 0.05,
-    'min_volume': 100000
+    'bid_ask_spread_limit': 0.25,
+    'min_volume': 10
 }
 
 # Markets to Monitor

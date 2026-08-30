@@ -1,6 +1,6 @@
 # Requirements audit
 
-Audited August 25, 2026 by and for **Omobolaji E Adeyan**.
+Audited August 30, 2026 by and for **Omobolaji E Adeyan**.
 
 This document separates requirements explicitly visible on the Alpaca event page from lablab-wide submission requirements and judging guidance. The event page may be expanded at kickoff; recheck it before final submission.
 
@@ -10,7 +10,7 @@ Source: <https://lablab.ai/ai-hackathons/alpaca-ai-trading-agents-hackathon>
 
 | Published line | Status | Evidence |
 |---|---|---|
-| Event is online | Ready | Browser application and public repository are available; public deployment still needs Streamlit authorization |
+| Event is online | Partial | Browser application works locally; public deployment remains a final submission action |
 | Dates: August 28–September 4, 2026 | Acknowledged | Submission checklist records the event window |
 | Prize pool: $6,000 | Informational | No implementation action required |
 | Build AI trading agents on Alpaca | Met | CrossSignal autonomously observes, reasons, constructs, governs, executes and audits |
@@ -22,8 +22,8 @@ Sources: <https://lablab.ai/guide> and <https://lablab.ai/ai-articles/hackathon-
 
 | Requirement | Status | Evidence / next action |
 |---|---|---|
-| Each participant enrolls independently | Unverified | Omobolaji E Adeyan must confirm enrollment in the authenticated lablab account |
-| Participant belongs to a team, including solo entrants | Unverified | Create or join a team on the event page |
+| Each participant enrolls independently | Met | Authenticated event dashboard shows Omobolaji Adeyan as enrolled |
+| Participant belongs to a team, including solo entrants | Met | Authenticated event dashboard shows the solo team `CrossSignal` |
 | Working prototype usable online | Partial | Local prototype works; authorize Streamlit Community Cloud deployment |
 | Project title, maximum 50 characters | Ready | `CrossSignal` |
 | Short description, maximum 255 characters | Ready | Supplied in `SUBMISSION.md` |
@@ -51,11 +51,13 @@ Lablab’s general rubric lists four dimensions. These are judging guidance, not
 
 ## Verified product evidence
 
-- Ten automated tests pass.
+- Twenty-nine automated tests pass, including broker-boundary, endpoint, redaction and untrusted-text controls.
 - Three Alpaca multi-leg paper spreads filled on August 25, 2026.
 - Three earlier theses received preliminary forward scores with a 66.7% short-horizon average hit rate.
+- A fresh connected preview captured six Alpaca Greek snapshots and ten relevant headlines, then correctly abstained because option liquidity and bid-ask quality failed.
 - Credentials and local trading databases are excluded from Git.
+- Public mode disables all broker mutations; controlled local execution requires explicit authorization and the exact Alpaca paper endpoint.
 
-## Recheck at kickoff
+## Current-rule caveat
 
-The public event page currently does not expose track-specific rules, judging weights, team-size limits, submission deadline time, or any performance leaderboard criteria. Review the authenticated event dashboard and kickoff/Discord announcements on August 28 before treating this audit as final.
+The public event page does not publish numeric judging weights or a performance leaderboard criterion. The authenticated event dashboard and event Discord remain controlling sources for any organizer announcement made after this audit.

@@ -27,6 +27,7 @@ from mcp.client.stdio import stdio_client
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from config import ALPACA_API_KEY, ALPACA_SECRET_KEY, ALPACA_BASE_URL, MAX_LOSS_PER_TRADE
+from security.controls import SecurityViolation, validate_paper_endpoint
 
 
 def _server_params():
@@ -117,8 +118,9 @@ class AlpacaTools:
     options order execution -- all over one persistent MCP connection.
     """
 
-    def __init__(self):
+    def __init__(self, mutation_authorized=False):
         print("[ALPACA] Connecting to Alpaca MCP server (alpaca-mcp-server)...")
+        self._mutation_authorized = bool(mutation_authorized)
         self._session = _AlpacaMCPSession()
         print("[ALPACA] ✓ Connected")
 
@@ -127,6 +129,14 @@ class AlpacaTools:
 
     def call(self, tool_name, arguments=None):
         return self._session.call(tool_name, arguments)
+
+    def authorize_paper_mutations(self, authorized):
+        self._mutation_authorized = bool(authorized)
+
+    def _require_paper_mutation(self):
+        validate_paper_endpoint(ALPACA_BASE_URL)
+        if not self._mutation_authorized:
+            raise SecurityViolation("broker mutation blocked: explicit local authorization is absent")
 
     def get_account_info(self):
         """Get account balance and state"""
@@ -155,6 +165,28 @@ class AlpacaTools:
         except Exception as e:
             return {'id': order_id, 'status': 'unknown', 'error': str(e)}
 
+    def cancel_order(self, order_id):
+        """Cancel one open paper order and return the broker response."""
+        self._require_paper_mutation()
+        return self.call("cancel_order_by_id", {'order_id': order_id})
+
+    def close_position(self, symbol, qty=None):
+        """Close a paper position explicitly; callers must provide human approval."""
+        self._require_paper_mutation()
+        args = {'symbol_or_asset_id': symbol}
+        if qty is not None:
+            args['qty'] = str(qty)
+        return self.call('close_position', args)
+
+    def get_portfolio_equity_history(self):
+        """Return recent account-equity observations for deterministic drawdown gates."""
+        try:
+            data = self.call("get_portfolio_history", {'period': '1M', 'timeframe': '1D'})
+            return data.get('equity', []) if isinstance(data, dict) else []
+        except Exception as e:
+            print(f"[ERROR] Get portfolio history: {e}")
+            return []
+
     def get_positions(self):
         """Get open positions"""
         try:
@@ -171,6 +203,18 @@ class AlpacaTools:
             ]
         except Exception as e:
             print(f"[ERROR] Get positions: {e}")
+            return []
+
+    def get_news(self, symbols=('SPY', 'HYG', 'TLT'), limit=10):
+        """Recent sponsor-native headlines used only as bounded catalyst context."""
+        try:
+            data = self.call('get_news', {
+                'symbols': ','.join(symbols), 'limit': limit,
+                'sort': 'desc', 'include_content': False,
+            })
+            return data if isinstance(data, list) else data.get('news', [])
+        except Exception as e:
+            print(f"[ERROR] Get Alpaca news: {e}")
             return []
 
     def get_stock_price(self, symbol):
@@ -309,6 +353,7 @@ class AlpacaTools:
         """Submit a single-leg market options order via Alpaca's MCP server.
         Raises AlpacaMCPError (or another exception) on rejection -- callers
         that want a soft failure should catch it, e.g. execute_leg below."""
+        self._require_paper_mutation()
         args = {'symbol': symbol, 'side': side, 'qty': str(qty), 'type': 'market'}
         if position_intent:
             args['position_intent'] = position_intent
@@ -318,6 +363,7 @@ class AlpacaTools:
         """Submit a multi-leg (e.g. vertical spread) market options order.
         `legs` is a list of {'symbol', 'side', 'position_intent'} dicts (max 4).
         Raises AlpacaMCPError (or another exception) on rejection."""
+        self._require_paper_mutation()
         args = {
             'qty': str(qty),
             'type': 'limit' if limit_price is not None else 'market',
@@ -412,6 +458,14 @@ class AlpacaTools:
                 near['symbol']: {'bid': near_bid, 'ask': near_ask},
                 far['symbol']: {'bid': far_bid, 'ask': far_ask},
             },
+            # Preserve sponsor-native Greeks at the exact preflight boundary.
+            # Missing snapshots remain visible and fail the downstream stress gate.
+            'snapshots': {
+                near['symbol']: self.get_option_snapshot(near['symbol']) or {},
+                far['symbol']: self.get_option_snapshot(far['symbol']) or {},
+            },
+            'underlyings': [underlying_symbol],
+            'underlying_price': spot,
         }
         if not submit:
             return prepared

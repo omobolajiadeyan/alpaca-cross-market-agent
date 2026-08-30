@@ -21,4 +21,13 @@ The repository began as pre-event research and scaffolding. Do not rewrite this 
 
 ## Official event window
 
-Record meaningful changes here each day with commit links, test evidence, and demo screenshots. Recheck kickoff and Discord announcements before selecting the final event scope.
+### August 28–30, 2026
+
+- Added the evidence protocol: option Greeks capture, delta/gamma/vega scenarios, catalyst context, execution-quality gates, recovery state, and portable evidence receipts.
+- Added a judge-facing Decision Replay courtroom and proof-of-abstention controls.
+- Added five-day walk-forward evaluation and agent/inverse/cash counterfactuals.
+- Added NIST AI RMF- and SSDF-aligned security controls, secret redaction, hostile-news treatment, strict paper-endpoint enforcement, and a public read-only deployment mode.
+- Expanded the Streamlit presentation to seven responsive tabs, including a Security decision-rationale view.
+- Expanded isolated verification to 29 tests and repeated browser, compilation, dependency, secret, and HTTP smoke checks.
+
+This log deliberately distinguishes pre-event foundations from competition-window work. Commit timestamps and authorship are preserved; no history is rewritten for eligibility optics.

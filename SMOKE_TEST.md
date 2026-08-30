@@ -1,17 +1,31 @@
 # Smoke-test record
 
-Last executed: August 25, 2026 by Omobolaji E Adeyan.
+Last executed: August 30, 2026 by Omobolaji E Adeyan.
 
 ## Automated verification
 
-- `python -m pytest` — 16 tests passed.
+- `python -m pytest` — 29 tests passed.
 - Python compilation — application, agent, compliance, live and Alpaca modules compiled successfully.
-- Streamlit `AppTest` — zero render exceptions; six judge-facing tabs detected.
+- Streamlit `AppTest` — zero render exceptions; seven judge-facing tabs detected, including Security.
 - HTTP health — local server returned `200 OK` and `_stcore/health` returned `ok`.
 
 ## Live-safe integration verification
 
 A complete preview cycle used the connected Alpaca paper account, live market data and Claude without submitting a new order.
+
+Latest expanded-risk preview:
+
+- Leading case: Rate expectations vs credit pricing
+- Disagreement score: 80/100
+- Stability: 100% across 10 bounded perturbations
+- Catalyst context: 10 relevant Alpaca headlines
+- Greek coverage: 6/6 proposed option legs
+- Decision Contract: `CS-20260825-97D864E6`
+- Authorization: `ABSTAIN`
+- Reason: option volume and relative bid-ask quality failed the new execution gates
+- Execution mode: preview; no paper order submitted
+
+Earlier baseline preview:
 
 - Leading case: Equity fear vs credit complacency
 - Disagreement score: 81/100

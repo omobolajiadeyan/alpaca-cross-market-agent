@@ -7,6 +7,10 @@ import pandas as pd
 import streamlit as st
 
 from compliance.audit_logger import AuditLogger
+from agent.evidence_protocol import EvidenceReceiptBuilder, PaperRecoveryExecutor
+from config import (ALLOW_PAPER_EXECUTION, PUBLIC_DEMO_MODE, REQUIRE_LIVE_DATA,
+                    ALPACA_API_KEY, ALPACA_SECRET_KEY, ALPACA_BASE_URL)
+from security.controls import security_posture
 
 
 st.set_page_config(
@@ -170,6 +174,7 @@ def render_protocol_journey(contract, execution_status):
 
 logger = AuditLogger()
 dashboard = logger.get_dashboard_data()
+broker_mutations_enabled = ALLOW_PAPER_EXECUTION and not PUBLIC_DEMO_MODE
 
 st.markdown('<div class="nav"><div class="brand"><span class="brand-mark">◈</span>CROSSSIGNAL</div><div class="nav-note">BUILT BY OMOBOLAJI E ADEYAN · ALPACA PAPER TRADING</div></div>', unsafe_allow_html=True)
 
@@ -186,8 +191,8 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-case_file, live_lab, overview, track_record, readiness, methodology = st.tabs([
-    "Decision case", "Run agent", "Executive overview", "Track record", "Readiness", "Methodology"
+case_file, live_lab, overview, track_record, readiness, security_tab, methodology = st.tabs([
+    "Decision case", "Run agent", "Executive overview", "Track record", "Readiness", "Security", "Methodology"
 ])
 
 with case_file:
@@ -197,8 +202,14 @@ with case_file:
     if not contracts:
         st.info("Run an agent cycle to create the first sealed Decision Contract.")
     else:
-        row = contracts[0]
+        contract_ids = [item['contract_id'] for item in contracts]
+        selected_id = st.selectbox("Replay decision", contract_ids,
+                                   help="Reconstructs only evidence sealed at the original decision time.")
+        row = next(item for item in contracts if item['contract_id'] == selected_id)
         contract = row['contract']
+        trade = next((item for item in dashboard.get('trades', [])
+                      if item.get('id') == row.get('trade_id')), None)
+        recorded_portfolio = (trade or {}).get('portfolio', {})
         disagreement = contract['disagreement']
         stability = contract['stability']
         prediction = contract['prediction']
@@ -211,6 +222,39 @@ with case_file:
         st.markdown(f'<div class="thesis"><span class="confidence">SEALED PREDICTION · {prediction["horizon_trading_days"]} TRADING DAYS</span><h2>{prediction["market"]} → {prediction["direction"]}</h2><p>{contract["thesis"]}</p></div>', unsafe_allow_html=True)
         render_protocol_journey(contract, row['execution_status'])
         render_disagreement_map(disagreement)
+
+        st.subheader("Decision Replay courtroom")
+        replay_steps = [
+            ("Known", contract.get('market_timestamp') or contract.get('created_at'),
+             "The market snapshot was frozen before broker access."),
+            ("Allegation", disagreement['primary']['title'],
+             f"Expected {prediction['market']} to move {prediction['direction']}."),
+            ("Cross-examination", contract['falsification']['strongest_counterargument'],
+             contract['falsification']['alternative_explanation']),
+            ("Judgment", contract['authorization'],
+             '; '.join(contract.get('authorization_reasons', [])) or 'All deterministic controls passed.'),
+            ("Broker", row.get('execution_status', 'not_submitted'),
+             "Order lifecycle is joined to the sealed contract, never rewritten into it."),
+            ("Verdict", "Scored" if row.get('evaluation') else "Pending",
+             "Outcome is revealed only after the predetermined horizon."),
+        ]
+        st.dataframe(pd.DataFrame(replay_steps, columns=['Stage', 'Evidence', 'Meaning']),
+                     width='stretch', hide_index=True)
+        if row.get('evaluation'):
+            evaluation = row['evaluation']
+            st.subheader("Predetermined verdict and counterfactuals")
+            verdict_cols = st.columns(3)
+            verdict_cols[0].metric("Direction correct",
+                                   "Yes" if evaluation.get('direction_correct') else "No")
+            verdict_cols[1].metric("Sealed baseline", fmt(evaluation.get('before')))
+            verdict_cols[2].metric("Observed outcome", fmt(evaluation.get('after')))
+            counterfactuals = evaluation.get('counterfactuals', {})
+            st.dataframe(pd.DataFrame([
+                {'Alternative': name.replace('_', ' ').title(), 'Normalized result': value}
+                for name, value in counterfactuals.items()
+            ]), width='stretch', hide_index=True)
+        else:
+            st.info("Verdict remains sealed until the configured horizon; no early outcome is revealed.")
 
         st.subheader("The proof chain")
         with st.expander("1 · Source integrity", expanded=True):
@@ -240,6 +284,83 @@ with case_file:
             st.write(f"**Execution lifecycle:** {row['execution_status']}")
             st.caption("The SHA-256 receipt was persisted before broker submission; changing any sealed claim produces a different hash.")
 
+        stress = recorded_portfolio.get('portfolio_stress')
+        with st.expander("6 · Greeks and scenario defense", expanded=True):
+            if stress:
+                greek_cols = st.columns(4)
+                for col, name in zip(greek_cols, ('delta', 'gamma', 'theta', 'vega')):
+                    col.metric(f"Net {name.title()}", fmt(stress.get('greeks', {}).get(name)))
+                st.dataframe(pd.DataFrame(stress.get('scenarios', [])), width='stretch', hide_index=True)
+                execution_risk = recorded_portfolio.get('execution_risk', {})
+                if execution_risk.get('checks'):
+                    risk_rows = [{**item, 'actual': json.dumps(item.get('actual'), default=str),
+                                  'limit': json.dumps(item.get('limit'), default=str)}
+                                 for item in execution_risk['checks']]
+                    st.dataframe(pd.DataFrame(risk_rows), width='stretch', hide_index=True)
+                st.caption(stress.get('note'))
+            else:
+                st.info("This historical contract predates Greek snapshot capture. The next cycle will preserve Alpaca Greeks at preflight.")
+
+        with st.expander("7 · Execution recovery and catalyst context", expanded=True):
+            recovery = recorded_portfolio.get('execution_recovery')
+            catalyst = recorded_portfolio.get('catalyst_context')
+            if recovery:
+                st.write(f"**Recovery state:** {recovery['state']}")
+                for action in recovery.get('actions', []):
+                    st.write(f"• {action}")
+                if recovery['state'] == 'RECOVERY_REQUIRED':
+                    approve_recovery = st.checkbox(
+                        "I approve canceling active orders in the Alpaca paper account",
+                        key=f"recover-{contract['contract_id']}",
+                        disabled=not broker_mutations_enabled,
+                    )
+                    if st.button("Execute paper recovery lock", disabled=not approve_recovery,
+                                 key=f"recover-button-{contract['contract_id']}"):
+                        from tools.alpaca_tools import AlpacaTools
+                        broker = AlpacaTools(mutation_authorized=broker_mutations_enabled)
+                        try:
+                            executions = {
+                                name: recorded_portfolio.get(name, {}).get('execution', {})
+                                for name in ('primary_trade', 'secondary_trade', 'hedge')
+                            }
+                            recovery_result = PaperRecoveryExecutor().execute(
+                                recovery, executions, broker, approved=True, paper_mode=True,
+                            )
+                            st.write(recovery_result)
+                        finally:
+                            broker.close()
+            else:
+                st.caption("Recovery state will be recorded on the next agent cycle.")
+            if catalyst:
+                st.write(f"**Catalyst classification:** {catalyst['classification']}")
+                if catalyst.get('articles'):
+                    st.dataframe(pd.DataFrame(catalyst['articles']), width='stretch', hide_index=True)
+
+        receipt = EvidenceReceiptBuilder().dumps(
+            contract, row.get('execution_status'), row.get('evaluation'), recorded_portfolio,
+        )
+        st.download_button("Download judge evidence receipt", receipt,
+                           file_name=f"{contract['contract_id']}-receipt.json",
+                           mime="application/json", width='stretch')
+        uploaded_receipt = st.file_uploader("Verify an evidence receipt", type=['json'])
+        if uploaded_receipt is not None:
+            verification = EvidenceReceiptBuilder().verify(uploaded_receipt.getvalue().decode('utf-8'))
+            (st.success if verification['valid'] else st.error)(verification['reason'])
+
+        st.subheader("Prove the agent can refuse")
+        weak_data = st.toggle("Simulate stale or fallback evidence", value=False)
+        weak_signal = st.slider("Simulated disagreement strength", 0, 100,
+                                int(disagreement['score']))
+        simulated_reasons = []
+        if weak_data:
+            simulated_reasons.append("required market data is not fully live")
+        if weak_signal < 55:
+            simulated_reasons.append("disagreement score below 55")
+        simulated_decision = "ABSTAIN" if simulated_reasons else "AUTHORIZED"
+        (st.error if simulated_reasons else st.success)(
+            f"{simulated_decision} — " + ('; '.join(simulated_reasons) if simulated_reasons else 'minimum evidence gates pass')
+        )
+
 with overview:
     st.markdown('<p class="section-label">The intelligence stack</p>', unsafe_allow_html=True)
     st.header("A complete decision, not another signal")
@@ -266,8 +387,11 @@ with live_lab:
     st.markdown('<p class="section-label">Controlled paper environment</p>', unsafe_allow_html=True)
     st.header("Run the agent")
     st.caption("Preview is the safe default. Paper execution remains disabled whenever a risk or live-data check fails.")
-    execute = st.toggle("Submit eligible paper orders", value=False,
+    execution_available = broker_mutations_enabled
+    execute = st.toggle("Submit eligible paper orders", value=False, disabled=not execution_available,
                         help="Uses the connected Alpaca paper account only. Leave off for a full dry run.")
+    if not execution_available:
+        st.info("Broker mutations are disabled by deployment policy. Set ALLOW_PAPER_EXECUTION=true and PUBLIC_DEMO_MODE=false only on a controlled local machine.")
     if execute:
         confirmation = st.checkbox("I understand this submits orders to the Alpaca paper account")
     else:
@@ -349,7 +473,7 @@ with readiness:
         ('Meaningful AI integration', 'Met', 'Claude generates structured macro theses and repricing signals'),
         ('Risk controls', 'Met', 'Defined loss, confidence, buying power, diversification and data-integrity gates'),
         ('Working browser prototype', 'Met', 'Judge-facing application with safe preview mode'),
-        ('Public GitHub repository', 'Met', 'Published under the authenticated project owner'),
+        ('Public GitHub repository', 'Deferred', 'Intentionally local until the eligible event window'),
         ('Successful paper execution evidence', 'Met', 'Three Alpaca multi-leg paper orders filled on 2026-08-25'),
         ('Forward-scored thesis evidence', 'Met', 'Three earlier theses scored at a preliminary 66.7% short-horizon hit rate'),
         ('Hosted public application URL', 'Missing', 'Deploy with credentials configured privately'),
@@ -363,6 +487,36 @@ with readiness:
     completed = sum(status == 'Met' for _, status, _ in requirements)
     st.progress(completed / len(requirements), text=f'{completed} of {len(requirements)} requirements fully met')
     st.info('The software requirements are substantially complete. External proof and final submission assets remain intentionally marked incomplete.')
+
+with security_tab:
+    st.markdown('<p class="section-label">NIST-aligned risk management</p>', unsafe_allow_html=True)
+    st.header("Every privilege has a reason and a boundary")
+    posture = security_posture({
+        'paper_endpoint': ALPACA_BASE_URL == 'https://paper-api.alpaca.markets',
+        'public_execution': PUBLIC_DEMO_MODE and ALLOW_PAPER_EXECUTION,
+        'require_live_data': REQUIRE_LIVE_DATA,
+        'credentials_present': bool(ALPACA_API_KEY and ALPACA_SECRET_KEY),
+    })
+    st.dataframe(pd.DataFrame(posture['checks']), width='stretch', hide_index=True)
+    st.caption(posture['residual_risk'])
+    st.subheader("Why each route exists")
+    st.dataframe(pd.DataFrame([
+        {'Decision': 'Public UI is read-only', 'Threat': 'Unauthorized visitor submits an order',
+         'Control': 'Deployment policy disables broker mutations', 'NIST route': 'AI RMF MANAGE 1; SP 800-53 AC'},
+        {'Decision': 'LLM cannot call Alpaca', 'Threat': 'Prompt injection or hallucination reaches broker',
+         'Control': 'Deterministic constructor and execution gate', 'NIST route': 'AI RMF MAP/MEASURE/MANAGE'},
+        {'Decision': 'News is untrusted context', 'Threat': 'Instruction-like third-party content',
+         'Control': 'Bound, sanitize and never authorize from headlines', 'NIST route': 'NIST AI 100-2e2025'},
+        {'Decision': 'Contract sealed before execution', 'Threat': 'Post-outcome evidence rewriting',
+         'Control': 'Canonical SHA-256 precommitment and verifier', 'NIST route': 'SP 800-53 AU/SI'},
+        {'Decision': 'Fallback means abstain', 'Threat': 'Trade based on fabricated or stale evidence',
+         'Control': 'Live-data integrity gate', 'NIST route': 'AI RMF MEASURE 1 / MANAGE 1'},
+        {'Decision': 'Recovery requires approval', 'Threat': 'Automatic correction compounds exposure',
+         'Control': 'Paper-only endpoint, explicit approval, logged actions', 'NIST route': 'SP 800-53 AC/AU/IR'},
+        {'Decision': 'Secrets never enter receipts', 'Threat': 'Credential disclosure in logs or exports',
+         'Control': 'Recursive redaction and Git exclusions', 'NIST route': 'SP 800-218 PW.4 / SP 800-53 IA'},
+    ]), width='stretch', hide_index=True)
+    st.warning("NIST guidance is voluntary and tailorable. CrossSignal is NIST-aligned, not NIST-certified or independently assessed.")
 
 with methodology:
     st.markdown('<p class="section-label">Transparent by construction</p>', unsafe_allow_html=True)

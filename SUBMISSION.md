@@ -18,7 +18,7 @@ Most trading agents stare at one chart and forget yesterday's prediction. CrossS
 - **2:40–3:25 — Alpaca:** show MCP-backed market reads and a successful paper order/order lifecycle recorded in the ledger.
 - **3:25–4:05 — Accountability:** show the stored market snapshot and self-scored thesis history.
 - **4:05–4:35 — Business:** research and risk copilot for active options traders and small investment teams; SaaS plus broker/infrastructure partnerships.
-- **4:35–5:00 — Roadmap:** Greeks, replay/backtest, fill reconciliation, and configurable strategy policies.
+- **4:35–5:00 — Evidence and roadmap:** show Greeks stress, decision replay, recovery controls, and the next step toward longer walk-forward validation.
 
 ## Slide deck
 
@@ -28,16 +28,17 @@ Most trading agents stare at one chart and forget yesterday's prediction. CrossS
 4. Live product screenshots.
 5. Architecture and Alpaca integration.
 6. Safety and auditability.
+   Show the NIST-aligned Security tab, public read-only boundary, threat-to-control rationale, and residual risks.
 7. Target user and business model.
 8. Evidence, limitations, and roadmap.
 
 ## Before submitting
 
-- [ ] Register/enroll on lablab.ai and verify event-specific rules.
-- [ ] Push a public GitHub repository with no secrets or database files.
+- [x] Register/enroll on lablab.ai and verify the published event requirements.
+- [x] Publish the secret-scanned GitHub repository during the official event window: <https://github.com/omobolajiadeyan/alpaca-cross-market-agent>.
 - [x] Capture at least one successful market-hours paper fill (three spreads filled on 2026-08-25).
 - [x] Verify order status and position in Alpaca; capture the filled workflow in the demo.
-- [x] Show forward-scored outcomes (three preliminary short-horizon scores; retain the one-day production horizon).
+- [x] Show preliminary forward-scored outcomes and clearly label the five-day evaluation horizon and sample-size limitation.
 - [ ] Deploy the Streamlit application with secrets configured privately.
 - [x] Add the final 16:9 cover image (`assets/crosssignal-hackathon-cover.png`).
 - [ ] Add application URL, repository URL, video, and PDF deck to lablab.ai.

@@ -7,7 +7,7 @@ import json
 from copy import deepcopy
 from datetime import datetime, timezone
 
-from config import MIN_SIGNAL_CONFIDENCE
+from config import MIN_SIGNAL_CONFIDENCE, EVALUATION_HORIZON_DAYS
 from agent.thesis_scorer import _extract_metric, _direction_correct
 
 
@@ -162,7 +162,7 @@ class DecisionContractBuilder:
                 'market': primary['repricing_market'],
                 'direction': primary['direction'],
                 'minimum_move': 'measurable directional move from sealed baseline',
-                'horizon_trading_days': 5,
+                'horizon_trading_days': EVALUATION_HORIZON_DAYS,
                 'invalidation': falsification.get('invalidation_condition'),
             },
             'thesis': thesis.get('thesis'),
@@ -172,6 +172,8 @@ class DecisionContractBuilder:
             'stability': stability,
             'falsification': falsification,
             'risk_assessment': risk,
+            'portfolio_stress': portfolio.get('portfolio_stress'),
+            'catalyst_context': portfolio.get('catalyst_context'),
             'portfolio': {
                 name: {key: value for key, value in portfolio.get(name, {}).items() if key != 'execution'}
                 for name in ('primary_trade', 'secondary_trade', 'hedge')

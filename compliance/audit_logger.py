@@ -7,6 +7,7 @@ import sqlite3
 import json
 from datetime import datetime, timedelta
 import os
+from security.controls import redact
 
 
 class AuditLogger:
@@ -142,7 +143,7 @@ class AuditLogger:
             thesis.get('rationale', ''),
             thesis.get('confidence_overall', 0),
             json.dumps(thesis.get('repricing_signals', [])),
-            json.dumps(market_state) if market_state is not None else None,
+            json.dumps(redact(market_state)) if market_state is not None else None,
         ))
 
         conn.commit()
@@ -232,7 +233,7 @@ class AuditLogger:
             datetime.now().isoformat(),
             thesis_id,
             portfolio.get('primary_trade', {}).get('strategy', ''),
-            json.dumps(portfolio),
+            json.dumps(redact(portfolio)),
             status
         ))
 
@@ -291,7 +292,7 @@ class AuditLogger:
             (contract_id, decision_hash, created_at, authorization, contract_json)
             VALUES (?, ?, ?, ?, ?)
         """, (contract['contract_id'], contract['decision_hash'], contract['created_at'],
-              contract['authorization'], json.dumps(contract)))
+              contract['authorization'], json.dumps(redact(contract))))
         conn.commit()
         conn.close()
         return contract['contract_id']
