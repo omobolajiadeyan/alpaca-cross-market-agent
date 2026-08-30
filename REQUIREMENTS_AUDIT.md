@@ -51,7 +51,7 @@ Lablab’s general rubric lists four dimensions. These are judging guidance, not
 
 ## Verified product evidence
 
-- Twenty-nine automated tests pass, including broker-boundary, endpoint, redaction and untrusted-text controls.
+- Thirty-one automated tests pass, including public-fixture integrity, broker-boundary, endpoint, redaction and untrusted-text controls.
 - Three Alpaca multi-leg paper spreads filled on August 25, 2026.
 - Three earlier theses received preliminary forward scores with a 66.7% short-horizon average hit rate.
 - A fresh connected preview captured six Alpaca Greek snapshots and ten relevant headlines, then correctly abstained because option liquidity and bid-ask quality failed.

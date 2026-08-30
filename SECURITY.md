@@ -94,6 +94,10 @@ ALLOW_PAPER_EXECUTION=false
 REQUIRE_LIVE_DATA=true
 ```
 
+Public mode uses a bundled, sanitized evidence replay. It does not require
+Alpaca or Anthropic credentials, does not contact the broker, and labels all
+replayed values as historical demonstration evidence rather than live data.
+
 Controlled local paper execution:
 
 ```env

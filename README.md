@@ -45,6 +45,25 @@ streamlit run app.py
 
 Open `http://localhost:8501`. The **Agent Lab** starts in safe preview mode. Paper-order submission requires an explicit toggle and confirmation, and remains blocked if any implemented risk or data-integrity gate fails.
 
+### Public judge deployment
+
+The default configuration is a credential-free, read-only judge experience. It
+loads a clearly labeled sanitized replay derived from a verified Alpaca paper
+workflow, never contacts a broker, and cannot submit orders. Deploy `app.py` to
+Streamlit Community Cloud with:
+
+```toml
+PUBLIC_DEMO_MODE = "true"
+ALLOW_PAPER_EXECUTION = "false"
+REQUIRE_LIVE_DATA = "true"
+EVALUATION_HORIZON_DAYS = "5"
+```
+
+Use controlled local mode for the presenter-led connected demonstration by
+setting `PUBLIC_DEMO_MODE=false` and supplying private Alpaca and Anthropic
+credentials. `ALLOW_PAPER_EXECUTION` should remain false unless an intentional
+paper-order demonstration is being supervised.
+
 For the terminal version:
 
 ```bash

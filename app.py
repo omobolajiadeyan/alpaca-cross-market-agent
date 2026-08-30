@@ -8,6 +8,7 @@ import streamlit as st
 
 from compliance.audit_logger import AuditLogger
 from agent.evidence_protocol import EvidenceReceiptBuilder, PaperRecoveryExecutor
+from demo.judge_fixture import judge_dashboard
 from config import (ALLOW_PAPER_EXECUTION, PUBLIC_DEMO_MODE, REQUIRE_LIVE_DATA,
                     ALPACA_API_KEY, ALPACA_SECRET_KEY, ALPACA_BASE_URL)
 from security.controls import security_posture
@@ -173,10 +174,13 @@ def render_protocol_journey(contract, execution_status):
 
 
 logger = AuditLogger()
-dashboard = logger.get_dashboard_data()
+dashboard = judge_dashboard() if PUBLIC_DEMO_MODE else logger.get_dashboard_data()
 broker_mutations_enabled = ALLOW_PAPER_EXECUTION and not PUBLIC_DEMO_MODE
 
 st.markdown('<div class="nav"><div class="brand"><span class="brand-mark">◈</span>CROSSSIGNAL</div><div class="nav-note">BUILT BY OMOBOLAJI E ADEYAN · ALPACA PAPER TRADING</div></div>', unsafe_allow_html=True)
+
+if PUBLIC_DEMO_MODE:
+    st.info("PUBLIC JUDGE MODE — Read-only sanitized replay derived from a verified Alpaca paper workflow. Values are historical demonstration evidence, not live quotes. Broker access and order submission are disabled.")
 
 st.markdown("""
 <div class="hero">
@@ -385,8 +389,8 @@ with overview:
 
 with live_lab:
     st.markdown('<p class="section-label">Controlled paper environment</p>', unsafe_allow_html=True)
-    st.header("Run the agent")
-    st.caption("Preview is the safe default. Paper execution remains disabled whenever a risk or live-data check fails.")
+    st.header("Replay the agent" if PUBLIC_DEMO_MODE else "Run the agent")
+    st.caption("This public replay makes the complete decision path available without credentials or broker access." if PUBLIC_DEMO_MODE else "Preview is the safe default. Paper execution remains disabled whenever a risk or live-data check fails.")
     execution_available = broker_mutations_enabled
     execute = st.toggle("Submit eligible paper orders", value=False, disabled=not execution_available,
                         help="Uses the connected Alpaca paper account only. Leave off for a full dry run.")
@@ -396,21 +400,26 @@ with live_lab:
         confirmation = st.checkbox("I understand this submits orders to the Alpaca paper account")
     else:
         confirmation = False
-    if st.button("Run cross-market cycle", width='stretch',
+    run_label = "Replay sanitized judge case" if PUBLIC_DEMO_MODE else "Run cross-market cycle"
+    if st.button(run_label, width='stretch',
                  disabled=execute and not confirmation):
-        from live.cross_market_agent import CrossMarketAgent
-        agent = None
-        try:
-            with st.status("Agent is reading the market…", expanded=True) as status:
-                agent = CrossMarketAgent()
-                result = agent.run(execute=execute)
-                status.update(label="Cycle complete", state="complete")
-            st.session_state['latest_cycle'] = result
-        except Exception as exc:
-            st.error(f"Cycle failed safely: {exc}")
-        finally:
-            if agent:
-                agent.close()
+        if PUBLIC_DEMO_MODE:
+            st.session_state['latest_cycle'] = dashboard['latest_cycle']
+            st.success("Sanitized case replayed. No external service or broker account was contacted.")
+        else:
+            from live.cross_market_agent import CrossMarketAgent
+            agent = None
+            try:
+                with st.status("Agent is reading the market…", expanded=True) as status:
+                    agent = CrossMarketAgent()
+                    result = agent.run(execute=execute)
+                    status.update(label="Cycle complete", state="complete")
+                st.session_state['latest_cycle'] = result
+            except Exception as exc:
+                st.error(f"Cycle failed safely: {exc}")
+            finally:
+                if agent:
+                    agent.close()
 
     result = st.session_state.get('latest_cycle')
     if result:
@@ -430,7 +439,13 @@ with live_lab:
         if portfolio:
             st.subheader("Risk decision")
             checks = portfolio.get('risk_assessment', {}).get('checks', [])
-            st.dataframe(pd.DataFrame(checks), width='stretch', hide_index=True)
+            display_checks = [{**item,
+                               'actual': json.dumps(item.get('actual'), default=str)
+                               if isinstance(item.get('actual'), (dict, list)) else item.get('actual'),
+                               'limit': json.dumps(item.get('limit'), default=str)
+                               if isinstance(item.get('limit'), (dict, list)) else item.get('limit')}
+                              for item in checks]
+            st.dataframe(pd.DataFrame(display_checks), width='stretch', hide_index=True)
             rows = []
             for name in ('primary_trade', 'secondary_trade', 'hedge'):
                 leg = portfolio.get(name, {})
@@ -473,13 +488,13 @@ with readiness:
         ('Meaningful AI integration', 'Met', 'Claude generates structured macro theses and repricing signals'),
         ('Risk controls', 'Met', 'Defined loss, confidence, buying power, diversification and data-integrity gates'),
         ('Working browser prototype', 'Met', 'Judge-facing application with safe preview mode'),
-        ('Public GitHub repository', 'Deferred', 'Intentionally local until the eligible event window'),
+        ('Public GitHub repository', 'Met', 'Published at github.com/omobolajiadeyan/alpaca-cross-market-agent'),
         ('Successful paper execution evidence', 'Met', 'Three Alpaca multi-leg paper orders filled on 2026-08-25'),
         ('Forward-scored thesis evidence', 'Met', 'Three earlier theses scored at a preliminary 66.7% short-horizon hit rate'),
-        ('Hosted public application URL', 'Missing', 'Deploy with credentials configured privately'),
+        ('Hosted public application URL', 'Pending', 'Repository is deployment-ready in credential-free public judge mode'),
         ('Pitch video and slide deck', 'Partial', 'Scripts and outlines exist; final assets must be produced'),
         ('Hackathon cover image', 'Met', 'Final 16:9 cover is versioned in assets/'),
-        ('Participant enrollment and team', 'Unverified', 'Omobolaji E Adeyan must enroll and join/create a team on lablab.ai'),
+        ('Participant enrollment and team', 'Met', 'Authenticated event dashboard shows Omobolaji Adeyan and team CrossSignal'),
         ('lablab submission form', 'Missing', 'Complete on lablab.ai before the deadline'),
     ]
     readiness_df = pd.DataFrame(requirements, columns=['Requirement', 'Status', 'Evidence / next action'])
