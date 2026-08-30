@@ -440,10 +440,8 @@ with live_lab:
             st.subheader("Risk decision")
             checks = portfolio.get('risk_assessment', {}).get('checks', [])
             display_checks = [{**item,
-                               'actual': json.dumps(item.get('actual'), default=str)
-                               if isinstance(item.get('actual'), (dict, list)) else item.get('actual'),
-                               'limit': json.dumps(item.get('limit'), default=str)
-                               if isinstance(item.get('limit'), (dict, list)) else item.get('limit')}
+                               'actual': json.dumps(item.get('actual'), default=str),
+                               'limit': json.dumps(item.get('limit'), default=str)}
                               for item in checks]
             st.dataframe(pd.DataFrame(display_checks), width='stretch', hide_index=True)
             rows = []
