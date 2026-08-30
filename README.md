@@ -118,7 +118,7 @@ compliance/audit_logger.py     SQLite decision and execution ledger
 tests/                         Fast isolated safety tests
 ```
 
-See [ARCHITECTURE.md](ARCHITECTURE.md) for system boundaries, [REQUIREMENTS_AUDIT.md](REQUIREMENTS_AUDIT.md) for the compliance audit, [SMOKE_TEST.md](SMOKE_TEST.md) for verification evidence, [BUILD_LOG.md](BUILD_LOG.md) for transparent event-window provenance, and [SUBMISSION.md](SUBMISSION.md) for the pitch checklist.
+See [ARCHITECTURE.md](ARCHITECTURE.md) for system boundaries, [REQUIREMENTS_AUDIT.md](REQUIREMENTS_AUDIT.md) for the compliance audit, [SMOKE_TEST.md](SMOKE_TEST.md) for verification evidence, [PROJECT_PROVENANCE.md](PROJECT_PROVENANCE.md) for project provenance, and [SUBMISSION.md](SUBMISSION.md) for the pitch checklist.
 
 See [SECURITY.md](SECURITY.md) for the NIST AI RMF/SSDF-aligned threat model,
 control rationale, residual risks, deployment modes and incident procedure.
