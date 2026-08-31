@@ -8,6 +8,7 @@ Last executed: August 30, 2026 by Omobolaji E Adeyan.
 - Python compilation — application, agent, compliance, live and Alpaca modules compiled successfully.
 - Streamlit `AppTest` — zero render exceptions; seven judge-facing tabs detected, including Security.
 - Public judge replay — renders without credentials, exposes the sanitized case, and makes no external or broker call.
+- Public deployment — <https://crosssignal-ai-agent.streamlit.app> opened successfully in a signed-out private browser session.
 - HTTP health — local server returned `200 OK` and `_stcore/health` returned `ok`.
 
 ## Live-safe integration verification

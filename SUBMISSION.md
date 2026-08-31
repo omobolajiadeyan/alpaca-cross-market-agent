@@ -39,8 +39,8 @@ Most trading agents stare at one chart and forget yesterday's prediction. CrossS
 - [x] Capture at least one successful market-hours paper fill (three spreads filled on 2026-08-25).
 - [x] Verify order status and position in Alpaca; capture the filled workflow in the demo.
 - [x] Show preliminary forward-scored outcomes and clearly label the five-day evaluation horizon and sample-size limitation.
-- [ ] Deploy the Streamlit application with secrets configured privately.
+- [x] Deploy the credential-free Streamlit judge application: <https://crosssignal-ai-agent.streamlit.app>.
 - [x] Add the final 16:9 cover image (`assets/crosssignal-hackathon-cover.png`).
 - [ ] Add application URL, repository URL, video, and PDF deck to lablab.ai.
-- [ ] Test the public URL in a private browser window.
+- [x] Test the public URL in a private browser window.
 - [ ] Submit before the deadline and reserve time for judge Q&A.

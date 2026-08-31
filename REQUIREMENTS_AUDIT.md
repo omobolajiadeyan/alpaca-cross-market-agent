@@ -10,7 +10,7 @@ Source: <https://lablab.ai/ai-hackathons/alpaca-ai-trading-agents-hackathon>
 
 | Published line | Status | Evidence |
 |---|---|---|
-| Event is online | Partial | Browser application works locally; public deployment remains a final submission action |
+| Event is online | Met | Public judge application: <https://crosssignal-ai-agent.streamlit.app> |
 | Dates: August 28–September 4, 2026 | Acknowledged | Submission checklist records the event window |
 | Prize pool: $6,000 | Informational | No implementation action required |
 | Build AI trading agents on Alpaca | Met | CrossSignal autonomously observes, reasons, constructs, governs, executes and audits |
@@ -24,7 +24,7 @@ Sources: <https://lablab.ai/guide> and <https://lablab.ai/ai-articles/hackathon-
 |---|---|---|
 | Each participant enrolls independently | Met | Authenticated event dashboard shows Omobolaji Adeyan as enrolled |
 | Participant belongs to a team, including solo entrants | Met | Authenticated event dashboard shows the solo team `CrossSignal` |
-| Working prototype usable online | Partial | Local prototype works; authorize Streamlit Community Cloud deployment |
+| Working prototype usable online | Met | Credential-free public judge replay is deployed on Streamlit Community Cloud |
 | Project title, maximum 50 characters | Ready | `CrossSignal` |
 | Short description, maximum 255 characters | Ready | Supplied in `SUBMISSION.md` |
 | Long description, minimum 100 words | Ready | README/product documentation provides source content; paste into submission form |
@@ -35,7 +35,7 @@ Sources: <https://lablab.ai/guide> and <https://lablab.ai/ai-articles/hackathon-
 | Pitch deck / slide presentation | Blocked on Canva auth | Eight-slide outline complete; reconnect Canva to generate/export PDF |
 | Public GitHub repository | Met | <https://github.com/omobolajiadeyan/alpaca-cross-market-agent> |
 | Demo application platform | Ready | Streamlit Community Cloud selected |
-| Direct application URL | Missing | Complete authenticated Streamlit deployment |
+| Direct application URL | Met | <https://crosssignal-ai-agent.streamlit.app> |
 | Submit through lablab before deadline | Missing | Requires authenticated final form submission |
 
 ## Judging guidance
