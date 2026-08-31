@@ -7,7 +7,9 @@ import pandas as pd
 import streamlit as st
 
 from compliance.audit_logger import AuditLogger
-from agent.evidence_protocol import EvidenceReceiptBuilder, PaperRecoveryExecutor
+from agent.evidence_protocol import (
+    EvidenceReceiptBuilder, PaperRecoveryExecutor, decision_scorecard,
+)
 from demo.judge_fixture import judge_dashboard
 from config import (ALLOW_PAPER_EXECUTION, PUBLIC_DEMO_MODE, REQUIRE_LIVE_DATA,
                     ALPACA_API_KEY, ALPACA_SECRET_KEY, ALPACA_BASE_URL)
@@ -207,7 +209,10 @@ with case_file:
         st.info("Run an agent cycle to create the first sealed Decision Contract.")
     else:
         contract_ids = [item['contract_id'] for item in contracts]
+        labels = {item['contract_id']: f"{item['authorization']} · {item['contract_id']}"
+                  for item in contracts}
         selected_id = st.selectbox("Replay decision", contract_ids,
+                                   format_func=lambda value: labels[value],
                                    help="Reconstructs only evidence sealed at the original decision time.")
         row = next(item for item in contracts if item['contract_id'] == selected_id)
         contract = row['contract']
@@ -222,6 +227,21 @@ with case_file:
         b.metric("Disagreement", f"{disagreement['score']:.0f}/100")
         c.metric("Stability", f"{stability['score']:.0%}")
         d.metric("Verdict", contract['authorization'])
+
+        scorecard = decision_scorecard(contract, row.get('evaluation'))
+        st.subheader("Decision intelligence scorecard")
+        score_cols = st.columns(4)
+        score_cols[0].metric("Signal quality", f"{scorecard['signal_quality']}/100")
+        score_cols[1].metric("Decision stability", f"{scorecard['decision_stability']}/100")
+        score_cols[2].metric(
+            "Execution quality", f"{scorecard['execution_quality']}/100",
+            help=f"{scorecard['risk_checks_passed']} of {scorecard['risk_checks_total']} deterministic checks passed",
+        )
+        score_cols[3].metric(
+            "Outcome evidence",
+            "Pending" if scorecard['outcome_evidence'] is None else f"{scorecard['outcome_evidence']}/100",
+            help="Revealed only after the sealed evaluation horizon.",
+        )
 
         st.markdown(f'<div class="thesis"><span class="confidence">SEALED PREDICTION · {prediction["horizon_trading_days"]} TRADING DAYS</span><h2>{prediction["market"]} → {prediction["direction"]}</h2><p>{contract["thesis"]}</p></div>', unsafe_allow_html=True)
         render_protocol_journey(contract, row['execution_status'])
@@ -489,7 +509,8 @@ with readiness:
         ('Public GitHub repository', 'Met', 'Published at github.com/omobolajiadeyan/alpaca-cross-market-agent'),
         ('Successful paper execution evidence', 'Met', 'Three Alpaca multi-leg paper orders filled on 2026-08-25'),
         ('Forward-scored thesis evidence', 'Met', 'Three earlier theses scored at a preliminary 66.7% short-horizon hit rate'),
-        ('Hosted public application URL', 'Pending', 'Repository is deployment-ready in credential-free public judge mode'),
+        ('Hosted public application URL', 'Met', 'Public judge app is deployed at crosssignal-ai-agent.streamlit.app'),
+        ('Scheduled cloud Evidence Watch', 'Ready', 'Read-only workflow is implemented; connected runs require encrypted repository secrets'),
         ('Pitch video and slide deck', 'Partial', 'Scripts and outlines exist; final assets must be produced'),
         ('Hackathon cover image', 'Met', 'Final 16:9 cover is versioned in assets/'),
         ('Participant enrollment and team', 'Met', 'Authenticated event dashboard shows Omobolaji Adeyan and team CrossSignal'),

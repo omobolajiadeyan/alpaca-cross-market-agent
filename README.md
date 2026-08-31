@@ -32,6 +32,8 @@ Every decision must pass a scientific proof chain:
 - **Proof of abstention** lets judges weaken evidence and watch authorization fail closed.
 - **Evidence receipts** export a secret-free JSON chain from sealed prediction to later verdict.
 - **Walk-forward verdicts** compare the agent direction with inverse and cash counterfactuals.
+- **Four-part scorecard** separates signal quality, decision stability, execution quality, and outcome evidence instead of collapsing intelligence into one confidence number.
+- **Contrasting cases** let judges compare a fully authorized workflow with a deliberate abstention under weaker execution evidence.
 
 If confidence, stability, data integrity, disagreement, or deterministic risk is inadequate, `ABSTAIN` is the correct protocol outcome.
 
@@ -65,6 +67,27 @@ Use controlled local mode for the presenter-led connected demonstration by
 setting `PUBLIC_DEMO_MODE=false` and supplying private Alpaca and Anthropic
 credentials. `ALLOW_PAPER_EXECUTION` should remain false unless an intentional
 paper-order demonstration is being supervised.
+
+### Autonomous Evidence Watch
+
+`.github/workflows/evidence-watch.yml` runs a read-only observation cycle every
+six hours on weekdays and can also be started manually. It generates a
+secret-free evidence receipt, summary, and four-part scorecard as a GitHub
+Actions artifact. The cloud job is intentionally unable to place or recover
+orders: `ALLOW_PAPER_EXECUTION` is fixed to `false`, and the script refuses to
+run if mutation is enabled.
+
+Configure these encrypted GitHub repository secrets to enable connected
+evidence collection:
+
+- `APCA_API_KEY_ID`
+- `APCA_API_SECRET_KEY`
+- `ANTHROPIC_API_KEY`
+
+Without them, the workflow records `CONFIGURATION_REQUIRED` and exits safely;
+it never substitutes fabricated market evidence. A green workflow therefore
+means the automation and safety boundary worked—inspect the artifact status to
+confirm whether a connected observation was produced.
 
 For the terminal version:
 
@@ -136,6 +159,8 @@ agent/signal_protocol.py       Disagreement, stability, sealing and verdicts
 agent/evidence_protocol.py     Greeks, stress, catalysts, recovery and receipts
 tools/alpaca_tools.py          Persistent Alpaca MCP integration
 compliance/audit_logger.py     SQLite decision and execution ledger
+scripts/evidence_watch.py      Read-only scheduled evidence exporter
+.github/workflows/             Tests and cloud Evidence Watch automation
 tests/                         Fast isolated safety tests
 ```
 

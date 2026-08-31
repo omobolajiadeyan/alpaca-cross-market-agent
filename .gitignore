@@ -17,6 +17,7 @@ logs/*
 *.db-*
 *.bak
 .streamlit/secrets.toml
+evidence-watch-output/
 
 # Editors / OS
 .vscode/

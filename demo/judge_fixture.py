@@ -8,6 +8,16 @@ from __future__ import annotations
 
 import hashlib
 import json
+from copy import deepcopy
+
+
+def _reseal(payload, prefix="CS-DEMO"):
+    payload.pop("decision_hash", None)
+    payload.pop("contract_id", None)
+    canonical = json.dumps(payload, sort_keys=True, separators=(",", ":"), default=str)
+    payload["decision_hash"] = hashlib.sha256(canonical.encode()).hexdigest()
+    payload["contract_id"] = f"{prefix}-{payload['decision_hash'][:8].upper()}"
+    return payload
 
 
 def _sealed_contract():
@@ -94,10 +104,7 @@ def _sealed_contract():
         "authorization": "ABSTAIN",
         "authorization_reasons": ["deterministic execution-risk assessment failed: option liquidity"],
     }
-    canonical = json.dumps(payload, sort_keys=True, separators=(",", ":"), default=str)
-    payload["decision_hash"] = hashlib.sha256(canonical.encode()).hexdigest()
-    payload["contract_id"] = f"CS-DEMO-{payload['decision_hash'][:8].upper()}"
-    return payload, stress, checks
+    return _reseal(payload), stress, checks
 
 
 def judge_dashboard():
@@ -136,10 +143,49 @@ def judge_dashboard():
            "created_at": contract["created_at"], "authorization": "ABSTAIN", "contract": contract,
            "execution_status": "abstained", "trade_id": 1, "evaluated": 1,
            "evaluation_json": json.dumps(evaluation), "evaluation": evaluation}
+
+    authorized_contract = deepcopy(contract)
+    authorized_contract.update({
+        "created_at": "2026-08-25T15:40:00+00:00",
+        "market_timestamp": "2026-08-25T15:35:00+00:00",
+        "thesis": "Equity-option fear was not fully reflected in credit; executable liquidity supported a defined-risk paper expression.",
+        "authorization": "AUTHORIZED", "authorization_reasons": [],
+    })
+    authorized_checks = deepcopy(checks)
+    for item in authorized_checks:
+        item["passed"] = True
+        if item["name"] == "Option liquidity":
+            item["actual"] = 120
+    authorized_contract["risk_assessment"] = {"passed": True, "checks": authorized_checks}
+    authorized_contract = _reseal(authorized_contract, "CS-VERIFIED")
+    filled_portfolio = deepcopy(portfolio)
+    for role in ("primary_trade", "secondary_trade", "hedge"):
+        filled_portfolio[role]["execution"] = {"submitted": True, "status": "filled"}
+    filled_portfolio["execution_risk"] = {"passed": True, "checks": authorized_checks}
+    filled_portfolio["risk_assessment"] = {"passed": True, "checks": authorized_checks}
+    filled_portfolio["execution_recovery"] = {
+        "state": "RECONCILED", "statuses": {role: "filled" for role in
+        ("primary_trade", "secondary_trade", "hedge")}, "filled_roles":
+        ["primary_trade", "secondary_trade", "hedge"],
+        "actions": ["Record final fills and release the recovery lock."],
+        "automatic_orders": False,
+    }
+    authorized_thesis = {**thesis, "id": 2, "timestamp": authorized_contract["created_at"],
+                         "thesis": authorized_contract["thesis"], "evaluated": 0,
+                         "hit_rate": None, "evaluated_at": None, "evaluation_detail": None}
+    filled_trade = {"id": 2, "timestamp": authorized_contract["created_at"], "thesis_id": 2,
+                    "strategy": "governed three-leg options portfolio",
+                    "portfolio": filled_portfolio, "status": "submitted"}
+    authorized_row = {"contract_id": authorized_contract["contract_id"],
+                      "decision_hash": authorized_contract["decision_hash"],
+                      "created_at": authorized_contract["created_at"], "authorization": "AUTHORIZED",
+                      "contract": authorized_contract, "execution_status": "filled", "trade_id": 2,
+                      "evaluated": 0, "evaluation_json": None}
     latest_cycle = {"market_state": {"data_quality": contract["data_quality"]},
                     "thesis": {"thesis": contract["thesis"], "rationale": thesis["rationale"],
                                "confidence_overall": .64},
                     "portfolio": portfolio, "decision_contract": contract}
-    return {"theses": [thesis], "trades": [trade], "contracts": [row],
-            "track_record": {"theses_scored": 1, "theses_pending": 0, "average_hit_rate": 1.0},
+    return {"theses": [thesis, authorized_thesis], "trades": [trade, filled_trade],
+            "contracts": [row, authorized_row],
+            "track_record": {"theses_scored": 1, "theses_pending": 1, "average_hit_rate": 1.0},
             "latest_cycle": latest_cycle, "fixture": True}

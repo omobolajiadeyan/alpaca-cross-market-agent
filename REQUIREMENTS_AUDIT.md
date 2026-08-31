@@ -1,6 +1,6 @@
 # Requirements audit
 
-Audited August 30, 2026 by and for **Omobolaji E Adeyan**.
+Audited August 31, 2026 by and for **Omobolaji E Adeyan**.
 
 This document separates requirements explicitly visible on the Alpaca event page from lablab-wide submission requirements and judging guidance. The event page may be expanded at kickoff; recheck it before final submission.
 
@@ -51,7 +51,9 @@ Lablab’s general rubric lists four dimensions. These are judging guidance, not
 
 ## Verified product evidence
 
-- Thirty-one automated tests pass, including public-fixture integrity, broker-boundary, endpoint, redaction and untrusted-text controls.
+- Thirty-four automated tests pass, including public-fixture integrity, broker-boundary, endpoint, redaction, untrusted-text and read-only cloud automation controls.
+- The public replay now presents one authorized and one abstention contract through the same four-part decision scorecard.
+- GitHub Actions Evidence Watch can collect fresh, secret-free decision evidence on schedule without paper-order authority.
 - Three Alpaca multi-leg paper spreads filled on August 25, 2026.
 - Three earlier theses received preliminary forward scores with a 66.7% short-horizon average hit rate.
 - A fresh connected preview captured six Alpaca Greek snapshots and ten relevant headlines, then correctly abstained because option liquidity and bid-ask quality failed.

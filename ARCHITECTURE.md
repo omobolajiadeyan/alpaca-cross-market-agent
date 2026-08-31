@@ -30,6 +30,9 @@ U.S. Treasury ── yield curve ───────┤
                                     ▼
                          Streamlit evidence layer
                          + replay / receipt export
+
+GitHub Actions scheduler ── read-only `run(execute=False)`
+                         └─ redacted receipt + scorecard artifact
 ```
 
 ## Trust boundaries
@@ -45,6 +48,8 @@ U.S. Treasury ── yield curve ───────┤
 - Delta, vega, theta, margin, option volume, bid-ask quality, drawdown, and Greek completeness are enforced before authorization.
 - Partial exposure enters an explicit recovery state; cancellation or position closure requires paper mode and explicit approval.
 - Alpaca News is contextual evidence only and cannot override deterministic controls.
+- Scheduled Evidence Watch has observation authority only; it cannot submit, cancel, or close paper orders.
+- The judge replay contains both an authorized contract and a fail-closed abstention so the policy boundary is directly comparable.
 
 ## Known limitations
 

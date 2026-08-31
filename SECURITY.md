@@ -3,7 +3,7 @@
 **Owner:** Omobolaji E Adeyan
 
 **Scope:** CrossSignal hackathon prototype; Alpaca paper trading only
-**Last reviewed:** August 30, 2026
+**Last reviewed:** August 31, 2026
 
 CrossSignal applies selected outcomes from the voluntary NIST AI Risk
 Management Framework (AI RMF 1.0), NIST SP 800-218 Secure Software Development
@@ -55,6 +55,7 @@ untrusted market/news data → sanitize + provenance → LLM proposal
 | T8 | Evidence rewritten after outcome | Canonical Decision Contract is SHA-256 sealed before submission and independently verifiable | Precommitment separates prediction from hindsight | Local database is not an external timestamp authority |
 | T9 | Secret leakage | `.env`, databases and deployment secrets are excluded; persistence/export uses recursive redaction | Defense in depth reduces accidental publication | Secrets can still leak through screenshots or operator error |
 | T10 | Vulnerable dependency | Versions are declared, tests run before release, and dependency scanning is a release requirement | NIST SSDF treats third-party components as part of product risk | No dependency scanner guarantees absence of vulnerabilities |
+| T11 | Scheduled automation gains trading authority | Evidence Watch is read-only, fixes execution false, refuses mutation-enabled configuration, and exports only redacted evidence | Continuous evidence collection does not require continuous order authority | Repository administrators can alter workflow code or secrets; protected review remains an operator responsibility |
 
 ## SP 800-218 SSDF practices used
 
@@ -97,6 +98,20 @@ REQUIRE_LIVE_DATA=true
 Public mode uses a bundled, sanitized evidence replay. It does not require
 Alpaca or Anthropic credentials, does not contact the broker, and labels all
 replayed values as historical demonstration evidence rather than live data.
+
+Scheduled cloud observation:
+
+```env
+PUBLIC_DEMO_MODE=false
+ALLOW_PAPER_EXECUTION=false
+REQUIRE_LIVE_DATA=true
+```
+
+Evidence Watch reads encrypted GitHub Actions secrets, executes only
+`run(execute=False)`, and retains a secret-free artifact for 14 days. Missing
+credentials produce an explicit `CONFIGURATION_REQUIRED` artifact; they never
+cause fallback data to be presented as live evidence. The workflow has
+read-only repository permissions and no broker-mutation mandate.
 
 Controlled local paper execution:
 

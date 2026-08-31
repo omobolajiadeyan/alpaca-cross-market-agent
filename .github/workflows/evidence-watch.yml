@@ -1,0 +1,55 @@
+name: Evidence Watch
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '17 */6 * * 1-5'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: crosssignal-evidence-watch
+  cancel-in-progress: false
+
+jobs:
+  observe-reason-seal:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      APCA_API_KEY_ID: ${{ secrets.APCA_API_KEY_ID }}
+      APCA_API_SECRET_KEY: ${{ secrets.APCA_API_SECRET_KEY }}
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      APCA_API_BASE_URL: https://paper-api.alpaca.markets
+      PUBLIC_DEMO_MODE: 'false'
+      ALLOW_PAPER_EXECUTION: 'false'
+      REQUIRE_LIVE_DATA: 'true'
+      EVALUATION_HORIZON_DAYS: '5'
+    steps:
+      - name: Check out the public source
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+
+      - name: Install declared dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run read-only Evidence Watch
+        run: python scripts/evidence_watch.py --allow-unconfigured --output-dir evidence-watch-output
+
+      - name: Publish workflow summary
+        if: always()
+        run: test -f evidence-watch-output/summary.md && cat evidence-watch-output/summary.md >> "$GITHUB_STEP_SUMMARY" || true
+
+      - name: Upload immutable evidence artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: crosssignal-evidence-${{ github.run_id }}-${{ github.run_attempt }}
+          path: evidence-watch-output/
+          if-no-files-found: error
+          retention-days: 14

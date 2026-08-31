@@ -20,6 +20,24 @@ def _float(value, default=0.0):
         return default
 
 
+def decision_scorecard(contract, evaluation=None):
+    """Summarize signal, stability, execution evidence and matured outcome."""
+    checks = contract.get("risk_assessment", {}).get("checks", [])
+    passed = sum(bool(item.get("passed")) for item in checks)
+    execution_quality = round(100 * passed / len(checks)) if checks else 0
+    outcome = None if not evaluation else (100 if evaluation.get("direction_correct") else 0)
+    return {
+        "signal_quality": round(_float(contract.get("disagreement", {}).get("score"))),
+        "decision_stability": round(100 * _float(contract.get("stability", {}).get("score"))),
+        "execution_quality": execution_quality,
+        "outcome_evidence": outcome,
+        "risk_checks_passed": passed,
+        "risk_checks_total": len(checks),
+        "authorization": contract.get("authorization", "UNKNOWN"),
+        "method": "crosssignal-decision-scorecard-v1",
+    }
+
+
 class PortfolioStressEngine:
     """Aggregate Alpaca option Greeks and produce transparent local shocks."""
 
