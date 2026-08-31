@@ -25,7 +25,8 @@ def decision_scorecard(contract, evaluation=None):
     checks = contract.get("risk_assessment", {}).get("checks", [])
     passed = sum(bool(item.get("passed")) for item in checks)
     execution_quality = round(100 * passed / len(checks)) if checks else 0
-    outcome = None if not evaluation else (100 if evaluation.get("direction_correct") else 0)
+    direction_correct = evaluation.get("direction_correct") if evaluation else None
+    outcome = None if direction_correct is None else (100 if direction_correct else 0)
     return {
         "signal_quality": round(_float(contract.get("disagreement", {}).get("score"))),
         "decision_stability": round(100 * _float(contract.get("stability", {}).get("score"))),

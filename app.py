@@ -268,8 +268,11 @@ with case_file:
             evaluation = row['evaluation']
             st.subheader("Predetermined verdict and counterfactuals")
             verdict_cols = st.columns(3)
-            verdict_cols[0].metric("Direction correct",
-                                   "Yes" if evaluation.get('direction_correct') else "No")
+            direction_correct = evaluation.get('direction_correct')
+            verdict = "Unscoreable" if direction_correct is None else (
+                "Yes" if direction_correct else "No"
+            )
+            verdict_cols[0].metric("Direction correct", verdict)
             verdict_cols[1].metric("Sealed baseline", fmt(evaluation.get('before')))
             verdict_cols[2].metric("Observed outcome", fmt(evaluation.get('after')))
             counterfactuals = evaluation.get('counterfactuals', {})

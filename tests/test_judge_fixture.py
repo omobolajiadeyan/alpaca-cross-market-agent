@@ -43,3 +43,9 @@ def test_decision_scorecard_separates_signal_from_execution_and_outcome():
     score = decision_scorecard(authorized["contract"])
     assert score["execution_quality"] == 100
     assert score["outcome_evidence"] is None
+
+
+def test_decision_scorecard_keeps_unscoreable_outcome_pending():
+    contract = judge_dashboard()["contracts"][0]["contract"]
+    score = decision_scorecard(contract, {"direction_correct": None})
+    assert score["outcome_evidence"] is None

@@ -8,7 +8,7 @@ from copy import deepcopy
 from datetime import datetime, timezone
 
 from config import MIN_SIGNAL_CONFIDENCE, EVALUATION_HORIZON_DAYS
-from agent.thesis_scorer import _extract_metric, _direction_correct
+from agent.thesis_scorer import _extract_metric, _direction_correct, _direction_multiplier
 
 
 def _number(value, default=0.0):
@@ -202,8 +202,13 @@ class ContractEvaluator:
             normalized_move = None
         else:
             normalized_move = round((after - before) / abs(before), 4)
-        direction_multiplier = 1 if prediction['direction'] in ('UP', 'HIGHER', 'WIDER') else -1
-        agent_score = round(normalized_move * direction_multiplier, 4) if normalized_move is not None else None
+        direction_multiplier = _direction_multiplier(
+            prediction.get('direction'), prediction.get('market')
+        )
+        agent_score = (
+            round(normalized_move * direction_multiplier, 4)
+            if normalized_move is not None and direction_multiplier is not None else None
+        )
         return {
             'contract_id': contract['contract_id'],
             'evaluated_at': datetime.now(timezone.utc).isoformat(),

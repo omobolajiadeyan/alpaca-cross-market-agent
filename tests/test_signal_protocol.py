@@ -93,3 +93,21 @@ def test_contract_evaluator_compares_inverse_and_cash():
     result = ContractEvaluator().evaluate(contract, later)
     assert result['counterfactuals']['cash_proxy'] == 0
     assert result['counterfactuals']['agent_direction_proxy'] == -result['counterfactuals']['inverse_direction_proxy']
+
+
+def test_contract_evaluator_does_not_invent_proxy_for_unscoreable_direction():
+    state = market_state()
+    disagreement = DisagreementEngine().score(state)
+    stability = StabilityTester().test(state, disagreement)
+    contract = DecisionContractBuilder().build(
+        thesis(), state, disagreement, stability, challenge(), portfolio(),
+        {'passed': True, 'checks': []},
+    )
+    later = market_state()
+    later['credit']['hy_spread_proxy_bps'] = 20
+    for direction in ('UNWIND', 'FLATTER', 'UNRELIABLE'):
+        contract['prediction']['direction'] = direction
+        result = ContractEvaluator().evaluate(contract, later)
+        assert result['direction_correct'] is None
+        assert result['counterfactuals']['agent_direction_proxy'] is None
+        assert result['counterfactuals']['inverse_direction_proxy'] is None

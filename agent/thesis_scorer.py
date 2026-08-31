@@ -13,6 +13,27 @@ _UP_WORDS = {'UP', 'HIGHER', 'WIDER'}
 _DOWN_WORDS = {'DOWN', 'LOWER', 'TIGHTER'}
 
 
+def _normalize_direction(direction, market_label=None):
+    """Map supported aliases to metric direction; return None if unscoreable."""
+    normalized = (direction or '').upper()
+    label = (market_label or '').upper()
+    if normalized in ('BULLISH', 'RALLY'):
+        normalized = 'TIGHTER' if label in ('CREDIT', 'CREDIT_SPREADS') else 'UP'
+    elif normalized in ('BEARISH', 'SELLOFF'):
+        normalized = 'WIDER' if label in ('CREDIT', 'CREDIT_SPREADS') else 'DOWN'
+    return normalized if normalized in (_UP_WORDS | _DOWN_WORDS) else None
+
+
+def _direction_multiplier(direction, market_label=None):
+    """Return +1/-1 only for vocabulary the scorer can actually evaluate."""
+    normalized = _normalize_direction(direction, market_label)
+    if normalized in _UP_WORDS:
+        return 1
+    if normalized in _DOWN_WORDS:
+        return -1
+    return None
+
+
 def _extract_metric(market_label, market_state):
     """Pull the one real number a signal's `market` label is actually about."""
     label = (market_label or '').upper()
@@ -40,12 +61,7 @@ def _direction_correct(direction, before, after, market_label=None):
     doesn't match -- an unscored signal should never silently count as a miss."""
     if before is None or after is None:
         return None
-    direction = (direction or '').upper()
-    label = (market_label or '').upper()
-    if direction in ('BULLISH', 'RALLY'):
-        direction = 'TIGHTER' if label in ('CREDIT', 'CREDIT_SPREADS') else 'UP'
-    elif direction in ('BEARISH', 'SELLOFF'):
-        direction = 'WIDER' if label in ('CREDIT', 'CREDIT_SPREADS') else 'DOWN'
+    direction = _normalize_direction(direction, market_label)
     delta = after - before
     if direction in _UP_WORDS:
         return delta > 0

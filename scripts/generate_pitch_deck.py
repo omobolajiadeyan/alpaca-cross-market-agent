@@ -236,7 +236,7 @@ def build():
     rect(s, 0, 0, 13.333, 7.5, NAVY)
     text(s, "THE PROOF IS PUBLIC", .75, .7, 4, .3, 11, LIGHT_CYAN, True)
     text(s, "Inspect the intelligence.\nChallenge the decision.", .72, 1.35, 8.8, 1.55, 36, WHITE, True, "Aptos Display")
-    stats = [("35", "automated tests"), ("85/100", "live signal quality"), ("14/15", "risk gates passed")]
+    stats = [("38", "automated tests"), ("85/100", "live signal quality"), ("14/15", "risk gates passed")]
     for i, (value, caption) in enumerate(stats):
         x = .75 + i * 2.55
         text(s, value, x, 3.35, 2.2, .55, 27, LIGHT_CYAN, True)
@@ -250,7 +250,7 @@ def build():
     text(s, "CrossSignal does not merely recommend a trade.\nIt proves whether the trade deserves authorization.",
          .75, 5.35, 7.45, .85, 17, WHITE, True)
     text(s, "Omobolaji E Adeyan · Paper trading only · Not investment advice", .75, 6.75, 8, .3, 11, LIGHT_CYAN)
-    add_notes(s, "Close on verified evidence: thirty-five tests pass in GitHub, the scheduled cloud watcher sealed a live contract, and the system abstained because one risk gate failed. CrossSignal makes AI trading decisions inspectable, challengeable, reproducible, and measurable. Invite judges to open the live application, repository, and Actions evidence artifact.")
+    add_notes(s, "Close on verified evidence: thirty-eight tests pass in GitHub, the scheduled cloud watcher sealed a live contract, and the system abstained because one risk gate failed. CrossSignal makes AI trading decisions inspectable, challengeable, reproducible, and measurable. Invite judges to open the live application, repository, and Actions evidence artifact.")
 
     OUT.parent.mkdir(parents=True, exist_ok=True)
     prs.save(OUT)
