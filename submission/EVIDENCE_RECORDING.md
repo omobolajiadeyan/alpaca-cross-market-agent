@@ -29,6 +29,20 @@ raw CI logs in the final submission. The green GitHub Actions run may be shown
 as a browser page, but the strongest evidence is its downloaded secret-free
 `summary.md` or `summary.json` artifact.
 
+## Build the narrated 4:35 draft
+
+After capturing the screenshots, run:
+
+```bash
+python scripts/build_narrated_submission.py
+```
+
+This uses a macOS system voice and the locally bundled Playwright `ffmpeg`
+binary to create `recording-output/CrossSignal-Submission-Narrated.mp4`. The
+builder verifies that the final duration is exactly 4:35. Review the entire
+file before uploading, and replace the synthetic narration with your own voice
+if the event requires the presenter to speak personally.
+
 ## Shot list and narration (4:35 target)
 
 | Time | Picture | Narration |
