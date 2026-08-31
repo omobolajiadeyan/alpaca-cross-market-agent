@@ -32,7 +32,7 @@ Sources: <https://lablab.ai/guide> and <https://lablab.ai/ai-articles/hackathon-
 | Technology tags | Ready | Alpaca MCP, Alpaca Trading API, Claude, Python, Streamlit, SQLite |
 | 16:9 cover image | Met | `assets/crosssignal-hackathon-cover.png` |
 | Video presentation, five minutes or less and under 300 MB | Missing | Recording script is complete; final recording/upload requires presenter action |
-| Pitch deck / slide presentation | Blocked on Canva auth | Eight-slide outline complete; reconnect Canva to generate/export PDF |
+| Pitch deck / slide presentation | Met | Editable eight-slide PowerPoint and final PDF are versioned in `submission/` |
 | Public GitHub repository | Met | <https://github.com/omobolajiadeyan/alpaca-cross-market-agent> |
 | Demo application platform | Ready | Streamlit Community Cloud selected |
 | Direct application URL | Met | <https://crosssignal-ai-agent.streamlit.app> |

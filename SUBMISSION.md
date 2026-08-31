@@ -41,6 +41,7 @@ Most trading agents stare at one chart and forget yesterday's prediction. CrossS
 - [x] Show preliminary forward-scored outcomes and clearly label the five-day evaluation horizon and sample-size limitation.
 - [x] Deploy the credential-free Streamlit judge application: <https://crosssignal-ai-agent.streamlit.app>.
 - [x] Add the final 16:9 cover image (`assets/crosssignal-hackathon-cover.png`).
+- [x] Create the final eight-slide presentation in editable PowerPoint and PDF formats.
 - [ ] Add application URL, repository URL, video, and PDF deck to lablab.ai.
 - [x] Test the public URL in a private browser window.
 - [ ] Submit before the deadline and reserve time for judge Q&A.

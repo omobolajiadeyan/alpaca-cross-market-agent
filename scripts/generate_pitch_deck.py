@@ -13,7 +13,7 @@ from pptx.util import Inches, Pt
 
 
 ROOT = Path(__file__).resolve().parents[1]
-OUT = ROOT / "submission" / "CrossSignal-Hackathon-Pitch.pptx"
+OUT = ROOT / "submission" / "CrossSignal-Hackathon-Pitch-Final.pptx"
 COVER = ROOT / "assets" / "crosssignal-hackathon-cover.png"
 
 NAVY = RGBColor(7, 29, 73)
@@ -217,11 +217,11 @@ def build():
              ("03", "Broker partnerships"), ("04", "Enterprise policy APIs")]
     for i, (num, value) in enumerate(steps):
         y = 3.0 + i * .67
-        text(s, num, 5.8, y, .4, .3, 11, CYAN, True)
-        text(s, value, 6.35, y - .03, 4.8, .35, 17, NAVY, True)
-    rect(s, 10.9, 2.45, 1.7, 3.4, NAVY)
-    text(s, "VALUE", 11.18, 2.8, 1.1, .3, 10, LIGHT_CYAN, True, align=PP_ALIGN.CENTER)
-    text(s, "Faster\nreview.\nStronger\ntrust.", 11.08, 3.45, 1.35, 1.75, 20, WHITE, True, align=PP_ALIGN.CENTER)
+        text(s, num, 5.8, y, .65, .3, 11, CYAN, True)
+        text(s, value, 6.55, y - .03, 4.35, .35, 17, NAVY, True)
+    rect(s, 10.55, 2.45, 2.05, 3.4, NAVY)
+    text(s, "VALUE", 10.9, 2.8, 1.35, .3, 10, LIGHT_CYAN, True, align=PP_ALIGN.CENTER)
+    text(s, "Faster\nreview.\nStronger\ntrust.", 10.72, 3.45, 1.7, 1.75, 18, WHITE, True, align=PP_ALIGN.CENTER)
     footer(s, 7)
     add_notes(s, "The wedge is decision accountability for serious individual and small-team options users, with a path toward broker and enterprise governance integrations.")
 
