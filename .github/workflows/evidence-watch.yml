@@ -27,10 +27,10 @@ jobs:
       EVALUATION_HORIZON_DAYS: '5'
     steps:
       - name: Check out the public source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: '3.12'
           cache: pip
@@ -47,7 +47,7 @@ jobs:
 
       - name: Upload immutable evidence artifact
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: crosssignal-evidence-${{ github.run_id }}-${{ github.run_attempt }}
           path: evidence-watch-output/
