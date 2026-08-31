@@ -14,11 +14,12 @@ Most trading agents stare at one chart and forget yesterday's prediction. CrossS
 
 - **0:00–0:25 — Problem:** markets transmit information at different speeds; single-market agents miss the disagreement.
 - **0:25–0:55 — Product:** show the landing screen and the observe → reason → govern loop.
-- **0:55–2:40 — Live demo:** run preview mode, inspect provenance, thesis, portfolio, and risk checks.
-- **2:40–3:25 — Alpaca:** show MCP-backed market reads and a successful paper order/order lifecycle recorded in the ledger.
-- **3:25–4:05 — Accountability:** show the stored market snapshot and self-scored thesis history.
+- **0:55–2:15 — Decision replay:** compare the authorized and abstention cases through the same four-part scorecard.
+- **2:15–3:00 — Live evidence:** show GitHub Evidence Watch contract `CS-20260831-66AAE940`, its secret-free receipt, and zero broker mutations.
+- **3:00–3:30 — Alpaca:** show MCP-backed market reads and the governed paper-order lifecycle recorded in the ledger.
+- **3:30–4:05 — Accountability:** show the stored market snapshot, sealed horizon, and pending-versus-matured outcome evidence.
 - **4:05–4:35 — Business:** research and risk copilot for active options traders and small investment teams; SaaS plus broker/infrastructure partnerships.
-- **4:35–5:00 — Evidence and roadmap:** show Greeks stress, decision replay, recovery controls, and the next step toward longer walk-forward validation.
+- **4:35–5:00 — Close:** show 35 passing tests, the public demo, and the next step toward longer walk-forward validation.
 
 ## Slide deck
 
@@ -45,3 +46,10 @@ Most trading agents stare at one chart and forget yesterday's prediction. CrossS
 - [ ] Add application URL, repository URL, video, and PDF deck to lablab.ai.
 - [x] Test the public URL in a private browser window.
 - [ ] Submit before the deadline and reserve time for judge Q&A.
+
+## Evidence recording
+
+Use [`submission/EVIDENCE_RECORDING.md`](submission/EVIDENCE_RECORDING.md) for
+the credential-free capture command, exact shot list, timed narration, and final
+privacy checklist. The automation records only the sanitized public replay with
+broker mutations forcibly disabled.

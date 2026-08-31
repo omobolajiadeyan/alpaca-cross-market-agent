@@ -1,8 +1,8 @@
 # Presentation assets
 
 `CrossSignal-Hackathon-Pitch-Final.pptx` is the final editable eight-slide competition
-deck. It includes presenter notes and uses only verified or explicitly labeled
-prototype evidence.
+deck. It includes presenter notes and reflects the verified GitHub Evidence Watch
+contract, four-part decision scorecard, 35-test suite, and zero-mutation cloud boundary.
 
 `CrossSignal-Hackathon-Pitch-Final.pdf` is the reviewed eight-page upload copy
 for the submission form.

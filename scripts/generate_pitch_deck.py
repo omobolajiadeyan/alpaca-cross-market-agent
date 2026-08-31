@@ -143,7 +143,7 @@ def build():
              NAVY if i in (2, 4) else RGBColor(213, 224, 233))
         text(s, f"{i+1}", x + .18, 3.25, .3, .3, 11, CYAN, True)
         text(s, head, x + .18, 3.67, 1.35, .3, 16, WHITE if i in (2, 4) else NAVY, True)
-        text(s, sub, x + .18, 4.05, 1.35, .25, 10, LIGHT_CYAN if i in (2, 4) else MUTED)
+        text(s, sub, x + .18, 4.05, 1.35, .25, 9, LIGHT_CYAN if i in (2, 4) else MUTED)
         if i < 5:
             text(s, "→", x + 1.76, 3.55, .3, .3, 16, CYAN, True)
     rect(s, .65, 5.25, 12.0, .72, BLUE)
@@ -171,26 +171,32 @@ def build():
 
     # 5 — Differentiation/evidence
     s = prs.slides.add_slide(blank); label(s, "Defensibility", 5)
-    title(s, "Every AI trade is placed under oath")
-    left = ["Decision Replay reconstructs only evidence known at decision time",
-            "Adversarial review challenges the thesis before authorization",
-            "SHA-256 contract exposes any post-outcome rewriting"]
-    right = ["Alpaca Greeks drive transparent scenario stress",
-             "Agent, inverse and cash comparisons reduce storytelling",
-             "Portable evidence receipt lets judges verify the proof chain"]
-    rect(s, .65, 2.45, 5.9, 3.5, NAVY)
-    text(s, "BEFORE THE OUTCOME", 1.0, 2.85, 5.2, .3, 11, LIGHT_CYAN, True)
-    bullet_list(s, left, 1.0, 3.45, 5.15, 1.85, 16, WHITE)
-    rect(s, 6.78, 2.45, 5.9, 3.5, ICE, RGBColor(213, 224, 233))
-    text(s, "AFTER THE OUTCOME", 7.13, 2.85, 5.2, .3, 11, CYAN, True)
-    bullet_list(s, right, 7.13, 3.45, 5.15, 1.85, 16)
+    title(s, "One scorecard. Two defensible decisions.",
+          "Signal strength never gets to hide weak execution evidence.")
+    metrics = [("85", "Signal quality"), ("100", "Decision stability"),
+               ("93", "Execution quality"), ("Pending", "Outcome evidence")]
+    for i, (value, caption) in enumerate(metrics):
+        x = .65 + i * 3.02
+        rect(s, x, 2.65, 2.72, 1.3, ICE, RGBColor(213, 224, 233))
+        text(s, value, x + .2, 2.88, 2.32, .45, 24, NAVY, True,
+             align=PP_ALIGN.CENTER)
+        text(s, caption, x + .2, 3.42, 2.32, .25, 11, MUTED, True,
+             align=PP_ALIGN.CENTER)
+    rect(s, .65, 4.35, 5.85, 1.38, NAVY)
+    text(s, "AUTHORIZED REPLAY", .95, 4.62, 2.2, .25, 11, LIGHT_CYAN, True)
+    text(s, "All deterministic gates passed", .95, 5.03, 4.9, .3, 17, WHITE, True)
+    rect(s, 6.78, 4.35, 5.85, 1.38, ICE, RGBColor(213, 224, 233))
+    text(s, "LIVE CLOUD EVIDENCE", 7.08, 4.62, 2.3, .25, 11, CYAN, True)
+    text(s, "ABSTAIN · 14 of 15 gates passed", 7.08, 5.03, 4.95, .3, 17, NAVY, True)
+    text(s, "CS-20260831-66AAE940 · sealed receipt · zero broker mutations",
+         .75, 6.18, 11.7, .25, 11, MUTED, True, align=PP_ALIGN.CENTER)
     footer(s, 5)
-    add_notes(s, "The defensibility comes from precommitment. A judge can inspect what the agent knew, how it was challenged, what was authorized, and what happened later.")
+    add_notes(s, "This is the key proof slide. The same policy evaluates both cases. The authorized replay shows the complete path when every gate passes. The live GitHub Evidence Watch contract scored 85 for signal and 100 for stability, but execution quality was 93 because one of fifteen gates failed—so the correct autonomous decision was abstention. Outcome evidence remains pending until the sealed horizon matures.")
 
     # 6 — Safety
     s = prs.slides.add_slide(blank); label(s, "Trust and safety", 6)
     title(s, "Safe by architecture—not by prompt")
-    controls = [("Public UI", "Read-only replay", GREEN), ("Broker", "Exact paper endpoint", GREEN),
+    controls = [("Public UI", "Read-only replay", GREEN), ("Cloud watch", "Observe only", GREEN),
                 ("LLM", "No direct tool access", GREEN), ("Evidence", "Secret-free receipts", GREEN),
                 ("Recovery", "Explicit approval", AMBER), ("News", "Untrusted context", AMBER)]
     for i, (head, body, tone) in enumerate(controls):
@@ -198,13 +204,13 @@ def build():
         x, y = .65 + col * 4.12, 2.6 + row * 1.45
         rect(s, x, y, 3.75, 1.12, ICE, RGBColor(213, 224, 233))
         rect(s, x, y, .08, 1.12, tone)
-        text(s, head, x + .3, y + .2, 1.1, .25, 13, NAVY, True)
-        text(s, body, x + 1.45, y + .2, 1.95, .5, 13, MUTED)
+        text(s, head, x + .3, y + .2, 1.25, .28, 11, NAVY, True)
+        text(s, body, x + 1.65, y + .2, 1.75, .5, 11, MUTED)
     rect(s, .65, 5.67, 12.0, .58, BLUE)
     text(s, "NIST AI RMF and SSDF aligned · voluntary and tailorable · not NIST-certified",
          .9, 5.85, 11.5, .25, 13, WHITE, True, align=PP_ALIGN.CENTER)
     footer(s, 6)
-    add_notes(s, "CrossSignal follows NIST-aligned risk-management reasoning without claiming certification. Public infrastructure has no broker mutation capability.")
+    add_notes(s, "CrossSignal follows NIST-aligned risk-management reasoning without claiming certification. Public infrastructure and scheduled GitHub automation have no broker mutation capability. The cloud watcher always runs execute false and exports only a secret-free artifact.")
 
     # 7 — Business
     s = prs.slides.add_slide(blank); label(s, "Business value", 7)
@@ -230,7 +236,7 @@ def build():
     rect(s, 0, 0, 13.333, 7.5, NAVY)
     text(s, "THE PROOF IS PUBLIC", .75, .7, 4, .3, 11, LIGHT_CYAN, True)
     text(s, "Inspect the intelligence.\nChallenge the decision.", .72, 1.35, 8.8, 1.55, 36, WHITE, True, "Aptos Display")
-    stats = [("31", "automated tests"), ("6/6", "Greeks coverage"), ("5 days", "scoring horizon")]
+    stats = [("35", "automated tests"), ("85/100", "live signal quality"), ("14/15", "risk gates passed")]
     for i, (value, caption) in enumerate(stats):
         x = .75 + i * 2.55
         text(s, value, x, 3.35, 2.2, .55, 27, LIGHT_CYAN, True)
@@ -244,7 +250,7 @@ def build():
     text(s, "CrossSignal does not merely recommend a trade.\nIt proves whether the trade deserves authorization.",
          .75, 5.35, 7.45, .85, 17, WHITE, True)
     text(s, "Omobolaji E Adeyan · Paper trading only · Not investment advice", .75, 6.75, 8, .3, 11, LIGHT_CYAN)
-    add_notes(s, "Close on the differentiator: CrossSignal makes AI trading decisions inspectable, challengeable, reproducible, and measurable. Invite judges to open the live application and repository.")
+    add_notes(s, "Close on verified evidence: thirty-five tests pass in GitHub, the scheduled cloud watcher sealed a live contract, and the system abstained because one risk gate failed. CrossSignal makes AI trading decisions inspectable, challengeable, reproducible, and measurable. Invite judges to open the live application, repository, and Actions evidence artifact.")
 
     OUT.parent.mkdir(parents=True, exist_ok=True)
     prs.save(OUT)
