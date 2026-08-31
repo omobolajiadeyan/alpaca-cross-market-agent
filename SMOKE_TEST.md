@@ -4,7 +4,7 @@ Last executed: August 31, 2026 by Omobolaji E Adeyan.
 
 ## Automated verification
 
-- `python -m pytest` — 34 tests passed.
+- `python -m pytest` — 35 tests passed.
 - Python compilation — application, agent, compliance, live and Alpaca modules compiled successfully.
 - Streamlit `AppTest` — zero render exceptions; seven judge-facing tabs detected, including Security.
 - Public judge replay — renders without credentials, exposes authorized and abstention cases plus the four-part scorecard, and makes no external or broker call.

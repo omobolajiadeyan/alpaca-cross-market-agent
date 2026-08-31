@@ -10,6 +10,11 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 
+REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
+if str(REPOSITORY_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPOSITORY_ROOT))
+
+
 REQUIRED_SECRETS = ("APCA_API_KEY_ID", "APCA_API_SECRET_KEY", "ANTHROPIC_API_KEY")
 
 

@@ -1,4 +1,7 @@
 import json
+import subprocess
+import sys
+from pathlib import Path
 
 import pytest
 
@@ -21,3 +24,13 @@ def test_evidence_watch_refuses_execution_authority(tmp_path, monkeypatch):
     monkeypatch.setenv("ALLOW_PAPER_EXECUTION", "true")
     with pytest.raises(SystemExit, match="refuses ALLOW_PAPER_EXECUTION=true"):
         main(["--output-dir", str(tmp_path)])
+
+
+def test_evidence_watch_script_resolves_project_packages(tmp_path):
+    script = Path(__file__).resolve().parents[1] / "scripts" / "evidence_watch.py"
+    result = subprocess.run(
+        [sys.executable, "-c",
+         f"import runpy; runpy.run_path({str(script)!r}, run_name='evidence_watch_probe'); import agent"],
+        cwd=tmp_path, capture_output=True, text=True, env={}, check=False,
+    )
+    assert result.returncode == 0

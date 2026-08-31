@@ -51,7 +51,7 @@ Lablab’s general rubric lists four dimensions. These are judging guidance, not
 
 ## Verified product evidence
 
-- Thirty-four automated tests pass, including public-fixture integrity, broker-boundary, endpoint, redaction, untrusted-text and read-only cloud automation controls.
+- Thirty-five automated tests pass, including public-fixture integrity, broker-boundary, endpoint, redaction, untrusted-text and read-only cloud automation controls.
 - The public replay now presents one authorized and one abstention contract through the same four-part decision scorecard.
 - GitHub Actions Evidence Watch can collect fresh, secret-free decision evidence on schedule without paper-order authority.
 - Three Alpaca multi-leg paper spreads filled on August 25, 2026.
