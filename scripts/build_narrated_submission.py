@@ -7,6 +7,7 @@ import argparse
 import re
 import shutil
 import subprocess
+import sys
 import tempfile
 from pathlib import Path
 
@@ -19,7 +20,7 @@ SCENES = [
     ("04-proof-of-abstention.png", 42, """A strong signal is not automatic permission to trade. In this demonstration, evidence integrity is deliberately weakened and the policy fails closed. The latest connected GitHub Evidence Watch reached the same kind of governed result. Signal quality was eighty-five, stability was one hundred, but execution quality was ninety-three because only fourteen of fifteen checks passed. CrossSignal abstained. That is a correct autonomous decision, not a system failure."""),
     ("05-read-only-replay.png", 30, """The public judge application is deliberately credential free. It uses a clearly labeled sanitized replay, cannot contact a broker, and cannot enable order submission. The same repository contains a scheduled cloud evidence watcher. That automation observes, reasons, and seals a receipt, while execution remains forcibly disabled. Judges receive reproducible evidence without receiving financial authority."""),
     ("06-track-record.png", 34, """No thesis disappears when it becomes inconvenient. The learning ledger keeps both scored and pending decisions. Each record preserves confidence, the evaluation horizon, the observed result, and whether the forecast direction was correct. The sample is intentionally labeled preliminary. CrossSignal does not turn a small result into a performance promise; it turns every new decision into additional accountable evidence."""),
-    ("07-security-boundary.png", 38, """Safety is architectural, not a sentence in a prompt. Claude proposes structured signals but has no direct broker tools. News is treated as untrusted context. Public execution is disabled in both the interface and broker boundary. Only the exact Alpaca paper endpoint is permitted. Recovery actions require explicit approval. Secret-free receipts, provenance, deterministic limits, and thirty-nine automated tests make each privilege visible and reviewable."""),
+    ("07-security-boundary.png", 38, """Safety is architectural, not a sentence in a prompt. Claude proposes structured signals but has no direct broker tools. News is treated as untrusted context. Public execution is disabled in both the interface and broker boundary. Only the exact Alpaca paper endpoint is permitted. Recovery actions require explicit approval. Secret-free receipts, provenance, deterministic limits, and forty-three automated tests make each privilege visible and reviewable."""),
     ("01-landing.png", 16, """CrossSignal does not merely recommend a trade. It shows the evidence, challenges the reasoning, governs execution, seals the decision, and learns from the outcome. Markets disagree. CrossSignal proves whether the gap deserves action."""),
 ]
 
@@ -43,19 +44,38 @@ def media_duration(ffmpeg: str, path: Path) -> float:
     return int(hours) * 3600 + int(minutes) * 60 + float(seconds)
 
 
+def synthesize_say(say: str, script: Path, audio: Path, voice: str, rate: int) -> None:
+    subprocess.run([say, "-v", voice, "-r", str(rate),
+                    "-f", str(script), "-o", str(audio)], check=True)
+
+
+def synthesize_edge(script: Path, audio: Path, voice: str, rate_pct: str) -> None:
+    edge_tts = shutil.which("edge-tts")
+    cmd = ([edge_tts] if edge_tts else [sys.executable, "-m", "edge_tts"])
+    subprocess.run([*cmd, "-f", str(script), "-v", voice, "--rate", rate_pct,
+                    "--write-media", str(audio)], check=True)
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--input-dir", default="recording-output/screenshots")
     parser.add_argument("--output", default="recording-output/CrossSignal-Submission-Narrated.mp4")
-    parser.add_argument("--voice", default="Samantha")
-    parser.add_argument("--rate", type=int, default=175)
+    parser.add_argument("--engine", choices=["say", "edge"],
+                         default="say" if shutil.which("say") else "edge",
+                         help="TTS backend: macOS 'say' or Microsoft Edge neural TTS")
+    parser.add_argument("--voice", default=None,
+                         help="Voice name; defaults to Samantha (say) or en-US-AndrewNeural (edge)")
+    parser.add_argument("--rate", type=int, default=175, help="Words per minute (say engine only)")
+    parser.add_argument("--edge-rate", default="+0%", help="Speech rate delta (edge engine only)")
     args = parser.parse_args()
     screenshots = (ROOT / args.input_dir).resolve()
     output = (ROOT / args.output).resolve()
     output.parent.mkdir(parents=True, exist_ok=True)
-    ffmpeg, say = find_ffmpeg(), shutil.which("say")
-    if not say:
-        raise RuntimeError("This builder currently requires the macOS 'say' command")
+    ffmpeg = find_ffmpeg()
+    voice = args.voice or ("Samantha" if args.engine == "say" else "en-US-AndrewNeural")
+    say = shutil.which("say") if args.engine == "say" else None
+    if args.engine == "say" and not say:
+        raise RuntimeError("--engine say requires the macOS 'say' command; use --engine edge instead")
 
     with tempfile.TemporaryDirectory(prefix="crosssignal-narration-") as name:
         temp, clips = Path(name), []
@@ -63,14 +83,17 @@ def main() -> int:
             image = screenshots / image_name
             if not image.exists():
                 raise FileNotFoundError(f"Missing evidence frame: {image}")
-            script, audio = temp / f"scene-{index:02d}.txt", temp / f"scene-{index:02d}.aiff"
+            suffix = ".aiff" if args.engine == "say" else ".mp3"
+            script, audio = temp / f"scene-{index:02d}.txt", temp / f"scene-{index:02d}{suffix}"
             clip = temp / f"scene-{index:02d}.mp4"
             script.write_text(narration.strip() + "\n")
-            subprocess.run([say, "-v", args.voice, "-r", str(args.rate),
-                            "-f", str(script), "-o", str(audio)], check=True)
+            if args.engine == "say":
+                synthesize_say(say, script, audio, voice, args.rate)
+            else:
+                synthesize_edge(script, audio, voice, args.edge_rate)
             spoken = media_duration(ffmpeg, audio)
             if spoken > allotted - 0.5:
-                raise RuntimeError(f"Scene {index} speech is {spoken:.1f}s; increase --rate")
+                raise RuntimeError(f"Scene {index} speech is {spoken:.1f}s; increase rate")
             subprocess.run([
                 ffmpeg, "-y", "-loop", "1", "-i", str(image), "-i", str(audio),
                 "-vf", "scale=1920:1080:force_original_aspect_ratio=decrease,"

@@ -25,7 +25,7 @@ criteria.
 | **P&L Performance** | Zero fills on the dedicated account as of this audit; five live cycles on 2026-09-01 all correctly abstained | This is the largest open risk — the account ID ties directly to this criterion and there is currently nothing for judges to evaluate |
 | Technology Implementation | Real Alpaca MCP integration, real Claude synthesis + adversarial falsification (verified genuine, not the earlier silently-fallback version), deterministic risk gates | None known |
 | Creativity & Originality | Six-lens disagreement engine, SHA-256 pre-registration, 10-perturbation stability testing, forward-scored walk-forward ledger, self-auditing Readiness tab | The "governed refusal" framing is shared by several other teams in this event's own public gallery; differentiation should lean on mechanism depth, not the headline concept |
-| Presentation & Execution | Narrated screen-recorded video produced | Deck still references a stale test count/contract ID (see below) |
+| Presentation & Execution | Narrated screen-recorded video produced, deck refreshed with real evidence | The rendered video file itself still predates today's fixes and needs a re-render (see `recording-output/`) |
 | Social engagement (bonus) | Not started | Up to 5 X/LinkedIn posts tagging @lablabai and @AlpacaHQ |
 
 ## lablab platform-wide submission checklist
@@ -35,7 +35,7 @@ criteria.
 | Project title, short/long description, tech tags | Ready | Content exists; paste into the form |
 | 16:9 cover image | Met | `assets/crosssignal-hackathon-cover.png` |
 | Video presentation (≤5 min, <300MB) | Met | Narrated walkthrough produced |
-| Slide deck | Partial | `submission/CrossSignal-Hackathon-Pitch-Final.pdf` still cites 39 tests and contract `CS-20260831-66AAE940`; needs a refresh pass before submitting |
+| Slide deck | Met | Regenerated 2026-09-01: 43 tests, contract `CS-20260901-4B6D4392`, account `PA3PDTUDIXDU` |
 | Public GitHub repository | Met | github.com/omobolajiadeyan/alpaca-cross-market-agent, commits through 2026-09-01 |
 | Demo application platform + URL | Met | crosssignal-ai-agent.streamlit.app, confirmed publicly reachable |
 | Alpaca paper account ID | Ready | `PA3PDTUDIXDU` — add to form |
