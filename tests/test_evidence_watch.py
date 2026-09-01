@@ -34,3 +34,26 @@ def test_evidence_watch_script_resolves_project_packages(tmp_path):
         cwd=tmp_path, capture_output=True, text=True, env={}, check=False,
     )
     assert result.returncode == 0
+
+
+def test_evidence_watch_records_connected_failure_without_fabricating_receipt(
+        tmp_path, monkeypatch):
+    for name in ("APCA_API_KEY_ID", "APCA_API_SECRET_KEY", "ANTHROPIC_API_KEY"):
+        monkeypatch.setenv(name, "configured-for-failure-test")
+    monkeypatch.setenv("ALLOW_PAPER_EXECUTION", "false")
+    monkeypatch.setenv("PUBLIC_DEMO_MODE", "false")
+
+    import live.cross_market_agent
+
+    class BrokenAgent:
+        def __init__(self):
+            raise RuntimeError("upstream unavailable")
+
+    monkeypatch.setattr(live.cross_market_agent, "CrossMarketAgent", BrokenAgent)
+    with pytest.raises(RuntimeError, match="upstream unavailable"):
+        main(["--output-dir", str(tmp_path)])
+    summary = json.loads((tmp_path / "summary.json").read_text())
+    assert summary["status"] == "OBSERVATION_FAILED"
+    assert summary["failure_type"] == "RuntimeError"
+    assert summary["broker_mutations"] is False
+    assert not (tmp_path / "evidence-receipt.json").exists()

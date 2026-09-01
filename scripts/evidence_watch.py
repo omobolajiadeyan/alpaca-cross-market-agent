@@ -41,6 +41,12 @@ def write_summary(path, summary):
         ])
     if summary.get("missing_secrets"):
         lines.extend(["", "Live evidence was not fabricated. Configure the listed repository secrets to enable the connected read-only cycle."])
+    if summary.get("failure_type"):
+        lines.extend([
+            f"- Failure category: `{summary['failure_type']}`",
+            "",
+            "The connected observation failed. No evidence or order was fabricated.",
+        ])
     path.write_text("\n".join(lines) + "\n")
 
 
@@ -67,14 +73,25 @@ def main(argv=None):
     if os.getenv("PUBLIC_DEMO_MODE", "false").lower() in ("1", "true", "yes"):
         raise SystemExit("Evidence Watch requires connected preview mode, not the public fixture")
 
-    from agent.evidence_protocol import EvidenceReceiptBuilder, decision_scorecard
-    from live.cross_market_agent import CrossMarketAgent
-
-    agent = CrossMarketAgent()
     try:
-        result = agent.run(execute=False)
-    finally:
-        agent.close()
+        from agent.evidence_protocol import EvidenceReceiptBuilder, decision_scorecard
+        from live.cross_market_agent import CrossMarketAgent
+
+        agent = CrossMarketAgent()
+        try:
+            result = agent.run(execute=False)
+        finally:
+            agent.close()
+    except Exception as exc:
+        summary = {
+            "status": "OBSERVATION_FAILED", "mode": "read-only-live-evidence",
+            "timestamp": timestamp, "broker_mutations": False,
+            "failure_type": type(exc).__name__,
+            "note": "Connected observation failed; no market evidence or order was fabricated.",
+        }
+        write_json(output / "summary.json", summary)
+        write_summary(output / "summary.md", summary)
+        raise
     if not result or not result.get("decision_contract"):
         raise SystemExit("Evidence Watch completed without a sealed Decision Contract")
 

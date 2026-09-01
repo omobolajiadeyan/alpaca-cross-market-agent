@@ -1,5 +1,6 @@
-alpaca-mcp-server>=2.3
-mcp>=1.29
+alpaca-mcp-server==2.3.0
+fastmcp==3.4.7
+mcp==1.29.1
 httpx>=0.28
 anthropic>=0.40
 python-dotenv>=1.0

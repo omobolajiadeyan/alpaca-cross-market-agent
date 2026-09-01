@@ -19,7 +19,7 @@ Most trading agents stare at one chart and forget yesterday's prediction. CrossS
 - **3:00–3:30 — Alpaca:** show MCP-backed market reads and the governed paper-order lifecycle recorded in the ledger.
 - **3:30–4:05 — Accountability:** show the stored market snapshot, sealed horizon, and pending-versus-matured outcome evidence.
 - **4:05–4:35 — Business:** research and risk copilot for active options traders and small investment teams; SaaS plus broker/infrastructure partnerships.
-- **4:35–5:00 — Close:** show 38 passing tests, the public demo, and the next step toward longer walk-forward validation.
+- **4:35–5:00 — Close:** show 39 passing tests, the public demo, and the next step toward longer walk-forward validation.
 
 ## Slide deck
 
