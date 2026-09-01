@@ -525,7 +525,7 @@ with readiness:
         ('Hosted public application URL', 'Met', 'Public judge app is deployed at crosssignal-ai-agent.streamlit.app'),
         ('Scheduled cloud Evidence Watch', 'Ready', 'Read-only workflow is implemented; connected runs require encrypted repository secrets'),
         ('Pitch video', 'Met', 'Narrated screen-recorded walkthrough produced'),
-        ('Slide deck', 'Partial', 'Existing deck still cites a stale test count and contract ID; needs a refresh pass'),
+        ('Slide deck', 'Met', 'Refreshed 2026-09-01 with the current test count and a real dedicated-account contract'),
         ('One-page write-up', 'Met', 'AI logic, risk gates and Alpaca infrastructure documented in submission/'),
         ('Hackathon cover image', 'Met', 'Final 16:9 cover is versioned in assets/'),
         ('Participant enrollment and team', 'Met', 'Authenticated event dashboard shows Omobolaji Adeyan and team CrossSignal'),

@@ -54,7 +54,7 @@ if the event requires the presenter to speak personally.
 | 2:10–2:45 | Proof-chain expanders and receipt control | “The contract preserves source integrity, quantified inconsistency, adversarial challenge, bounded perturbations, a SHA-256 seal, Greeks stress, catalyst context, and recovery state. The downloadable receipt is secret-free and independently verifiable.” |
 | 2:45–3:15 | `04-proof-of-abstention.png` | “Here I weaken data integrity. CrossSignal fails closed. The latest connected Evidence Watch also abstained because fourteen of fifteen checks passed and option liquidity failed. Abstention is a correct governed outcome, not an error.” |
 | 3:15–3:40 | `05-read-only-replay.png` | “The public demo replays a sanitized case without credentials or broker access. The execution toggle is disabled by deployment policy, so judges can inspect the workflow safely.” |
-| 3:40–4:00 | Authorized case in Decision case, then execution ledger | “A separate verified paper case records three filled spreads from August 25. It demonstrates the order lifecycle without placing a new trade during this recording.” |
+| 3:40–4:00 | Executive overview / track record | “Three spreads filled on August 25th on an earlier account, before the hackathon's dedicated-account rule was confirmed -- historical evidence of the order lifecycle only, not a claim toward this submission's P&L.” |
 | 4:00–4:20 | `06-track-record.png` | “No decision disappears. The learning ledger keeps scored and pending theses and compares the sealed direction with inverse and cash counterfactuals.” |
 | 4:20–4:35 | `07-security-boundary.png`, then closing slide | “The architecture keeps the language model away from broker calls, treats news as untrusted context, disables public mutations, and requires human approval for recovery. CrossSignal makes trading intelligence inspectable.” |
 
@@ -62,8 +62,9 @@ if the event requires the presenter to speak personally.
 
 - Use the reviewed PDF/PPTX as the opening and closing frame; do not claim the
   public replay is live market data.
-- Show both the verified filled case and the newer `ABSTAIN` case, keeping their
-  labels visible.
+- Show the `ABSTAIN` case from the dedicated account; if the earlier filled
+  case is shown at all, label it clearly as historical evidence from a prior
+  account, not evidence for this submission's P&L.
 - If showing Evidence Watch, state: `EVIDENCE_SEALED`, read-only, broker
   mutations disabled, and 14/15 deterministic checks passed.
 - Keep the final edit under five minutes and export 1920×1080 H.264 MP4. The
