@@ -53,3 +53,7 @@ Use [`submission/EVIDENCE_RECORDING.md`](submission/EVIDENCE_RECORDING.md) for
 the credential-free capture command, exact shot list, timed narration, and final
 privacy checklist. The automation records only the sanitized public replay with
 broker mutations forcibly disabled.
+
+Use [`submission/FINAL_VIDEO_SCRIPT.md`](submission/FINAL_VIDEO_SCRIPT.md) as
+the final presenter script. It includes the exact application clicks, verified
+cloud evidence, code/repository proof, security language, and a 4:45 timeline.
