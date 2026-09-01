@@ -519,14 +519,17 @@ with readiness:
         ('Risk controls', 'Met', 'Defined loss, confidence, buying power, diversification and data-integrity gates'),
         ('Working browser prototype', 'Met', 'Judge-facing application with safe preview mode'),
         ('Public GitHub repository', 'Met', 'Published at github.com/omobolajiadeyan/alpaca-cross-market-agent'),
-        ('Successful paper execution evidence', 'Met', 'Three Alpaca multi-leg paper orders filled on 2026-08-25'),
-        ('Forward-scored thesis evidence', 'Met', 'Three earlier theses scored at a preliminary 66.7% short-horizon hit rate'),
+        ('Dedicated new Alpaca paper account', 'Met', 'PA3PDTUDIXDU, created 2026-09-01, $100,000 starting balance'),
+        ('Filled trade on the dedicated account', 'Pending', 'Five live cycles on 2026-09-01 correctly abstained; no fill yet -- required for P&L judging'),
+        ('Forward-scored thesis evidence', 'Info', 'Earlier scored theses predate the dedicated account and are historical evidence only'),
         ('Hosted public application URL', 'Met', 'Public judge app is deployed at crosssignal-ai-agent.streamlit.app'),
         ('Scheduled cloud Evidence Watch', 'Ready', 'Read-only workflow is implemented; connected runs require encrypted repository secrets'),
-        ('Pitch video and slide deck', 'Partial', 'Scripts and outlines exist; final assets must be produced'),
+        ('Pitch video', 'Met', 'Narrated screen-recorded walkthrough produced'),
+        ('Slide deck', 'Partial', 'Existing deck still cites a stale test count and contract ID; needs a refresh pass'),
+        ('One-page write-up', 'Met', 'AI logic, risk gates and Alpaca infrastructure documented in submission/'),
         ('Hackathon cover image', 'Met', 'Final 16:9 cover is versioned in assets/'),
         ('Participant enrollment and team', 'Met', 'Authenticated event dashboard shows Omobolaji Adeyan and team CrossSignal'),
-        ('lablab submission form', 'Missing', 'Complete on lablab.ai before the deadline'),
+        ('lablab submission form', 'Missing', 'Complete on lablab.ai before the deadline, including the dedicated account ID'),
     ]
     readiness_df = pd.DataFrame(requirements, columns=['Requirement', 'Status', 'Evidence / next action'])
     st.dataframe(readiness_df, width='stretch', hide_index=True)

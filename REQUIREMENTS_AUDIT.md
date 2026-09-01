@@ -1,65 +1,67 @@
 # Requirements audit
 
-Audited August 31, 2026 by and for **Omobolaji E Adeyan**.
-
-This document separates requirements explicitly visible on the Alpaca event page from lablab-wide submission requirements and judging guidance. The event page may be expanded at kickoff; recheck it before final submission.
+Audited September 1, 2026 by and for **Omobolaji E Adeyan**. Updated from the
+official event page/PDF (`lablab.ai/ai-hackathons/alpaca-ai-trading-agents-hackathon`),
+which supersedes the earlier August 31 audit's guesses at generic judging
+criteria.
 
 ## Alpaca event page — explicit lines
 
-Source: <https://lablab.ai/ai-hackathons/alpaca-ai-trading-agents-hackathon>
-
 | Published line | Status | Evidence |
 |---|---|---|
-| Event is online | Met | Public judge application: <https://crosssignal-ai-agent.streamlit.app> |
-| Dates: August 28–September 4, 2026 | Acknowledged | Submission checklist records the event window |
-| Prize pool: $6,000 | Informational | No implementation action required |
-| Build AI trading agents on Alpaca | Met | CrossSignal autonomously observes, reasons, constructs, governs, executes and audits |
-| Use Alpaca Trading API, MCP server or CLI | Met | Official `alpaca-mcp-server` is used for market data, account access and multi-leg paper orders |
+| Event is online, Aug 28–Sep 4 2026 | Met | Enrolled, team `CrossSignal`, dashboard shows Approved |
+| Autonomous AI trading agent on Alpaca's Trading API | Met | `live/cross_market_agent.py` |
+| Uses Alpaca MCP server or CLI | Met | `alpaca-mcp-server`, persistent stdio session |
+| All strategies incorporate options trading | Met | SPY/HYG/TLT vertical spreads only |
+| **Brand-new paper account dedicated to this hackathon** | Met | `PA3PDTUDIXDU`, created 2026-09-01 |
+| **$100,000 starting balance on that account** | Met | Verified via live `GET /v2/account` call |
+| **Alpaca paper account ID in the final submission** | Ready | `PA3PDTUDIXDU` — must be entered on the lablab form |
+| **One-page write-up** (AI logic, risk gates, Alpaca infra) | Met | `submission/ONE_PAGE_WRITEUP.md` |
 
-## lablab platform-wide participation requirements
+## Real judging criteria (from the official page, not a generic rubric)
 
-Sources: <https://lablab.ai/guide> and <https://lablab.ai/ai-articles/hackathon-guidelines>
+| Dimension | Current evidence | Gap |
+|---|---|---|
+| **P&L Performance** | Zero fills on the dedicated account as of this audit; five live cycles on 2026-09-01 all correctly abstained | This is the largest open risk — the account ID ties directly to this criterion and there is currently nothing for judges to evaluate |
+| Technology Implementation | Real Alpaca MCP integration, real Claude synthesis + adversarial falsification (verified genuine, not the earlier silently-fallback version), deterministic risk gates | None known |
+| Creativity & Originality | Six-lens disagreement engine, SHA-256 pre-registration, 10-perturbation stability testing, forward-scored walk-forward ledger, self-auditing Readiness tab | The "governed refusal" framing is shared by several other teams in this event's own public gallery; differentiation should lean on mechanism depth, not the headline concept |
+| Presentation & Execution | Narrated screen-recorded video produced | Deck still references a stale test count/contract ID (see below) |
+| Social engagement (bonus) | Not started | Up to 5 X/LinkedIn posts tagging @lablabai and @AlpacaHQ |
+
+## lablab platform-wide submission checklist
 
 | Requirement | Status | Evidence / next action |
 |---|---|---|
-| Each participant enrolls independently | Met | Authenticated event dashboard shows Omobolaji Adeyan as enrolled |
-| Participant belongs to a team, including solo entrants | Met | Authenticated event dashboard shows the solo team `CrossSignal` |
-| Working prototype usable online | Met | Credential-free public judge replay is deployed on Streamlit Community Cloud |
-| Project title, maximum 50 characters | Ready | `CrossSignal` |
-| Short description, maximum 255 characters | Ready | Supplied in `SUBMISSION.md` |
-| Long description, minimum 100 words | Ready | README/product documentation provides source content; paste into submission form |
-| Main track/categories | Pending event form | Select the Alpaca/autonomous-agent track shown by the authenticated form |
-| Technology tags | Ready | Alpaca MCP, Alpaca Trading API, Claude, Python, Streamlit, SQLite |
+| Project title, short/long description, tech tags | Ready | Content exists; paste into the form |
 | 16:9 cover image | Met | `assets/crosssignal-hackathon-cover.png` |
-| Video presentation, five minutes or less and under 300 MB | Missing | Recording script is complete; final recording/upload requires presenter action |
-| Pitch deck / slide presentation | Met | Editable eight-slide PowerPoint and final PDF are versioned in `submission/` |
-| Public GitHub repository | Met | <https://github.com/omobolajiadeyan/alpaca-cross-market-agent> |
-| Demo application platform | Ready | Streamlit Community Cloud selected |
-| Direct application URL | Met | <https://crosssignal-ai-agent.streamlit.app> |
-| Submit through lablab before deadline | Missing | Requires authenticated final form submission |
+| Video presentation (≤5 min, <300MB) | Met | Narrated walkthrough produced |
+| Slide deck | Partial | `submission/CrossSignal-Hackathon-Pitch-Final.pdf` still cites 39 tests and contract `CS-20260831-66AAE940`; needs a refresh pass before submitting |
+| Public GitHub repository | Met | github.com/omobolajiadeyan/alpaca-cross-market-agent, commits through 2026-09-01 |
+| Demo application platform + URL | Met | crosssignal-ai-agent.streamlit.app, confirmed publicly reachable |
+| Alpaca paper account ID | Ready | `PA3PDTUDIXDU` — add to form |
+| Submit through lablab before deadline | Missing | Sep 4, 10:00 AM CDT |
 
-## Judging guidance
+## Verified product evidence (2026-09-01)
 
-Lablab’s general rubric lists four dimensions. These are judging guidance, not additional Alpaca-specific technical requirements.
-
-| Dimension | Current evidence | Remaining improvement |
-|---|---|---|
-| Application of technology | Claude produces structured signals; Alpaca MCP supplies real data and filled paper orders | Show the workflow in the video |
-| Presentation | Executive browser UI, cover, pitch and video outlines | Finalize deck and video |
-| Business value | Defined-risk decision intelligence for active options traders and small investment teams | Add sourced TAM and pricing hypothesis to deck |
-| Originality | Cross-market disagreement plus forward self-scoring and data provenance | Emphasize the accountability loop in the opening minute |
-
-## Verified product evidence
-
-- Thirty-nine automated tests pass, including public-fixture integrity, broker-boundary, endpoint, redaction, untrusted-text, unscoreable-direction and read-only cloud automation controls.
-- The public replay now presents one authorized and one abstention contract through the same four-part decision scorecard.
-- GitHub Actions Evidence Watch can collect fresh, secret-free decision evidence on schedule without paper-order authority.
-- Three Alpaca multi-leg paper spreads filled on August 25, 2026.
-- Three earlier theses received preliminary forward scores with a 66.7% short-horizon average hit rate.
-- A fresh connected preview captured six Alpaca Greek snapshots and ten relevant headlines, then correctly abstained because option liquidity and bid-ask quality failed.
-- Credentials and local trading databases are excluded from Git.
-- Public mode disables all broker mutations; controlled local execution requires explicit authorization and the exact Alpaca paper endpoint.
+- 43 automated tests pass (up from 39 — added while fixing a real
+  trade-direction bug, a partly-dead stability test, a misleading recovery
+  state, and a silently-truncated falsification call).
+- Stability testing is now genuinely 10-for-10 real perturbations (two of
+  the original ten mutated a field the scoring engine never read).
+- Falsification is confirmed running real Claude critiques per cycle
+  (`source: claude-falsification-review`), not a canned fallback — this had
+  been silently broken until fixed today.
+- Five live cycles against the dedicated account on 2026-09-01 all correctly
+  abstained, for legitimate reasons (confidence just under threshold after
+  genuine adversarial review, or a live-data gap in options positioning) —
+  not forced, not gamed.
+- Three earlier paper spreads filled on 2026-08-25 are **historical evidence
+  only** — that was a prior account and predates the dedicated-account
+  requirement; it does not count toward P&L judging on `PA3PDTUDIXDU`.
+- Credentials and local audit databases remain excluded from Git.
 
 ## Current-rule caveat
 
-The public event page does not publish numeric judging weights or a performance leaderboard criterion. The authenticated event dashboard and event Discord remain controlling sources for any organizer announcement made after this audit.
+This audit reflects the official event PDF as read on 2026-09-01. Re-check
+the authenticated dashboard and event Discord for any organizer update
+issued after this date.
