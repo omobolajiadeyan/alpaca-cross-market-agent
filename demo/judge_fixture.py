@@ -110,10 +110,10 @@ def _sealed_contract():
 def judge_dashboard():
     """Return the complete presentation model used only in public demo mode."""
     contract, stress, checks = _sealed_contract()
-    recovery = {"state": "STOPPED",
+    recovery = {"state": "PREFLIGHTED",
                 "statuses": {"primary_trade": "not_submitted", "secondary_trade": "not_submitted",
                              "hedge": "not_submitted"},
-                "filled_roles": [], "actions": ["Do not retry automatically; inspect liquidity evidence."],
+                "filled_roles": [], "actions": ["No broker exposure exists."],
                 "automatic_orders": False}
     portfolio = {
         "primary_trade": {"symbol": "HYG", "strategy": "call_debit_spread", "stance": "bearish credit",

@@ -1,7 +1,16 @@
 """Judge-facing browser experience for the Cross-Market Macro Agent."""
 
+import html
 import json
+import sys
 from datetime import datetime
+
+if sys.platform == "win32":
+    # Live agent code paths (AlpacaTools, etc.) print checkmark characters
+    # outside the default Windows console codepage; force UTF-8 so a local
+    # "Run agent" click can't crash on that.
+    sys.stdout.reconfigure(encoding="utf-8")
+    sys.stderr.reconfigure(encoding="utf-8")
 
 import pandas as pd
 import streamlit as st
@@ -243,7 +252,7 @@ with case_file:
             help="Revealed only after the sealed evaluation horizon.",
         )
 
-        st.markdown(f'<div class="thesis"><span class="confidence">SEALED PREDICTION · {prediction["horizon_trading_days"]} TRADING DAYS</span><h2>{prediction["market"]} → {prediction["direction"]}</h2><p>{contract["thesis"]}</p></div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="thesis"><span class="confidence">SEALED PREDICTION · {prediction["horizon_trading_days"]} TRADING DAYS</span><h2>{html.escape(str(prediction["market"]))} → {html.escape(str(prediction["direction"]))}</h2><p>{html.escape(str(contract["thesis"]))}</p></div>', unsafe_allow_html=True)
         render_protocol_journey(contract, row['execution_status'])
         render_disagreement_map(disagreement)
 
@@ -457,7 +466,7 @@ with live_lab:
             )
         thesis = result.get('thesis')
         if thesis:
-            st.markdown(f'<div class="thesis"><span class="confidence">CONFIDENCE {thesis.get("confidence_overall", 0):.0%}</span><h2>{thesis.get("thesis", "")}</h2><p>{thesis.get("rationale", "")}</p></div>', unsafe_allow_html=True)
+            st.markdown(f'<div class="thesis"><span class="confidence">CONFIDENCE {thesis.get("confidence_overall", 0):.0%}</span><h2>{html.escape(str(thesis.get("thesis", "")))}</h2><p>{html.escape(str(thesis.get("rationale", "")))}</p></div>', unsafe_allow_html=True)
         portfolio = result.get('portfolio')
         if portfolio:
             st.subheader("Risk decision")

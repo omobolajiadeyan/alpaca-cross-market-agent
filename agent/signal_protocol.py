@@ -96,7 +96,9 @@ class StabilityTester:
         ('atm_iv', -.01), ('atm_iv', .01), ('realized_vol', -.01), ('realized_vol', .01),
         ('put_call_ratio', -.10), ('put_call_ratio', .10),
         ('hy_spread_proxy_bps', -10), ('hy_spread_proxy_bps', 10),
-        ('price', -.005), ('price', .005),
+        # A second, larger vol shock -- tests robustness at a different noise magnitude
+        # rather than repeating the same field at the same size.
+        ('atm_iv', -.02), ('atm_iv', .02),
     )
 
     def __init__(self, engine=None):
@@ -108,7 +110,7 @@ class StabilityTester:
         outcomes = []
         for field, delta in self.PERTURBATIONS:
             perturbed = deepcopy(state)
-            if field in ('atm_iv', 'price'):
+            if field == 'atm_iv':
                 bucket = perturbed.setdefault('equity_vol', {})
             elif field == 'realized_vol':
                 bucket = perturbed.setdefault('realized', {})

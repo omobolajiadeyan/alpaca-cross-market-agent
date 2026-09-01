@@ -146,11 +146,18 @@ class CrossMarketDataFeed:
         }
 
     def get_rate_expectations(self):
-        """Rate expectations derived from the real curve's front end (1yr vs. 3mo)"""
+        """Rate expectations derived from the real curve's front end (1yr vs. 3mo).
+
+        NOTE: this is a curve-shape proxy, not a genuine fed-funds-futures-implied
+        rate. `short_end_yield_3mo` is literally the 3-month T-bill yield -- it is
+        reported (not a market-implied policy path) so that Claude's synthesis and
+        falsification prompts don't misread it as something it isn't (a mislabeled
+        earlier version of this field caused exactly that confusion).
+        """
         latest = self._fetch_treasury_curve()
         if not latest:
             return {
-                'implied_fed_rate': 5.25,
+                'short_end_yield_3mo': 5.25,
                 'rate_change_expected': 'DOWN',
                 'market': 'RATES_EXPECTATIONS',
                 'note': 'fallback placeholder -- live Treasury data unavailable',
@@ -169,8 +176,15 @@ class CrossMarketDataFeed:
             direction = 'FLAT'
 
         return {
-            'implied_fed_rate': three_mo,
+            'short_end_yield_3mo': three_mo,
+            'one_year_yield': one_yr,
             'rate_change_expected': direction,
+            'note': (
+                "short_end_yield_3mo is the reported 3-month Treasury bill yield, "
+                "a near-term-policy-rate proxy -- not a fed-funds-futures-implied "
+                "rate. rate_change_expected direction comes from comparing it to "
+                "the 1-year yield, not from any other point on the curve."
+            ),
             'as_of': latest.get('Date'),
             'market': 'RATES_EXPECTATIONS',
             'timestamp': datetime.now().isoformat()

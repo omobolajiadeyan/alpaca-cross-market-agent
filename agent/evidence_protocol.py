@@ -8,16 +8,10 @@ from datetime import datetime, timezone
 
 from config import RISK_GATES, MAX_MARGIN_UTILIZATION
 from security.controls import redact, sanitize_external_text
+from agent.signal_protocol import _number as _float
 
 
 GREEKS = ("delta", "gamma", "theta", "vega")
-
-
-def _float(value, default=0.0):
-    try:
-        return float(value)
-    except (TypeError, ValueError):
-        return default
 
 
 def decision_scorecard(contract, evaluation=None):
@@ -196,18 +190,21 @@ class ExecutionRecoveryPlanner:
                     for role, item in executions.items()}
         filled = [role for role, status in statuses.items() if status in self.TERMINAL_SUCCESS]
         active = [role for role, status in statuses.items() if status in self.ACTIVE]
-        failed = [role for role, status in statuses.items()
-                  if status in {"rejected", "canceled", "expired", "unknown", "not_submitted"}]
+        # "not_submitted" is the normal preview/abstain state -- nothing was ever sent to
+        # the broker, so it is not a failure. Only a broker-returned terminal failure status
+        # counts as something to recover from.
+        rejected = [role for role, status in statuses.items()
+                    if status in {"rejected", "canceled", "expired", "unknown"}]
         if len(filled) == len(statuses) and statuses:
             state, actions = "RECONCILED", ["Record final fills and release the recovery lock."]
-        elif filled and (active or failed):
+        elif filled and (active or rejected):
             state = "RECOVERY_REQUIRED"
             actions = ["Block new portfolio submissions.", "Cancel remaining open orders.",
                        "Recalculate risk from actual positions.",
                        "Require explicit paper-only approval before closing or hedging exposure."]
         elif active:
             state, actions = "MONITORING", ["Poll broker lifecycle until terminal state."]
-        elif failed:
+        elif rejected:
             state, actions = "STOPPED", ["Do not retry automatically; inspect broker rejection evidence."]
         else:
             state, actions = "PREFLIGHTED", ["No broker exposure exists."]

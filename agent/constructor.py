@@ -63,15 +63,23 @@ class TradeConstructor:
     def __init__(self):
         print("[CONSTRUCTOR] Initialized")
 
-    def _stance(self, symbol, direction):
-        """Map a signal's stated direction to a bullish/bearish stance on `symbol`."""
+    def _stance(self, market, direction):
+        """Map a signal's stated direction to a bullish/bearish stance on its instrument."""
         direction = (direction or '').upper()
-        if symbol == 'TLT':
+        market = (market or '').upper()
+        if market in ('RATES', 'RATES_EXPECTATIONS', 'DURATION', 'TREASURY'):
             # direction describes the yield; yields down -> bond prices up (bullish TLT)
             if direction in ('DOWN', 'LOWER'):
                 return 'bullish'
             if direction in ('UP', 'HIGHER'):
                 return 'bearish'
+        elif market == 'EQUITY_VOL':
+            # direction describes implied volatility, not price -- rising vol is a
+            # fear/defensive signal, not a bullish one, so it inverts vs. a price signal
+            if direction in ('UP', 'HIGHER'):
+                return 'bearish'
+            if direction in ('DOWN', 'LOWER'):
+                return 'bullish'
         else:
             # direction describes the instrument/spread itself
             if direction in ('UP', 'HIGHER', 'TIGHTER', 'BULLISH', 'RALLY'):
@@ -88,7 +96,7 @@ class TradeConstructor:
 
         if signal:
             symbol = MARKET_SYMBOL_MAP.get(signal.get('market', '').upper(), default_symbol)
-            stance = self._stance(symbol, signal.get('direction')) or default_stance
+            stance = self._stance(signal.get('market'), signal.get('direction')) or default_stance
             reason = signal.get('reason', reason)
 
         structure = SYMBOL_STRUCTURES[symbol][stance]

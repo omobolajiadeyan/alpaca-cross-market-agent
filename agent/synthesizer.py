@@ -127,7 +127,7 @@ The confidence adjustment must be between -0.20 and 0.00.
 """
         try:
             response = self.client.messages.create(
-                model="claude-sonnet-5", max_tokens=1200,
+                model="claude-sonnet-5", max_tokens=2500,
                 messages=[{"role": "user", "content": prompt}],
             )
             text = next(block.text for block in response.content if block.type == 'text').strip()

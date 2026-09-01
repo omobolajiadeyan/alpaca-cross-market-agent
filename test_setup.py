@@ -5,6 +5,10 @@ Quick test to verify everything is set up correctly
 import sys
 import os
 
+if sys.platform == "win32":
+    sys.stdout.reconfigure(encoding="utf-8")
+    sys.stderr.reconfigure(encoding="utf-8")
+
 sys.path.insert(0, os.path.abspath('.'))
 
 print("\n" + "="*70)

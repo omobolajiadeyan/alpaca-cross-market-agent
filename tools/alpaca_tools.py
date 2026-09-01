@@ -68,7 +68,14 @@ class _AlpacaMCPSession:
         self._stdio_cm = None
         self._session_cm = None
         self._session = None
-        self._run(self._connect(), timeout=30)
+        try:
+            self._run(self._connect(), timeout=30)
+        except Exception:
+            # Connection failed after the event-loop thread was already started --
+            # stop it and clean up any partially-opened transport before re-raising,
+            # instead of leaking a daemon thread/event loop per failed attempt.
+            self.close()
+            raise
 
     def _run(self, coro, timeout=60):
         future = asyncio.run_coroutine_threadsafe(coro, self._loop)

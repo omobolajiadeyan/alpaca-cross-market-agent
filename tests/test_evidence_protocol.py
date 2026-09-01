@@ -49,6 +49,26 @@ def test_recovery_requires_human_approval_for_partial_exposure():
     assert result['automatic_orders'] is False
 
 
+def test_recovery_is_preflighted_not_stopped_when_nothing_was_submitted():
+    """A normal preview/abstain cycle -- nothing sent to the broker -- must
+    not be reported as a stopped/failed recovery state."""
+    result = ExecutionRecoveryPlanner().assess({
+        'primary_trade': {'status': 'not_submitted'},
+        'secondary_trade': {'status': 'not_submitted'},
+        'hedge': {'status': 'not_submitted'},
+    })
+    assert result['state'] == 'PREFLIGHTED'
+
+
+def test_recovery_is_stopped_when_broker_actually_rejects():
+    result = ExecutionRecoveryPlanner().assess({
+        'primary_trade': {'status': 'rejected'},
+        'secondary_trade': {'status': 'not_submitted'},
+        'hedge': {'status': 'not_submitted'},
+    })
+    assert result['state'] == 'STOPPED'
+
+
 def test_catalyst_classifier_only_keeps_portfolio_symbols():
     result = CatalystClassifier().classify([
         {'headline': 'Rates move', 'symbols': ['TLT'], 'source': 'wire'},
