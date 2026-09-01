@@ -171,10 +171,10 @@ def build():
 
     # 5 — Differentiation/evidence
     s = prs.slides.add_slide(blank); label(s, "Defensibility", 5)
-    title(s, "One scorecard. Two defensible decisions.",
+    title(s, "One scorecard. A decision that defends itself.",
           "Signal strength never gets to hide weak execution evidence.")
-    metrics = [("85", "Signal quality"), ("100", "Decision stability"),
-               ("93", "Execution quality"), ("Pending", "Outcome evidence")]
+    metrics = [("82", "Signal quality"), ("100", "Decision stability"),
+               ("67", "Execution quality"), ("Pending", "Outcome evidence")]
     for i, (value, caption) in enumerate(metrics):
         x = .65 + i * 3.02
         rect(s, x, 2.65, 2.72, 1.3, ICE, RGBColor(213, 224, 233))
@@ -183,15 +183,15 @@ def build():
         text(s, caption, x + .2, 3.42, 2.32, .25, 11, MUTED, True,
              align=PP_ALIGN.CENTER)
     rect(s, .65, 4.35, 5.85, 1.38, NAVY)
-    text(s, "AUTHORIZED REPLAY", .95, 4.62, 2.2, .25, 11, LIGHT_CYAN, True)
-    text(s, "All deterministic gates passed", .95, 5.03, 4.9, .3, 17, WHITE, True)
+    text(s, "PUBLIC JUDGE REPLAY", .95, 4.62, 2.2, .25, 11, LIGHT_CYAN, True)
+    text(s, "Sanitized case, credential-free", .95, 5.03, 4.9, .3, 17, WHITE, True)
     rect(s, 6.78, 4.35, 5.85, 1.38, ICE, RGBColor(213, 224, 233))
-    text(s, "LIVE CLOUD EVIDENCE", 7.08, 4.62, 2.3, .25, 11, CYAN, True)
-    text(s, "ABSTAIN · 14 of 15 gates passed", 7.08, 5.03, 4.95, .3, 17, NAVY, True)
-    text(s, "CS-20260831-66AAE940 · sealed receipt · zero broker mutations",
+    text(s, "LIVE DEDICATED ACCOUNT", 7.08, 4.62, 2.3, .25, 11, CYAN, True)
+    text(s, "ABSTAIN · 4 of 6 gates passed", 7.08, 5.03, 4.95, .3, 17, NAVY, True)
+    text(s, "CS-20260901-4B6D4392 · account PA3PDTUDIXDU · sealed receipt · zero broker mutations",
          .75, 6.18, 11.7, .25, 11, MUTED, True, align=PP_ALIGN.CENTER)
     footer(s, 5)
-    add_notes(s, "This is the key proof slide. The same policy evaluates both cases. The authorized replay shows the complete path when every gate passes. The live GitHub Evidence Watch contract scored 85 for signal and 100 for stability, but execution quality was 93 because one of fifteen gates failed—so the correct autonomous decision was abstention. Outcome evidence remains pending until the sealed horizon matures.")
+    add_notes(s, "This is the key proof slide, drawn from a live cycle against the dedicated hackathon paper account on September 1st. Signal quality scored 82 and decision stability 100 across ten real perturbations, but execution quality was 67 because two of six deterministic checks failed -- live-data integrity and post-falsification confidence -- so the correct autonomous decision was abstention. Outcome evidence remains pending until the sealed horizon matures.")
 
     # 6 — Safety
     s = prs.slides.add_slide(blank); label(s, "Trust and safety", 6)
@@ -236,7 +236,7 @@ def build():
     rect(s, 0, 0, 13.333, 7.5, NAVY)
     text(s, "THE PROOF IS PUBLIC", .75, .7, 4, .3, 11, LIGHT_CYAN, True)
     text(s, "Inspect the intelligence.\nChallenge the decision.", .72, 1.35, 8.8, 1.55, 36, WHITE, True, "Aptos Display")
-    stats = [("39", "automated tests"), ("85/100", "live signal quality"), ("14/15", "risk gates passed")]
+    stats = [("43", "automated tests"), ("82/100", "live signal quality"), ("4/6", "risk gates passed")]
     for i, (value, caption) in enumerate(stats):
         x = .75 + i * 2.55
         text(s, value, x, 3.35, 2.2, .55, 27, LIGHT_CYAN, True)
@@ -250,7 +250,7 @@ def build():
     text(s, "CrossSignal does not merely recommend a trade.\nIt proves whether the trade deserves authorization.",
          .75, 5.35, 7.45, .85, 17, WHITE, True)
     text(s, "Omobolaji E Adeyan · Paper trading only · Not investment advice", .75, 6.75, 8, .3, 11, LIGHT_CYAN)
-    add_notes(s, "Close on verified evidence: thirty-nine tests pass in GitHub, the scheduled cloud watcher sealed a live contract, and the system abstained because one risk gate failed. CrossSignal makes AI trading decisions inspectable, challengeable, reproducible, and measurable. Invite judges to open the live application, repository, and Actions evidence artifact.")
+    add_notes(s, "Close on verified evidence: forty-three tests pass in GitHub, a live cycle against the dedicated hackathon paper account sealed a real contract on September 1st, and the system abstained because two of six deterministic checks failed. CrossSignal makes AI trading decisions inspectable, challengeable, reproducible, and measurable. Invite judges to open the live application, repository, and dedicated account PA3PDTUDIXDU.")
 
     OUT.parent.mkdir(parents=True, exist_ok=True)
     prs.save(OUT)
