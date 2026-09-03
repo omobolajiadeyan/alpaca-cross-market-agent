@@ -70,10 +70,12 @@ Any single failure blocks submission and the cycle logs an explicit
 
 ## Status at submission
 
-As of Sep 1, live cycles against the dedicated account have correctly
-identified real cross-market disagreement (score 82/100, stability
+As of Sep 2, nine live cycles against the dedicated account have correctly
+identified real cross-market disagreement (score ~82/100, stability
 100%/10) but abstained each time — either on signal confidence just under
-threshold after genuine adversarial review, or on a live-data gap in
-options-volume positioning. We treat this as the system working as
-designed: refusing marginal evidence is the point, not a shortfall. Live
-cycles continue through the submission window.
+threshold after genuine adversarial review, thin option liquidity, or a
+live-data gap in options-volume positioning. The closest cycle cleared
+five of six deterministic gates and missed the 55% confidence floor by a
+single point (54%). We treat this as the system working as designed:
+refusing marginal evidence is the point, not a shortfall. Live cycles
+continue through the submission window.
