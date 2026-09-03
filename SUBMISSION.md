@@ -43,7 +43,7 @@ Most trading agents stare at one chart and forget yesterday's prediction. CrossS
 - [x] Show preliminary forward-scored outcomes and clearly label the five-day evaluation horizon and sample-size limitation.
 - [x] Deploy the credential-free Streamlit judge application: <https://crosssignal-ai-agent.streamlit.app>.
 - [x] Add the final 16:9 cover image (`assets/crosssignal-hackathon-cover.png`).
-- [x] Create the final eight-slide presentation in editable PowerPoint and PDF formats (refreshed 2026-09-01: 43 tests, contract `CS-20260901-4B6D4392`, dedicated account `PA3PDTUDIXDU`).
+- [x] Create the final eight-slide presentation in editable PowerPoint and PDF formats (refreshed 2026-09-02: 46 tests, contract `CS-20260902-BF9B142D`, dedicated account `PA3PDTUDIXDU`).
 - [x] Write the one-page write-up covering AI logic, risk gates, and Alpaca infrastructure (`submission/ONE_PAGE_WRITEUP.md`).
 - [ ] Add application URL, repository URL, video, PDF deck, one-page write-up, and the Alpaca account ID to lablab.ai.
 - [x] Test the public URL in a private browser window.

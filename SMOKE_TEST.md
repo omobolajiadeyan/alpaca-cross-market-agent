@@ -1,13 +1,15 @@
 # Smoke-test record
 
-Last executed: September 1, 2026 by Omobolaji E Adeyan.
+Last executed: September 2, 2026 by Omobolaji E Adeyan.
 
 ## Automated verification
 
-- `python -m pytest` — 43 tests passed (39 original + 4 added while fixing a
+- `python -m pytest` — 46 tests passed (39 original + 4 added while fixing a
   trade-direction bug, a partly-dead stability test, a misleading recovery
-  state, and a silently-truncated falsification call -- see repository
-  commit history for 2026-09-01).
+  state, and a silently-truncated falsification call, + 3 more added while
+  fixing a spread-leg selector that could pick two different expirations
+  for one "vertical" spread -- see repository commit history for
+  2026-09-01/02).
 - Python compilation — application, agent, compliance, live and Alpaca modules compiled successfully.
 - Streamlit `AppTest` — zero render exceptions; seven judge-facing tabs detected, including Security.
 - Public judge replay — renders without credentials, exposes authorized and abstention cases plus the four-part scorecard, and makes no external or broker call.

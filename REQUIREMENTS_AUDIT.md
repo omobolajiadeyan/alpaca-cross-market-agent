@@ -1,6 +1,6 @@
 # Requirements audit
 
-Audited September 1, 2026 by and for **Omobolaji E Adeyan**. Updated from the
+Audited September 2, 2026 by and for **Omobolaji E Adeyan**. Updated from the
 official event page/PDF (`lablab.ai/ai-hackathons/alpaca-ai-trading-agents-hackathon`),
 which supersedes the earlier August 31 audit's guesses at generic judging
 criteria.
@@ -25,7 +25,7 @@ criteria.
 | **P&L Performance** | Zero fills on the dedicated account as of this audit; nine live cycles across 2026-09-01/02 all correctly abstained | This is the largest open risk — the account ID ties directly to this criterion and there is currently nothing for judges to evaluate |
 | Technology Implementation | Real Alpaca MCP integration, real Claude synthesis + adversarial falsification (verified genuine, not the earlier silently-fallback version), deterministic risk gates | None known |
 | Creativity & Originality | Six-lens disagreement engine, SHA-256 pre-registration, 10-perturbation stability testing, forward-scored walk-forward ledger, self-auditing Readiness tab | The "governed refusal" framing is shared by several other teams in this event's own public gallery; differentiation should lean on mechanism depth, not the headline concept |
-| Presentation & Execution | Narrated screen-recorded video produced, deck refreshed with real evidence | The rendered video file itself still predates today's fixes and needs a re-render (see `recording-output/`) |
+| Presentation & Execution | Narrated video with the presenter's real voice throughout, real problem/architecture explanation, both AUTHORIZED and ABSTAIN cases demonstrated live, deck refreshed with real evidence | None known |
 | Social engagement (bonus) | Not started | Up to 5 X/LinkedIn posts tagging @lablabai and @AlpacaHQ |
 
 ## lablab platform-wide submission checklist
@@ -35,7 +35,7 @@ criteria.
 | Project title, short/long description, tech tags | Ready | Content exists; paste into the form |
 | 16:9 cover image | Met | `assets/crosssignal-hackathon-cover.png` |
 | Video presentation (≤5 min, <300MB) | Met | Narrated walkthrough produced |
-| Slide deck | Met | Regenerated 2026-09-01: 43 tests, contract `CS-20260901-4B6D4392`, account `PA3PDTUDIXDU` |
+| Slide deck | Met | Regenerated 2026-09-02: 46 tests, contract `CS-20260902-BF9B142D`, account `PA3PDTUDIXDU` |
 | Public GitHub repository | Met | github.com/omobolajiadeyan/alpaca-cross-market-agent, commits through 2026-09-02 |
 | Demo application platform + URL | Met | crosssignal-ai-agent.streamlit.app, confirmed publicly reachable |
 | Alpaca paper account ID | Ready | `PA3PDTUDIXDU` — add to form |
