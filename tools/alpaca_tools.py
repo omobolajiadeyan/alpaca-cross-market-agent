@@ -26,7 +26,10 @@ from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from config import ALPACA_API_KEY, ALPACA_SECRET_KEY, ALPACA_BASE_URL, MAX_LOSS_PER_TRADE
+from config import (
+    ALPACA_API_KEY, ALPACA_SECRET_KEY, ALPACA_BASE_URL,
+    MAX_LOSS_PER_TRADE, RISK_GATES,
+)
 from security.controls import SecurityViolation, validate_paper_endpoint
 
 
@@ -274,10 +277,20 @@ class AlpacaTools:
         return {'realized_vol': realized_vol, 'atr_pct': atr_pct}
 
     def find_option_contract(self, underlying_symbol, option_type, target_strike,
-                              days_out_min=25, days_out_max=45, strike_band=0.2):
-        """Find the real, tradable option contract closest to a target strike."""
+                              days_out_min=25, days_out_max=45, strike_band=0.03):
+        """Find the real, tradable option contract closest to strike and target DTE.
+
+        Alpaca can return the same strike for several expirations. Selecting on
+        strike alone made the result depend on API ordering and could choose a
+        thin deferred weekly expiry even when the nearest eligible contract was
+        liquid. A narrow strike window also prevents Alpaca's 100-contract page
+        limit from truncating the response before it reaches the actual target.
+        Strike remains the primary criterion; proximity to the minimum eligible
+        DTE is the deterministic tie-breaker.
+        """
         try:
             today = date.today()
+            target_expiration = today + timedelta(days=days_out_min)
             data = self.call("get_option_contracts", {
                 'underlying_symbols': underlying_symbol,
                 'type': option_type,
@@ -292,7 +305,17 @@ class AlpacaTools:
             contracts = data.get('option_contracts', [])
             if not contracts:
                 return None
-            return min(contracts, key=lambda c: abs(float(c['strike_price']) - target_strike))
+
+            def proximity(contract):
+                strike_distance = abs(float(contract['strike_price']) - target_strike)
+                try:
+                    expiration = date.fromisoformat(str(contract.get('expiration_date'))[:10])
+                    expiration_distance = abs((expiration - target_expiration).days)
+                except (TypeError, ValueError):
+                    expiration_distance = float('inf')
+                return strike_distance, expiration_distance
+
+            return min(contracts, key=proximity)
         except Exception as e:
             print(f"[ERROR] Find option contract for {underlying_symbol}: {e}")
             return None
@@ -305,6 +328,114 @@ class AlpacaTools:
         except Exception as e:
             print(f"[ERROR] Get option snapshot for {contract_symbol}: {e}")
             return None
+
+    def find_option_spread_contracts(self, underlying_symbol, option_type,
+                                     near_target, far_target,
+                                     days_out_min=25, days_out_max=45,
+                                     strike_band=0.03):
+        """Select two liquid, same-expiration contracts for a vertical spread.
+
+        Candidate selection never relaxes the execution gates. It uses those
+        same published volume, spread, and Greek requirements to avoid routing
+        a valid thesis into an obviously untradeable weekly contract. If no
+        candidate pair meets them, the closest same-expiry pair is returned so
+        the downstream risk gate can fail closed with inspectable evidence.
+        """
+        today = date.today()
+        lower_target = min(near_target, far_target)
+        upper_target = max(near_target, far_target)
+        data = self.call("get_option_contracts", {
+            'underlying_symbols': underlying_symbol,
+            'type': option_type,
+            'expiration_date_gte': (today + timedelta(days=days_out_min)).isoformat(),
+            'expiration_date_lte': (today + timedelta(days=days_out_max)).isoformat(),
+            'strike_price_gte': round(lower_target * (1 - strike_band), 2),
+            'strike_price_lte': round(upper_target * (1 + strike_band), 2),
+            'limit': 100,
+        })
+        contracts = data.get('option_contracts', [])
+        if len(contracts) < 2:
+            return None, None, {}
+
+        by_expiration = {}
+        for contract in contracts:
+            expiration = str(contract.get('expiration_date') or '')[:10]
+            by_expiration.setdefault(expiration, []).append(contract)
+
+        snapshot_cache = {}
+
+        def snapshot(contract):
+            symbol = contract['symbol']
+            if symbol not in snapshot_cache:
+                snapshot_cache[symbol] = self.get_option_snapshot(symbol) or {}
+            return snapshot_cache[symbol]
+
+        def number(value, default=0.0):
+            try:
+                return float(value)
+            except (TypeError, ValueError):
+                return default
+
+        target_expiration = today + timedelta(days=days_out_min)
+        candidates = []
+        for expiration_text, expiry_contracts in by_expiration.items():
+            if len(expiry_contracts) < 2:
+                continue
+            near_options = sorted(
+                expiry_contracts,
+                key=lambda c: abs(number(c.get('strike_price')) - near_target),
+            )[:3]
+            far_options = sorted(
+                expiry_contracts,
+                key=lambda c: abs(number(c.get('strike_price')) - far_target),
+            )[:3]
+            try:
+                expiration = date.fromisoformat(expiration_text)
+                expiration_distance = abs((expiration - target_expiration).days)
+            except ValueError:
+                expiration_distance = float('inf')
+
+            for near in near_options:
+                for far in far_options:
+                    if near['symbol'] == far['symbol']:
+                        continue
+                    near_snapshot, far_snapshot = snapshot(near), snapshot(far)
+                    qualities = []
+                    for item in (near_snapshot, far_snapshot):
+                        quote = item.get('latestQuote') or {}
+                        bid, ask = number(quote.get('bp')), number(quote.get('ap'))
+                        midpoint = (bid + ask) / 2
+                        relative_spread = ((ask - bid) / midpoint) if midpoint > 0 else 1.0
+                        volume = number((item.get('dailyBar') or {}).get('v'))
+                        qualities.append((volume, relative_spread, bool(item.get('greeks'))))
+                    liquid = all(
+                        volume >= RISK_GATES['min_volume']
+                        and spread <= RISK_GATES['bid_ask_spread_limit']
+                        and has_greeks
+                        for volume, spread, has_greeks in qualities
+                    )
+                    target_distance = (
+                        abs(number(near.get('strike_price')) - near_target)
+                        + abs(number(far.get('strike_price')) - far_target)
+                    )
+                    max_spread = max(item[1] for item in qualities)
+                    min_volume = min(item[0] for item in qualities)
+                    rank = (
+                        0 if liquid else 1,
+                        target_distance,
+                        expiration_distance,
+                        max_spread,
+                        -min_volume,
+                    )
+                    candidates.append((rank, near, far))
+
+        if not candidates:
+            return None, None, snapshot_cache
+        _, near, far = min(candidates, key=lambda item: item[0])
+        return near, far, {
+            near['symbol']: snapshot_cache[near['symbol']],
+            far['symbol']: snapshot_cache[far['symbol']],
+        }
 
     def get_atm_iv_and_volume(self, underlying_symbol, spot):
         """
@@ -410,13 +541,22 @@ class AlpacaTools:
 
         far_target = spot * (1 + width_pct) if option_type == 'call' else spot * (1 - width_pct)
 
-        near = self.find_option_contract(underlying_symbol, option_type, target_strike=spot)
-        far = self.find_option_contract(underlying_symbol, option_type, target_strike=far_target)
+        near, far, selected_snapshots = self.find_option_spread_contracts(
+            underlying_symbol, option_type, near_target=spot, far_target=far_target,
+        )
         if not near or not far or near['symbol'] == far['symbol']:
             return {'submitted': False, 'reason': 'could not find two distinct strikes for a spread'}
 
-        near_quote = self.get_option_bid_ask(near['symbol'])
-        far_quote = self.get_option_bid_ask(far['symbol'])
+        def selected_quote(contract):
+            snapshot = selected_snapshots.get(contract['symbol'], {})
+            quote = snapshot.get('latestQuote') or {}
+            try:
+                return float(quote['bp']), float(quote['ap'])
+            except (KeyError, TypeError, ValueError):
+                return self.get_option_bid_ask(contract['symbol'])
+
+        near_quote = selected_quote(near)
+        far_quote = selected_quote(far)
         if not near_quote or not far_quote:
             return {'submitted': False, 'reason': 'no quote available for one or both legs'}
 
@@ -467,10 +607,7 @@ class AlpacaTools:
             },
             # Preserve sponsor-native Greeks at the exact preflight boundary.
             # Missing snapshots remain visible and fail the downstream stress gate.
-            'snapshots': {
-                near['symbol']: self.get_option_snapshot(near['symbol']) or {},
-                far['symbol']: self.get_option_snapshot(far['symbol']) or {},
-            },
+            'snapshots': selected_snapshots,
             'underlyings': [underlying_symbol],
             'underlying_price': spot,
         }

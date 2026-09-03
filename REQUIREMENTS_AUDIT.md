@@ -22,7 +22,7 @@ criteria.
 
 | Dimension | Current evidence | Gap |
 |---|---|---|
-| **P&L Performance** | Zero fills on the dedicated account as of this audit; five live cycles on 2026-09-01 all correctly abstained | This is the largest open risk — the account ID ties directly to this criterion and there is currently nothing for judges to evaluate |
+| **P&L Performance** | Zero fills on the dedicated account as of this audit; nine live cycles across 2026-09-01/02 all correctly abstained | This is the largest open risk — the account ID ties directly to this criterion and there is currently nothing for judges to evaluate |
 | Technology Implementation | Real Alpaca MCP integration, real Claude synthesis + adversarial falsification (verified genuine, not the earlier silently-fallback version), deterministic risk gates | None known |
 | Creativity & Originality | Six-lens disagreement engine, SHA-256 pre-registration, 10-perturbation stability testing, forward-scored walk-forward ledger, self-auditing Readiness tab | The "governed refusal" framing is shared by several other teams in this event's own public gallery; differentiation should lean on mechanism depth, not the headline concept |
 | Presentation & Execution | Narrated screen-recorded video produced, deck refreshed with real evidence | The rendered video file itself still predates today's fixes and needs a re-render (see `recording-output/`) |
@@ -36,25 +36,28 @@ criteria.
 | 16:9 cover image | Met | `assets/crosssignal-hackathon-cover.png` |
 | Video presentation (≤5 min, <300MB) | Met | Narrated walkthrough produced |
 | Slide deck | Met | Regenerated 2026-09-01: 43 tests, contract `CS-20260901-4B6D4392`, account `PA3PDTUDIXDU` |
-| Public GitHub repository | Met | github.com/omobolajiadeyan/alpaca-cross-market-agent, commits through 2026-09-01 |
+| Public GitHub repository | Met | github.com/omobolajiadeyan/alpaca-cross-market-agent, commits through 2026-09-02 |
 | Demo application platform + URL | Met | crosssignal-ai-agent.streamlit.app, confirmed publicly reachable |
 | Alpaca paper account ID | Ready | `PA3PDTUDIXDU` — add to form |
 | Submit through lablab before deadline | Missing | Sep 4, 10:00 AM CDT |
 
-## Verified product evidence (2026-09-01)
+## Verified product evidence (2026-09-02)
 
-- 43 automated tests pass (up from 39 — added while fixing a real
+- 46 automated tests pass (up from 39 — added while fixing a real
   trade-direction bug, a partly-dead stability test, a misleading recovery
-  state, and a silently-truncated falsification call).
+  state, a silently-truncated falsification call, and a spread-leg selector
+  that could pick two different expirations for one "vertical" spread).
 - Stability testing is now genuinely 10-for-10 real perturbations (two of
   the original ten mutated a field the scoring engine never read).
 - Falsification is confirmed running real Claude critiques per cycle
   (`source: claude-falsification-review`), not a canned fallback — this had
   been silently broken until fixed today.
-- Five live cycles against the dedicated account on 2026-09-01 all correctly
-  abstained, for legitimate reasons (confidence just under threshold after
-  genuine adversarial review, or a live-data gap in options positioning) —
-  not forced, not gamed.
+- Nine live cycles against the dedicated account across 2026-09-01/02 all
+  correctly abstained, for legitimate reasons (confidence just under
+  threshold after genuine adversarial review, thin option liquidity, or a
+  live-data gap in options positioning) — not forced, not gamed. One
+  2026-09-02 cycle missed the 55% confidence threshold by a single point
+  (54%) with every other gate — including live-data integrity — passing.
 - Three earlier paper spreads filled on 2026-08-25 are **historical evidence
   only** — that was a prior account and predates the dedicated-account
   requirement; it does not count toward P&L judging on `PA3PDTUDIXDU`.
