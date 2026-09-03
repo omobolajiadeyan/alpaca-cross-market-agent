@@ -174,7 +174,7 @@ def build():
     title(s, "One scorecard. A decision that defends itself.",
           "Signal strength never gets to hide weak execution evidence.")
     metrics = [("82", "Signal quality"), ("100", "Decision stability"),
-               ("67", "Execution quality"), ("Pending", "Outcome evidence")]
+               ("83", "Execution quality"), ("Pending", "Outcome evidence")]
     for i, (value, caption) in enumerate(metrics):
         x = .65 + i * 3.02
         rect(s, x, 2.65, 2.72, 1.3, ICE, RGBColor(213, 224, 233))
@@ -187,11 +187,11 @@ def build():
     text(s, "Sanitized case, credential-free", .95, 5.03, 4.9, .3, 17, WHITE, True)
     rect(s, 6.78, 4.35, 5.85, 1.38, ICE, RGBColor(213, 224, 233))
     text(s, "LIVE DEDICATED ACCOUNT", 7.08, 4.62, 2.3, .25, 11, CYAN, True)
-    text(s, "ABSTAIN · 4 of 6 gates passed", 7.08, 5.03, 4.95, .3, 17, NAVY, True)
-    text(s, "CS-20260901-4B6D4392 · account PA3PDTUDIXDU · sealed receipt · zero broker mutations",
+    text(s, "ABSTAIN · missed by 1 point · 5 of 6 gates passed", 7.08, 5.03, 4.95, .3, 15, NAVY, True)
+    text(s, "CS-20260902-BF9B142D · account PA3PDTUDIXDU · sealed receipt · zero broker mutations",
          .75, 6.18, 11.7, .25, 11, MUTED, True, align=PP_ALIGN.CENTER)
     footer(s, 5)
-    add_notes(s, "This is the key proof slide, drawn from a live cycle against the dedicated hackathon paper account on September 1st. Signal quality scored 82 and decision stability 100 across ten real perturbations, but execution quality was 67 because two of six deterministic checks failed -- live-data integrity and post-falsification confidence -- so the correct autonomous decision was abstention. Outcome evidence remains pending until the sealed horizon matures.")
+    add_notes(s, "This is the key proof slide, drawn from the latest live cycle against the dedicated hackathon paper account on September 2nd. Signal quality scored 82 and decision stability 100 across ten real perturbations. Five of six deterministic execution checks passed -- every gate cleared except post-falsification confidence, which landed at 54 percent against a 55 percent minimum. One point short. That razor-close abstention is the point: CrossSignal does not round in its own favor. Outcome evidence remains pending until the sealed horizon matures.")
 
     # 6 — Safety
     s = prs.slides.add_slide(blank); label(s, "Trust and safety", 6)
@@ -236,7 +236,7 @@ def build():
     rect(s, 0, 0, 13.333, 7.5, NAVY)
     text(s, "THE PROOF IS PUBLIC", .75, .7, 4, .3, 11, LIGHT_CYAN, True)
     text(s, "Inspect the intelligence.\nChallenge the decision.", .72, 1.35, 8.8, 1.55, 36, WHITE, True, "Aptos Display")
-    stats = [("43", "automated tests"), ("82/100", "live signal quality"), ("4/6", "risk gates passed")]
+    stats = [("46", "automated tests"), ("82/100", "live signal quality"), ("5/6", "risk gates passed")]
     for i, (value, caption) in enumerate(stats):
         x = .75 + i * 2.55
         text(s, value, x, 3.35, 2.2, .55, 27, LIGHT_CYAN, True)
@@ -250,7 +250,7 @@ def build():
     text(s, "CrossSignal does not merely recommend a trade.\nIt proves whether the trade deserves authorization.",
          .75, 5.35, 7.45, .85, 17, WHITE, True)
     text(s, "Omobolaji E Adeyan · Paper trading only · Not investment advice", .75, 6.75, 8, .3, 11, LIGHT_CYAN)
-    add_notes(s, "Close on verified evidence: forty-three tests pass in GitHub, a live cycle against the dedicated hackathon paper account sealed a real contract on September 1st, and the system abstained because two of six deterministic checks failed. CrossSignal makes AI trading decisions inspectable, challengeable, reproducible, and measurable. Invite judges to open the live application, repository, and dedicated account PA3PDTUDIXDU.")
+    add_notes(s, "Close on verified evidence: forty-six tests pass in GitHub, a live cycle against the dedicated hackathon paper account sealed a real contract on September 2nd, and the system abstained by a single confidence point after five of six deterministic checks passed. CrossSignal makes AI trading decisions inspectable, challengeable, reproducible, and measurable. Invite judges to open the live application, repository, and dedicated account PA3PDTUDIXDU.")
 
     OUT.parent.mkdir(parents=True, exist_ok=True)
     prs.save(OUT)
