@@ -60,7 +60,7 @@ or fabricate P&L for the competition.
 - Judge demo: <https://crosssignal-ai-agent.streamlit.app>
 - Repository: <https://github.com/omobolajiadeyan/alpaca-cross-market-agent>
 - Dedicated Alpaca paper account ID: `PA3PDTUDIXDU`
-- Selected video: `CrossSignal-Submission-Video.mp4` (4:49, 1920×1080, all ten cycles including today's)
+- Selected video: `CrossSignal-Submission-Video.mp4` (4:30, 1920×1080, position-lifecycle cut per `submission/FINAL_VIDEO_SCRIPT.md`, AI-narrated via edge-tts — no time to record a human voice-over before the deadline)
 - Slide deck: `CrossSignal-Hackathon-Pitch-Final.pdf`
 - One-page write-up: `CrossSignal-One-Page-Writeup.pdf`
 - Latest secret-free evidence: `Latest-Run-Evidence.json`
@@ -73,7 +73,7 @@ or fabricate P&L for the competition.
   video rendering, all reaching "PUBLIC JUDGE MODE" directly. Not a blocker —
   still worth a manual private-window glance before submitting.
 - [ ] Enter account ID `PA3PDTUDIXDU` in the lablab submission form.
-- [ ] Upload the selected 4:49 video, cover, PDF deck, and one-page PDF.
+- [ ] Upload the selected 4:30 position-lifecycle video, cover, PDF deck, and one-page PDF.
 - [ ] Add the public GitHub URL and demo URL.
 - [ ] Paste the prepared short and long descriptions from
   `submission/SUBMISSION_FORM_COPY.md`.

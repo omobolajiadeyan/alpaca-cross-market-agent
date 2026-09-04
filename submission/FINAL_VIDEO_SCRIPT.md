@@ -1,8 +1,15 @@
 # CrossSignal final video — position-lifecycle cut
 
-**Target runtime:** 4:35–4:55  
-**Format:** 1920×1080, H.264 video, AAC audio, human narration  
-**Status:** Re-record required. The existing 4:55.923 video was produced before the position-lifecycle feature and does not demonstrate exits.
+**Target runtime:** 4:35–4:55 (produced cut: 4:30)  
+**Format:** 1920×1080, H.264 video, AAC audio, Microsoft Edge neural TTS narration
+(edge-tts, `en-US-AndrewMultilingualNeural`) — there was no time before the
+deadline to record a human voice-over, so this narration is read verbatim
+from the script below by the same AI voice used in the earlier draft.
+**Status:** Recorded. `scripts/build_lifecycle_video.py` renders this script
+verbatim over real live-app screenshots (the Track record tab's Position
+lifecycle table), real code (`agent/position_manager.py`'s exit-rule
+evaluator), and real `59 passed` / `11 passed` test output. Output:
+`recording-output/CrossSignal-Position-Lifecycle-Narrated.mp4`.
 
 ## Narration and scene order
 
