@@ -173,6 +173,9 @@ def main() -> int:
         mobile_page.get_by_text("One decision. Every claim inspectable.").scroll_into_view_if_needed()
         mobile_page.wait_for_timeout(500)
         mobile_page.screenshot(path=str(SHOTS / "13-mobile-decision.png"), full_page=False)
+        mobile_page.get_by_text("Inspect a market disagreement", exact=True).scroll_into_view_if_needed()
+        mobile_page.wait_for_timeout(500)
+        mobile_page.screenshot(path=str(SHOTS / "14-mobile-controls.png"), full_page=False)
         mobile_context.close()
         browser.close()
 

@@ -72,6 +72,13 @@ h1,h2,h3 { font-family:'Manrope',sans-serif !important; letter-spacing:-.04em !i
 .thesis p { color:#d7e7f0; line-height:1.65; }.thesis .confidence { color:#72d4e8; font:700 .8rem Manrope; }
 div.stButton > button { border-radius:9px; border:0; background:var(--blue); color:white; font-weight:700; min-height:3rem; }
 div.stButton > button:hover { background:var(--navy); color:#fff; }
+[data-testid="stButton"] button,[data-testid="stDownloadButton"] button,[data-testid="stFileUploaderDropzone"] button{max-width:100%;min-height:44px;white-space:normal;line-height:1.35;transition:background .16s ease,border-color .16s ease,transform .16s ease}
+[data-testid="stButton"] button:hover,[data-testid="stDownloadButton"] button:hover{transform:translateY(-1px)}
+[data-testid="stButtonGroup"] [role="radiogroup"]{display:flex!important;flex-wrap:wrap!important;gap:.4rem!important;width:100%;overflow:visible!important}
+[data-testid="stButtonGroup"] button{min-width:0!important;min-height:42px;white-space:normal!important;line-height:1.25!important}
+[data-testid="stButtonGroup"] button[data-variant="segmented_control"]{flex:1 1 105px}
+[data-testid="stButtonGroup"] button[data-variant="pills"]{flex:1 1 225px}
+[data-testid="stButtonGroup"] button p{white-space:normal!important;overflow-wrap:anywhere;text-align:center}
 [data-testid="stMetric"] { background:#fff; border:1px solid var(--line); border-top:3px solid var(--cyan); border-radius:10px; padding:1rem; box-shadow:0 4px 14px rgba(7,29,73,.035); }
 [data-testid="stMetricLabel"] p{color:#40576e!important;font-weight:700!important;font-size:.8rem!important}
 [data-testid="stMetricValue"]{color:var(--ink)!important;font-family:'Manrope',sans-serif!important}
@@ -98,7 +105,7 @@ button:focus-visible,[role="tab"]:focus-visible { outline:3px solid rgba(25,181,
 @media(max-width:520px){
   .block-container{padding:.55rem .72rem 2rem}.hero{margin-top:.75rem;padding:1.5rem 1.1rem}.hero-copy{font-size:.94rem}.hero-status{padding:.9rem}.hero-verdict{font-size:1.6rem}
   .proof-grid{grid-template-columns:1fr}.proof{padding:1.25rem;border-right:0;border-bottom:1px solid var(--line)}.nav{padding:.5rem 0 1rem}[data-testid="stMetric"]{padding:.75rem}
-  h1{font-size:2.05rem!important}h2{font-size:1.55rem!important}.footer{line-height:1.6}.mode-banner{align-items:flex-start;flex-wrap:wrap}.mode-banner b{margin-left:1.4rem}.evidence-detail{grid-template-columns:1fr}.evidence-detail>div:last-child{grid-column:auto}[data-testid="stTabs"] [data-testid="stTab"]{padding:.5rem .75rem!important;font-size:.8rem}
+  h1{font-size:2.05rem!important}h2{font-size:1.55rem!important}.footer{line-height:1.6}.mode-banner{align-items:flex-start;flex-wrap:wrap}.mode-banner b{margin-left:1.4rem}.evidence-detail{grid-template-columns:1fr}.evidence-detail>div:last-child{grid-column:auto}[data-testid="stTabs"] [data-testid="stTab"]{padding:.5rem .75rem!important;font-size:.8rem}[data-testid="stButton"],[data-testid="stDownloadButton"]{width:100%}[data-testid="stButton"] button,[data-testid="stDownloadButton"] button{width:100%}[data-testid="stButtonGroup"] button[data-variant="segmented_control"],[data-testid="stButtonGroup"] button[data-variant="pills"]{flex:1 1 46%}.nav-actions{gap:.35rem}.nav-link{padding:.4rem .5rem;font-size:.64rem}
 }
 </style>
 """, unsafe_allow_html=True)
