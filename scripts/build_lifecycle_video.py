@@ -596,13 +596,16 @@ def capture_live_segment(browser, action_fn, target_duration: float, out_mp4: Pa
             page.wait_for_timeout(400)
 
             action_fn(page, target_duration)
+            # Keep a deliberate tail so the retained window contains only the
+            # settled interaction, never Streamlit navigation/loading frames.
+            page.wait_for_timeout(int(target_duration * 1000 * 0.30))
         finally:
             # Closing the context flushes Playwright's WebM writer. Without
             # this guard, a failed selector can leave the file locked on Windows.
             context.close()
         recorded = next(Path(vdir).glob("*.webm"))
         subprocess.run([
-            ffmpeg, "-y", "-i", str(recorded),
+            ffmpeg, "-y", "-sseof", f"-{target_duration}", "-i", str(recorded),
             "-c:v", "libx264", "-preset", "medium", "-crf", "20", "-r", "30",
             "-pix_fmt", "yuv420p", "-t", str(target_duration), str(out_mp4),
         ], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)

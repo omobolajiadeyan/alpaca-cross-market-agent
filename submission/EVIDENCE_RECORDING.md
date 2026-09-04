@@ -5,9 +5,9 @@
 ## Selected video
 
 - File: `CrossSignal-Submission-Video.mp4`
-- Duration: 3:46.768
+- Duration: 3:46.714
 - Resolution: 1920×1080
-- SHA-256: `5615D792391B1E83BE5F7BD64255D719379686D08552EF271316D6ED15ED7739`
+- SHA-256: `762BF3996343548691BE287538CB3596C3D221F4C2113318D40EDCFE5D114BD7`
 - Evidence date represented in video: through September 3, 2026
 - Status: final live-demo-first position-lifecycle cut
 
