@@ -439,13 +439,13 @@ def build_clip(ffmpeg: str, image: Path, audio: Path, duration: float, out_mp4: 
         "[0:v]scale=1920:1080:force_original_aspect_ratio=decrease,"
         "pad=1920:1080:(ow-iw)/2:(oh-ih)/2:color=0x071d49,format=yuv420p,"
         f"fade=t=in:st=0:d=0.4,fade=t=out:st={fade_out}:d=0.4[base];"
-        "[2:v]scale=190:190[wm];[base][wm]overlay=W-w-90:H-h-70:format=auto[wmout];"
+        "[2:v]scale=190:190[wm];[base][wm]overlay=W-w-90:H-h-70:format=yuv420[wmout];"
         f"{progress_bar_filters('wmout', 'outv', step_index, step_total)}"
     )
     subprocess.run([
         ffmpeg, "-y", "-loop", "1", "-i", str(image), "-i", str(audio), "-i", str(WATERMARK_PNG),
         "-filter_complex", filter_complex, "-map", "[outv]", "-map", "1:a",
-        "-af", "apad", "-t", str(duration), "-r", "30",
+        "-af", "apad", "-t", str(duration), "-r", "30", "-pix_fmt", "yuv420p",
         "-c:v", "libx264", "-preset", "medium", "-crf", "20",
         "-c:a", "aac", "-b:a", "160k", "-ar", "48000", str(out_mp4),
     ], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
@@ -546,13 +546,13 @@ def capture_public_site_tour(target_duration: float, out_mp4: Path, ffmpeg: str)
 def build_video_clip(ffmpeg: str, silent_video: Path, audio: Path, duration: float,
                       out_mp4: Path, step_index: int, step_total: int) -> None:
     filter_complex = (
-        "[2:v]scale=190:190[wm];[0:v][wm]overlay=W-w-90:H-h-70:format=auto[wmout];"
+        "[2:v]scale=190:190[wm];[0:v][wm]overlay=W-w-90:H-h-70:format=yuv420[wmout];"
         f"{progress_bar_filters('wmout', 'outv', step_index, step_total)}"
     )
     subprocess.run([
         ffmpeg, "-y", "-i", str(silent_video), "-i", str(audio), "-i", str(WATERMARK_PNG),
         "-filter_complex", filter_complex, "-map", "[outv]", "-map", "1:a:0",
-        "-c:v", "libx264", "-preset", "medium", "-crf", "20", "-r", "30",
+        "-c:v", "libx264", "-preset", "medium", "-crf", "20", "-r", "30", "-pix_fmt", "yuv420p",
         "-af", "apad", "-t", str(duration),
         "-c:a", "aac", "-b:a", "160k", "-ar", "48000", str(out_mp4),
     ], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
