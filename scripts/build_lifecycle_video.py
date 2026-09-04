@@ -88,6 +88,19 @@ FONT_HEAD = (
     '&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">'
 )
 
+import base64
+PRESENTER_PHOTO_B64 = base64.b64encode(
+    (ROOT / "assets" / "presenter-headshot.png").read_bytes()
+).decode("ascii")
+HEADSHOT_HTML = (
+    f'<img class="headshot" src="data:image/png;base64,{PRESENTER_PHOTO_B64}">'
+)
+HEADSHOT_STYLE = """
+.headshot { position:absolute; right:90px; bottom:70px; width:190px; height:190px;
+  border-radius:50%; border:4px solid #19b5d8; object-fit:cover;
+  box-shadow:0 6px 20px rgba(0,0,0,.35); z-index:2; }
+"""
+
 CARD_STYLE = """
 * { box-sizing: border-box; margin:0; padding:0; }
 body { width:1920px; height:1080px; background:#071d49;
@@ -123,6 +136,52 @@ def card(eyebrow: str, title: str, sub: str = "", items: list[str] | None = None
 </body></html>"""
 
 
+FLOW_STYLE = """
+* { box-sizing: border-box; margin:0; padding:0; }
+body { width:1920px; height:1080px; background:#071d49;
+  font-family:'DM Sans',sans-serif; color:#fff;
+  display:flex; flex-direction:column; justify-content:center;
+  padding:0 140px; position:relative; overflow:hidden; }
+.ring { position:absolute; width:520px; height:520px; border:80px solid #19b5d8;
+  border-radius:50%; opacity:.9; right:-220px; bottom:-220px; }
+.eyebrow { font-family:'Manrope',sans-serif; font-size:16px; letter-spacing:.16em;
+  color:#72d4e8; font-weight:700; margin-bottom:20px; z-index:1; }
+h1 { font-family:'Manrope',sans-serif; font-weight:800; font-size:48px;
+  letter-spacing:-.02em; line-height:1.25; max-width:1200px; margin-bottom:44px; z-index:1; }
+.flow { display:flex; align-items:stretch; gap:18px; z-index:1; }
+.step { flex:1; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.15);
+  border-radius:12px; padding:26px 22px; }
+.step.accent { background:#19b5d8; border-color:#19b5d8; }
+.step .n { font-family:'Manrope',sans-serif; font-weight:800; font-size:13px;
+  color:#72d4e8; letter-spacing:.1em; margin-bottom:10px; }
+.step.accent .n { color:#04222c; }
+.step .t { font-family:'Manrope',sans-serif; font-weight:700; font-size:21px; margin-bottom:8px; }
+.step.accent .t { color:#04222c; }
+.step .d { font-size:14px; color:#b9cfe0; line-height:1.5; }
+.step.accent .d { color:#0b3542; }
+.arrow { display:flex; align-items:center; color:#72d4e8; font-size:22px; font-weight:700; }
+"""
+
+
+def flow_card(eyebrow: str, title: str, steps: list[tuple[str, str, str]],
+              accent_index: int | None = None) -> str:
+    parts = []
+    for i, (num, name, desc) in enumerate(steps):
+        if i:
+            parts.append('<div class="arrow">&#8594;</div>')
+        cls = "step accent" if i == accent_index else "step"
+        parts.append(f'<div class="{cls}"><div class="n">{num}</div>'
+                      f'<div class="t">{name}</div><div class="d">{desc}</div></div>')
+    flow_html = '<div class="flow">' + "".join(parts) + "</div>"
+    return f"""<!doctype html><html><head><meta charset="utf-8">{FONT_HEAD}
+<style>{FLOW_STYLE}</style></head><body>
+<div class="ring"></div>
+<div class="eyebrow">{eyebrow}</div>
+<h1>{title}</h1>
+{flow_html}
+</body></html>"""
+
+
 TITLE_HTML = f"""<!doctype html><html><head><meta charset="utf-8">{FONT_HEAD}
 <style>
 * {{ box-sizing: border-box; margin:0; padding:0; }}
@@ -135,14 +194,15 @@ body {{ width:1920px; height:1080px; background:#071d49;
 .brand {{ font-family:'Manrope',sans-serif; font-weight:800; font-size:64px;
   letter-spacing:-.03em; margin-bottom:28px; z-index:1; }}
 .brand .mark {{ color:#19b5d8; margin-right:14px; }}
-.tagline {{ font-size:28px; color:#d7e7f0; max-width:1000px; line-height:1.5;
-  margin-bottom:40px; z-index:1; }}
-.presenter {{ font-size:18px; color:#b9dced; z-index:1; }}
+.eyebrow {{ font-family:'Manrope',sans-serif; font-size:16px; letter-spacing:.16em;
+  color:#72d4e8; font-weight:700; margin-bottom:24px; z-index:1; }}
+.presenter {{ font-size:18px; color:#b9dced; z-index:1; margin-top:36px; }}
+{HEADSHOT_STYLE}
 </style></head><body>
 <div class="ring"></div>
+{HEADSHOT_HTML}
+<div class="eyebrow">DECISION AND POSITION-LIFECYCLE INTELLIGENCE</div>
 <div class="brand"><span class="mark">&#9670;</span>CROSSSIGNAL</div>
-<div class="tagline">What if the smartest thing an AI trading agent could do was say
-no&mdash;and, when it says yes, know exactly how to get out?</div>
 <div class="presenter">Omobolaji Adeyan &middot; Alpaca AI Trading Agents Hackathon &middot; Paper trading only</div>
 </body></html>"""
 
@@ -166,11 +226,12 @@ body {{ width:1920px; height:1080px; background:#071d49;
   text-transform:uppercase; margin-bottom:8px; }}
 .link-value {{ font-size:19px; color:#fff; font-weight:600; }}
 .presenter {{ font-size:16px; color:#b9dced; z-index:1; }}
+{HEADSHOT_STYLE}
 </style></head><body>
 <div class="ring"></div>
+{HEADSHOT_HTML}
 <div class="brand"><span class="mark">&#9670;</span>CROSSSIGNAL</div>
-<div class="tagline">Proves when a trade deserves entry, manages it under rules fixed in
-advance, and proves why it exited.</div>
+<div class="tagline">Entry, governed. Exit, proven.</div>
 <div class="links">
   <div class="link-block"><div class="link-label">Live Application</div><div class="link-value">crosssignal-ai-agent.streamlit.app</div></div>
   <div class="link-block"><div class="link-label">Source Code</div><div class="link-value">github.com/omobolajiadeyan/alpaca-cross-market-agent</div></div>
@@ -500,15 +561,18 @@ def main() -> int:
 
     scenes = {
         "opening": TITLE_HTML,
-        "problem": card("THE PROBLEM", "A valid entry can become unmanaged risk.",
-                         "Without an explicit take-profit, stop-loss, time limit, and expiry rule, "
-                         "a strong signal alone is not a safe trade. An autonomous agent must justify "
-                         "both why it entered and why it stayed or exited."),
-        "solution": card("THE ARCHITECTURE", "One proposal. Independent, deterministic authority.",
-                          "CrossSignal synchronizes six market lenses. Claude proposes a structured "
-                          "thesis and attacks its own case &mdash; independent deterministic code "
-                          "measures disagreement, tests stability, checks risk and execution quality, "
-                          "and has final authority. Claude never contacts the broker."),
+        "problem": card("THE PROBLEM", "Entry is only half the problem.", items=[
+            "No take-profit &rarr; upside left uncaptured",
+            "No stop-loss &rarr; downside unbounded",
+            "No time or expiry limit &rarr; position drifts past its thesis",
+        ]),
+        "solution": flow_card("THE ARCHITECTURE", "One proposal. Independent, deterministic authority.", [
+            ("01", "6 lenses", "Claude proposes a thesis"),
+            ("02", "Attack", "Claude challenges its own case"),
+            ("03", "Disagreement", "Scored independently"),
+            ("04", "Stability", "Tested under noise"),
+            ("05", "Risk + execution", "Deterministic, final"),
+        ], accent_index=4),
         "entry_governance": card("ENTRY GOVERNANCE", "Ten checks before any order.", items=[
             "Live-data integrity &middot; confidence &middot; maximum loss",
             "Buying power &middot; diversification &middot; Greeks coverage",
