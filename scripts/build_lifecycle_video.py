@@ -17,8 +17,6 @@ import sys
 import tempfile
 import time
 from pathlib import Path
-from urllib.error import URLError
-from urllib.request import urlopen
 
 from playwright.sync_api import sync_playwright
 
@@ -389,50 +387,107 @@ def build_clip(ffmpeg: str, image: Path, audio: Path, duration: float, out_mp4: 
     ], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
 
-def wait_for_app(url: str, timeout: int = 45) -> None:
-    deadline = time.monotonic() + timeout
-    while time.monotonic() < deadline:
-        try:
-            with urlopen(url, timeout=2) as response:
-                if response.status < 500:
-                    return
-        except (URLError, TimeoutError, OSError):
-            time.sleep(0.5)
-    raise RuntimeError(f"Streamlit did not become ready at {url}")
+PUBLIC_SITE_URL = "https://crosssignal-ai-agent.streamlit.app/~/+/"
+
+CURSOR_INIT_JS = """
+() => {
+  const dot = document.createElement('div');
+  dot.id = '__cs_cursor';
+  dot.style.cssText = 'position:fixed;z-index:2147483647;width:22px;height:22px;'
+    + 'border-radius:50%;background:rgba(25,181,216,0.85);border:2px solid white;'
+    + 'box-shadow:0 2px 8px rgba(0,0,0,0.35);pointer-events:none;'
+    + 'transition:left 0.5s ease,top 0.5s ease,transform 0.15s ease;'
+    + 'left:-40px;top:-40px;transform:scale(1);';
+  document.documentElement.appendChild(dot);
+  window.__csMoveCursor = (x, y) => {
+    const el = document.getElementById('__cs_cursor');
+    if (el) { el.style.left = (x - 11) + 'px'; el.style.top = (y - 11) + 'px'; }
+  };
+  window.__csPulseCursor = () => {
+    const el = document.getElementById('__cs_cursor');
+    if (!el) return;
+    el.style.transform = 'scale(0.6)';
+    setTimeout(() => { el.style.transform = 'scale(1)'; }, 150);
+  };
+}
+"""
 
 
-def capture_dashboard_screenshot(out_png: Path) -> None:
-    import os
-    env = dict(os.environ)
-    for name in ("APCA_API_KEY_ID", "APCA_API_SECRET_KEY", "ANTHROPIC_API_KEY"):
-        env.pop(name, None)
-    env.update({"PUBLIC_DEMO_MODE": "true", "ALLOW_PAPER_EXECUTION": "false"})
-    server = subprocess.Popen(
-        [sys.executable, "-m", "streamlit", "run", "app.py",
-         "--server.headless=true", "--server.address=127.0.0.1",
-         "--server.port=8517", "--browser.gatherUsageStats=false",
-         "--client.toolbarMode=minimal"],
-        cwd=ROOT, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT,
-    )
-    try:
-        wait_for_app("http://127.0.0.1:8517")
-        with sync_playwright() as pw:
-            browser = pw.chromium.launch(headless=True)
-            page = browser.new_page(viewport={"width": 1920, "height": 1080})
-            page.goto("http://127.0.0.1:8517", wait_until="networkidle", timeout=60_000)
+def visible_click(page, locator) -> None:
+    box = locator.bounding_box()
+    if box:
+        cx, cy = box["x"] + box["width"] / 2, box["y"] + box["height"] / 2
+        page.evaluate("([x,y]) => window.__csMoveCursor && window.__csMoveCursor(x,y)", [cx, cy])
+        page.mouse.move(cx, cy, steps=20)
+        page.wait_for_timeout(500)
+        page.evaluate("window.__csPulseCursor && window.__csPulseCursor()")
+        page.wait_for_timeout(150)
+    locator.click()
+
+
+def capture_public_site_tour(target_duration: float, out_mp4: Path, ffmpeg: str) -> None:
+    """Record a real, cursor-driven tour of the actual public deployment
+    (not a local instance) -- the same URL judges will open themselves --
+    touring the decision scorecard and then the position-lifecycle table."""
+    with sync_playwright() as pw:
+        browser = pw.chromium.launch(headless=True)
+
+        # Warm-up (not recorded): Streamlit Community Cloud apps sleep after
+        # inactivity and can take well over 30s to cold-start on first hit.
+        print("  [public-tour] warming up the public deployment (may cold-start)...")
+        warm = browser.new_context(viewport={"width": 1920, "height": 1080})
+        warm_page = warm.new_page()
+        warm_page.goto(PUBLIC_SITE_URL, wait_until="domcontentloaded", timeout=90_000)
+        warm_page.get_by_text("PUBLIC JUDGE MODE", exact=False).wait_for(timeout=90_000)
+        warm.close()
+
+        with tempfile.TemporaryDirectory(prefix="crosssignal-publictour-") as vdir:
+            context = browser.new_context(
+                viewport={"width": 1920, "height": 1080}, device_scale_factor=1,
+                record_video_dir=vdir, record_video_size={"width": 1920, "height": 1080},
+            )
+            page = context.new_page()
+            page.goto(PUBLIC_SITE_URL, wait_until="domcontentloaded", timeout=60_000)
             page.get_by_text("PUBLIC JUDGE MODE", exact=False).wait_for(timeout=30_000)
-            page.get_by_role("tab", name="Track record").click()
+            # Streamlit renders skeleton placeholders first and fills real data in
+            # a moment later; without this, the recording captures gray shimmer
+            # boxes instead of the actual scorecard numbers.
+            page.get_by_text("Decision intelligence scorecard", exact=False) \
+                .wait_for(timeout=15_000)
+            page.wait_for_timeout(4000)
+            page.evaluate(CURSOR_INIT_JS)
             page.wait_for_timeout(600)
+
+            page.get_by_text("Decision intelligence scorecard", exact=False) \
+                .scroll_into_view_if_needed()
+            page.wait_for_timeout(int(target_duration * 1000 * 0.40))
+
+            page.evaluate("window.scrollTo(0, 0)")
+            page.wait_for_timeout(200)
+            visible_click(page, page.get_by_role("tab", name="Track record"))
+            page.wait_for_timeout(300)
             page.get_by_text("Position lifecycle", exact=False).scroll_into_view_if_needed()
-            page.wait_for_timeout(400)
-            page.screenshot(path=str(out_png))
-            browser.close()
-    finally:
-        server.terminate()
-        try:
-            server.wait(timeout=10)
-        except subprocess.TimeoutExpired:
-            server.kill()
+            page.wait_for_timeout(int(target_duration * 1000 * 0.40))
+
+            context.close()
+            recorded = next(Path(vdir).glob("*.webm"))
+            subprocess.run([
+                ffmpeg, "-y", "-i", str(recorded),
+                "-c:v", "libx264", "-preset", "medium", "-crf", "20", "-r", "30",
+                "-pix_fmt", "yuv420p", "-t", str(target_duration), str(out_mp4),
+            ], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        browser.close()
+
+
+def build_video_clip(ffmpeg: str, silent_video: Path, audio: Path, duration: float,
+                      out_mp4: Path) -> None:
+    subprocess.run([
+        ffmpeg, "-y", "-i", str(silent_video), "-i", str(audio),
+        "-map", "0:v:0", "-map", "1:a:0",
+        "-c:v", "libx264", "-preset", "medium", "-crf", "20", "-r", "30",
+        "-af", "apad", "-t", str(duration),
+        "-c:a", "aac", "-b:a", "160k", "-ar", "48000", str(out_mp4),
+    ], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
 
 def main() -> int:
@@ -471,7 +526,7 @@ def main() -> int:
             "A dedicated kill switch pauses new entries, not open positions",
         ]),
         "evidence": EVIDENCE_HTML,
-        "dashboard": None,  # filled in with a live screenshot below
+        "dashboard": None,  # built from a live public-site recording below
         "repo_tests": TERMINAL_HTML,
         "close": CLOSING_HTML,
     }
@@ -479,38 +534,44 @@ def main() -> int:
     with tempfile.TemporaryDirectory(prefix="crosssignal-lifecycle-") as name:
         temp = Path(name)
 
-        print("Capturing live dashboard screenshot (Track record / Position lifecycle)...")
-        dashboard_png = temp / "dashboard_capture.png"
-        capture_dashboard_screenshot(dashboard_png)
-
         print("Synthesizing narration and measuring durations...")
-        clips = []
-        total_duration = 0.0
-        with sync_playwright() as pw:
-            browser = pw.chromium.launch(headless=True)
-            for beat_id, narration in BEATS:
-                audio = temp / f"{beat_id}.mp3"
-                synthesize(ffmpeg, narration, audio)
-                spoken = media_duration(ffmpeg, audio)
-                duration = spoken + TAIL_PAD
+        audio_paths: dict[str, Path] = {}
+        durations: dict[str, float] = {}
+        for beat_id, narration in BEATS:
+            audio = temp / f"{beat_id}.mp3"
+            synthesize(ffmpeg, narration, audio)
+            spoken = media_duration(ffmpeg, audio)
+            durations[beat_id] = spoken + TAIL_PAD
+            audio_paths[beat_id] = audio
+            print(f"  {beat_id}: {spoken:.1f}s speech -> {durations[beat_id]:.1f}s clip")
 
-                image = temp / f"{beat_id}.png"
-                if beat_id == "dashboard":
-                    shutil.copy(dashboard_png, image)
-                else:
-                    render_png(browser, scenes[beat_id], image)
-
-                clip = temp / f"{beat_id}.mp4"
-                build_clip(ffmpeg, image, audio, duration, clip)
-                clips.append(clip)
-                total_duration += duration
-                print(f"  {beat_id}: {spoken:.1f}s speech -> {duration:.1f}s clip")
-            browser.close()
-
+        total_duration = sum(durations.values())
         if total_duration > HARD_CAP_SECONDS:
             raise RuntimeError(
                 f"Assembled video is {total_duration:.1f}s, over the {HARD_CAP_SECONDS}s cap"
             )
+
+        print("Recording live tour of the public deployment "
+              "(crosssignal-ai-agent.streamlit.app)...")
+        dashboard_tour_mp4 = temp / "dashboard_tour.mp4"
+        capture_public_site_tour(durations["dashboard"], dashboard_tour_mp4, ffmpeg)
+
+        print("Rendering scene cards and assembling clips...")
+        clips = []
+        with sync_playwright() as pw:
+            browser = pw.chromium.launch(headless=True)
+            for beat_id, narration in BEATS:
+                duration = durations[beat_id]
+                audio = audio_paths[beat_id]
+                clip = temp / f"{beat_id}.mp4"
+                if beat_id == "dashboard":
+                    build_video_clip(ffmpeg, dashboard_tour_mp4, audio, duration, clip)
+                else:
+                    image = temp / f"{beat_id}.png"
+                    render_png(browser, scenes[beat_id], image)
+                    build_clip(ffmpeg, image, audio, duration, clip)
+                clips.append(clip)
+            browser.close()
 
         manifest = temp / "clips.txt"
         manifest.write_text("".join(f"file '{c}'\n" for c in clips), encoding="utf-8")
