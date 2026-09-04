@@ -111,6 +111,21 @@ def build():
          .75, 4.18, 8.2, .75, 20, LIGHT_CYAN)
     rect(s, 9.7, -.6, 4.5, 4.5, CYAN, radius=True)
     rect(s, 10.42, .12, 3.1, 3.1, NAVY, radius=True)
+    if COVER.exists():
+        from PIL import Image
+        cover_w, cover_h = Image.open(COVER).size
+        cover_aspect = cover_w / cover_h
+        inset = 0.18
+        pic = s.shapes.add_picture(str(COVER), Inches(10.42 + inset), Inches(.12 + inset),
+                                    Inches(3.1 - 2 * inset), Inches(3.1 - 2 * inset))
+        if cover_aspect > 1:
+            crop = (1 - 1 / cover_aspect) / 2
+            pic.crop_left = crop
+            pic.crop_right = crop
+        elif cover_aspect < 1:
+            crop = (1 - cover_aspect) / 2
+            pic.crop_top = crop
+            pic.crop_bottom = crop
     text(s, "CROSSSIGNAL", .75, 6.25, 4, .4, 18, WHITE, True)
     text(s, "Created by Omobolaji E Adeyan", .75, 6.7, 5, .3, 12, LIGHT_CYAN)
     add_notes(s, "Markets often disagree before they reprice. CrossSignal identifies that disagreement, challenges the conclusion, applies deterministic controls, and records whether the prediction was ultimately correct.")
