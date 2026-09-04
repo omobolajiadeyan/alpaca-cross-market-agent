@@ -79,8 +79,10 @@ not broker fill evidence."""),
 Fifty-nine automated tests cover authorization, pricing, profit and loss
 triggers, time and expiry exits, market-closed deferral, atomic leg reversal,
 audit persistence, privacy, and duplicate-order prevention."""),
-    ("close", """CrossSignal proves when a trade deserves entry, manages it under rules fixed in
-advance, and proves why it exited. I'm Omobolaji Adeyan. Thank you."""),
+    ("close", """That's the fix for the problem I opened with: an entry decision is not enough.
+CrossSignal governs both halves — it proves a trade deserves entry, then manages
+it under exit rules fixed in advance, and proves why it closed when it did.
+I'm Omobolaji Adeyan. Thank you."""),
 ]
 
 FONT_HEAD = (
@@ -173,6 +175,18 @@ def flow_card(eyebrow: str, title: str, steps: list[tuple[str, str, str]],
 <h1>{title}</h1>
 {flow_html}
 </body></html>"""
+
+
+STATE_MACHINE_HTML = flow_card(
+    "POSITION LIFECYCLE", "Every open position, one real state at a time.",
+    [
+        ("01", "PENDING_ENTRY", "Broker confirms every leg filled"),
+        ("02", "OPEN", "Reconciled &amp; valued every cycle"),
+        ("03", "EXIT_PENDING", "Atomic reversal order submitted"),
+        ("04", "CLOSED", "Realized P&amp;L, audit-logged"),
+    ],
+    accent_index=3,
+)
 
 
 TITLE_HTML = f"""<!doctype html><html><head><meta charset="utf-8">{FONT_HEAD}
@@ -451,6 +465,46 @@ def build_clip(ffmpeg: str, image: Path, audio: Path, duration: float, out_mp4: 
     ], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
 
+def build_split_clip(ffmpeg: str, images_durations: list[tuple[Path, float]], audio: Path,
+                      total_duration: float, out_mp4: Path, step_index: int,
+                      step_total: int) -> None:
+    """Two (or more) images shown in sequence under one continuous narration
+    track. Used for beats whose audio is long enough that a single static
+    image would sit on screen doing nothing for most of a minute."""
+    n = len(images_durations)
+    inputs: list[str] = []
+    filter_parts: list[str] = []
+    concat_labels = []
+    for i, (image, dur) in enumerate(images_durations):
+        inputs += ["-loop", "1", "-t", str(dur), "-i", str(image)]
+        fade = ""
+        if i == 0:
+            fade = ",fade=t=in:st=0:d=0.4"
+        if i == n - 1:
+            fade_out_st = max(dur - 0.4, 0)
+            fade += f",fade=t=out:st={fade_out_st}:d=0.4"
+        filter_parts.append(
+            f"[{i}:v]scale=1920:1080:force_original_aspect_ratio=decrease,"
+            f"pad=1920:1080:(ow-iw)/2:(oh-ih)/2:color=0x071d49,format=yuv420p{fade}[v{i}]"
+        )
+        concat_labels.append(f"[v{i}]")
+    audio_index, watermark_index = n, n + 1
+    filter_parts.append(f"{''.join(concat_labels)}concat=n={n}:v=1:a=0[base]")
+    filter_parts.append(
+        f"[{watermark_index}:v]scale=190:190[wm];"
+        "[base][wm]overlay=W-w-90:H-h-70:format=yuv420[wmout]"
+    )
+    filter_parts.append(progress_bar_filters("wmout", "outv", step_index, step_total))
+    subprocess.run([
+        ffmpeg, "-y", *inputs, "-i", str(audio), "-i", str(WATERMARK_PNG),
+        "-filter_complex", ";".join(filter_parts),
+        "-map", "[outv]", "-map", f"{audio_index}:a",
+        "-af", "apad", "-t", str(total_duration), "-r", "30", "-pix_fmt", "yuv420p",
+        "-c:v", "libx264", "-preset", "medium", "-crf", "20",
+        "-c:a", "aac", "-b:a", "160k", "-ar", "48000", str(out_mp4),
+    ], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+
 PUBLIC_SITE_URL = "https://crosssignal-ai-agent.streamlit.app/~/+/"
 
 CURSOR_INIT_JS = """
@@ -587,7 +641,7 @@ def main() -> int:
             "Sealed into a SHA-256 Decision Contract before submission",
             "One critical control fails &rarr; ABSTAIN, not a forced trade",
         ]),
-        "position_lifecycle": CODE_HTML,
+        "position_lifecycle": None,  # split: real code, then the state-machine diagram
         "safety_boundary": card("SAFETY BOUNDARY", "Exit automation is independently gated.", items=[
             "Exact Alpaca paper endpoint required",
             "Entry authorization + a second automated-exit switch",
@@ -639,6 +693,17 @@ def main() -> int:
                 if beat_id == "dashboard":
                     build_video_clip(ffmpeg, dashboard_tour_mp4, audio, duration, clip,
                                       step_index, step_total)
+                elif beat_id == "position_lifecycle":
+                    code_png = temp / "position_lifecycle_code.png"
+                    diagram_png = temp / "position_lifecycle_diagram.png"
+                    render_png(browser, CODE_HTML, code_png)
+                    render_png(browser, STATE_MACHINE_HTML, diagram_png)
+                    code_dur = duration * 0.55
+                    diagram_dur = duration - code_dur
+                    build_split_clip(
+                        ffmpeg, [(code_png, code_dur), (diagram_png, diagram_dur)],
+                        audio, duration, clip, step_index, step_total,
+                    )
                 else:
                     image = temp / f"{beat_id}.png"
                     render_png(browser, scenes[beat_id], image)

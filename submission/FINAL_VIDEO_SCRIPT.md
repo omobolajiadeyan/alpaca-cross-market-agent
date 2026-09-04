@@ -6,9 +6,12 @@
 deadline to record a human voice-over, so this narration is read verbatim
 from the script below by the same AI voice used in the earlier draft.
 **Status:** Recorded. `scripts/build_lifecycle_video.py` renders this script
-verbatim over real live-app screenshots (the Track record tab's Position
-lifecycle table), real code (`agent/position_manager.py`'s exit-rule
-evaluator), and real `59 passed` / `11 passed` test output. Output:
+over real live-app footage (a cursor-driven recording of the public
+deployment itself, not a local copy), real code
+(`agent/position_manager.py`'s exit-rule evaluator), a state-machine
+diagram of the four real `PositionState` values, and real `59 passed` /
+`11 passed` test output. A persistent presenter watermark and a
+step-progress bar run throughout. Output:
 `recording-output/CrossSignal-Position-Lifecycle-Narrated.mp4`.
 
 ## Narration and scene order
@@ -93,12 +96,15 @@ evaluator), and real `59 passed` / `11 passed` test output. Output:
 
 ### 4:42–4:55 — Close
 
-> CrossSignal proves when a trade deserves entry, manages it under rules fixed in
-> advance, and proves why it exited. I'm Omobolaji Adeyan. Thank you.
+> That's the fix for the problem I opened with: an entry decision is not enough.
+> CrossSignal governs both halves — it proves a trade deserves entry, then
+> manages it under exit rules fixed in advance, and proves why it closed when
+> it did. I'm Omobolaji Adeyan. Thank you.
 
 ## Recording checklist
 
-- Show `agent/position_manager.py`, `tools/alpaca_tools.py`, and the lifecycle table.
+- Show `agent/position_manager.py`, the lifecycle table, and the
+  PENDING_ENTRY &rarr; OPEN &rarr; EXIT_PENDING &rarr; CLOSED state-machine diagram.
 - Show the four dollar/time exit thresholds, broker reconciliation, quote freshness,
   deterministic client order ID, entry kill switch, and `EXIT_PENDING` control.
 - State clearly that the lifecycle replay is illustrative and the competition account has no fill or P&L evidence.
