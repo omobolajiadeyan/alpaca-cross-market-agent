@@ -1,98 +1,99 @@
-# CrossSignal final video — reviewed submission cut
+# CrossSignal final video — position-lifecycle cut
 
-**Selected asset:** `CrossSignal-Submission-Video.mp4`  
-**Source file:** `recording-output/CrossSignal-Submission-Narrated.mp4`  
-**Runtime:** 4:49  
-**Format:** 1920×1080, H.264 video, AAC audio, en-US-AndrewNeural narration  
-**SHA-256:** `59AA76D2D18354CAC8E7298DEE49C0EDC7DAAA856740705BDDC5A250A16CD342`
-
-This supersedes the earlier September 2 cut. The video now says **ten live
-cycles** and its evidence table includes the September 3 tenth cycle
-(contract `CS-20260903-FE01A097`) alongside the first nine.
+**Target runtime:** 4:35–4:55  
+**Format:** 1920×1080, H.264 video, AAC audio, human narration  
+**Status:** Re-record required. The existing 4:55.923 video was produced before the position-lifecycle feature and does not demonstrate exits.
 
 ## Narration and scene order
 
-### Opening
+### 0:00–0:15 — Opening
 
-> What if the smartest thing an AI trading agent could do was say no? I'm
-> Omobolaji Adeyan, and this is CrossSignal.
+> What if the smartest thing an AI trading agent could do was say no—and, when
+> it says yes, know exactly how to get out? I'm Omobolaji Adeyan, and this is
+> CrossSignal.
 
-### Problem
+### 0:15–0:48 — Problem
 
-> Most trading agents are designed to find opportunities and execute quickly.
-> But a strong signal alone does not make a trade safe. The market may be
-> unstable, spreads may be too wide, liquidity may be insufficient, or different
-> indicators may conflict. A single model can overlook that and still place the
-> trade. That's a reliability problem: how does an autonomous agent prove a trade
-> was justified before it acts?
+> Most trading agents focus on finding an opportunity and entering quickly. But
+> a strong signal alone does not make a safe trade. Market data may conflict,
+> liquidity may be poor, or the spread may be too wide. And entry is only half
+> the problem. Without an explicit take-profit, stop-loss, time limit, and
+> expiry rule, a valid entry can become unmanaged risk. An autonomous agent must
+> justify both why it entered and why it stayed or exited.
 
-### Solution and architecture
+### 0:48–1:20 — Solution and architecture
 
-> CrossSignal is a decision-control system for Alpaca trading. Claude proposes a
-> structured thesis from six synchronized market lenses. Independent,
-> deterministic checks verify opportunity strength, stability under realistic
-> noise, and execution quality before anything moves. Each produces its own score
-> and evidence—not one blended confidence number.
+> CrossSignal is an auditable decision and position-management system for Alpaca
+> paper trading. It synchronizes six market lenses. Claude proposes a structured
+> thesis and attacks its own case. Independent deterministic code measures the
+> disagreement, tests stability, checks risk and execution quality, and has final
+> authority. Claude never contacts the broker.
 
-### Deterministic authorization
+### 1:20–1:58 — Entry governance
 
-> A trade is authorized only when every required threshold is met. If one
-> critical check fails, or the evidence is incomplete, the system abstains
-> automatically. Uncertainty becomes an explicit, logged decision instead of an
-> accidental trade. That logic lives in code, not in a prompt.
+> Before any order, CrossSignal verifies live-data integrity, confidence,
+> maximum loss, buying power, diversification, Greeks coverage, portfolio stress,
+> liquidity, bid-ask quality, and drawdown. Every authorized decision is sealed
+> into a SHA-256 Decision Contract before submission. If one critical control
+> fails, the outcome is ABSTAIN—not a forced trade.
 
-### Dedicated-account evidence
+### 1:58–2:38 — Position lifecycle and exits
 
-> CrossSignal uses Alpaca's official MCP server for market data, account state,
-> and paper execution. Against a fresh, dedicated $100,000 Alpaca paper account,
-> it sealed a Decision Contract with SHA-256 before the outcome was known. The
-> disagreement was real and stable, but the execution evidence was incomplete.
-> Verdict: abstain.
+> Governance now continues after entry. Every submitted vertical spread stores
+> its two option legs, fill price, maximum profit, maximum loss, expiry, and four
+> exit rules. By default, it takes profit at fifty percent of maximum profit,
+> cuts the position at fifty percent of defined maximum loss, exits after five
+> trading days, or closes two calendar days before expiry. The monitor first
+> reconciles every registered leg against Alpaca, then values the complete spread
+> using executable bids and asks. Stale quotes cannot trigger an order. When a
+> rule fires, it reverses both legs in one atomic Alpaca multi-leg limit order
+> with a deterministic client order ID. An atomic claim and EXIT_PENDING state
+> prevent duplicate closes, while every recommendation, deferral, submission,
+> and fill remains auditable.
 
-### Repeated live cycles
+### 2:38–3:08 — Safety boundary
 
-> Not one cherry-picked example — ten live cycles, the same real edge scored
-> again and again, each honestly refused for its own inspectable reason.
-> Never forced. Never gamed.
+> Exit automation is independently gated. It requires the exact Alpaca paper
+> endpoint, entry authorization, a second automated-exit switch, valid quotes,
+> and an open Alpaca market clock. The public judge application and scheduled
+> GitHub Evidence Watch are read-only. Emergency recovery for a broken entry
+> remains separate and human-approved. A dedicated kill switch can pause new
+> entries while continuing to manage positions already open.
 
-### Public replay, courtroom, and scorecard
+### 3:08–3:42 — Dedicated-account evidence and no-trade decision
 
-> The credential-free replay exposes the disagreement engine, stability test,
-> and execution gate independently. The courtroom reconstructs the allegation,
-> cross-examination, and judgment from evidence known at decision time, then
-> seals the result so it cannot be edited after the fact.
+> Against a fresh one-hundred-thousand-dollar competition paper account,
+> CrossSignal repeatedly found real disagreements but refused execution when
+> adversarial confidence or after-hours liquidity failed fixed thresholds. The
+> account therefore has no competition P-and-L to claim. That is a competitive
+> limitation, but it is honest evidence that the controls were not weakened to
+> manufacture a trade.
 
-### Abstention and authorization contrast
+### 3:42–4:20 — Dashboard and proof
 
-> In the abstention example, signal and stability pass but option liquidity does
-> not. No order is sent and nothing needs recovery. In the contrasting authorized
-> replay, all thresholds clear and CrossSignal seals the scores, rules, and
-> evidence into a receipt a judge can verify independently.
+> The dashboard exposes the decision courtroom, risk scorecard, entry ledger,
+> and the new position lifecycle. Judges can inspect each sealed policy and each
+> state transition from pending entry, to open, to exit pending, to closed. The
+> public example is explicitly labeled as an illustrative policy demonstration,
+> not broker fill evidence.
 
-### Cloud automation and repository proof
+### 4:20–4:42 — Repository and tests
 
-> CrossSignal also runs unattended in GitHub Actions with broker mutations
-> disabled. The public repository contains the full implementation and automated
-> tests; it is not a mock-up.
+> The public repository contains the complete implementation, not a mock-up.
+> Fifty-nine automated tests cover authorization, pricing, profit and loss
+> triggers, time and expiry exits, market-closed deferral, atomic leg reversal,
+> audit persistence, privacy, and duplicate-order prevention.
 
-### Close
+### 4:42–4:55 — Close
 
-> CrossSignal is a verification layer between a proposal and execution. Claude
-> never touches the broker directly. Its job is to determine whether enough
-> reliable evidence exists to act. I'm Omobolaji Adeyan. Thank you.
+> CrossSignal proves when a trade deserves entry, manages it under rules fixed in
+> advance, and proves why it exited. I'm Omobolaji Adeyan. Thank you.
 
-## Critical video audit
+## Recording checklist
 
-- Passes the official five-minute limit with 10.7 seconds to spare.
-- Clearly explains the problem and the mechanism, then demonstrates abstention
-  and a contrasting authorized replay.
-- Shows app, code, evidence, dashboard, cloud automation, and public repository.
-- Correctly avoids claiming dedicated-account P&L.
-- The authorized case is a sanitized demonstration, not a dedicated-account fill.
-- No subtitle stream or burned-in captions — deliberate: an earlier captioned
-  cut covered the live application UI and was judged more distracting than
-  helpful, so captions were dropped by explicit choice, not an oversight.
-- The visible presenter credit reads "Omobolaji Adeyan" (no middle initial),
-  matching the presenter's own choice for the on-screen title/closing cards;
-  written submission materials additionally use the full "Omobolaji E Adeyan."
-  Not a competition-rule issue either way.
+- Show `agent/position_manager.py`, `tools/alpaca_tools.py`, and the lifecycle table.
+- Show the four dollar/time exit thresholds, broker reconciliation, quote freshness,
+  deterministic client order ID, entry kill switch, and `EXIT_PENDING` control.
+- State clearly that the lifecycle replay is illustrative and the competition account has no fill or P&L evidence.
+- Show `59 passed` in the terminal.
+- Keep the rendered video at or below five minutes and recompute its SHA-256 afterward.

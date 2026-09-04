@@ -185,7 +185,44 @@ def judge_dashboard():
                     "thesis": {"thesis": contract["thesis"], "rationale": thesis["rationale"],
                                "confidence_overall": .64},
                     "portfolio": portfolio, "decision_contract": contract}
+    positions = [{
+        "id": 1, "trade_id": 2, "contract_id": authorized_contract["contract_id"],
+        "role": "primary_trade", "underlying_symbol": "HYG",
+        "strategy": "call_debit_spread", "spread_type": "debit", "qty": 1,
+        "multiplier": 100, "opening_legs": [
+            {"symbol": "HYG_OPTION_NEAR_REDACTED", "side": "buy"},
+            {"symbol": "HYG_OPTION_FAR_REDACTED", "side": "sell"},
+        ],
+        "entry_price": .80,
+        "max_profit": 420.0, "max_loss": 80.0,
+        "take_profit_target": 210.0, "stop_loss_limit": 40.0,
+        "max_holding_days": 5, "exit_before_expiry_days": 2,
+        "expiration_date": "2026-09-25", "opened_at": "2026-08-25T15:41:00+00:00",
+        "status": "CLOSED", "exit_reason": "TAKE_PROFIT",
+        "closed_at": "2026-08-27T15:05:00+00:00", "last_mark": 2.90,
+        "last_pnl": 210.0, "last_checked_at": "2026-08-27T15:05:00+00:00",
+        "realized_pnl": 210.0, "evidence_label": "illustrative policy demonstration; not broker fill evidence",
+    }]
+    position_events = [
+        {"id": 3, "position_id": 1, "timestamp": "2026-08-27T15:05:00+00:00",
+         "event_type": "EXIT_FILLED", "state_before": "EXIT_PENDING", "state_after": "CLOSED",
+         "reason": "TAKE_PROFIT", "detail": {"evidence_label": "illustrative policy demonstration; not broker fill evidence"}},
+        {"id": 2, "position_id": 1, "timestamp": "2026-08-27T15:04:00+00:00",
+         "event_type": "EXIT_SUBMITTED", "state_before": "OPEN", "state_after": "EXIT_PENDING",
+         "reason": "TAKE_PROFIT", "detail": {"atomic_multileg": True}},
+        {"id": 1, "position_id": 1, "timestamp": "2026-08-25T15:41:00+00:00",
+         "event_type": "POSITION_REGISTERED", "state_before": None, "state_after": "OPEN",
+         "reason": "Exit policy sealed when the entry was logged.", "detail": {}},
+    ]
     return {"theses": [thesis, authorized_thesis], "trades": [trade, filled_trade],
             "contracts": [row, authorized_row],
+            "positions": positions, "position_events": position_events,
+            "position_performance": {
+                "by_status": {"CLOSED": 1}, "closed_positions": 1,
+                "wins": 1, "losses": 0, "win_rate": 1.0,
+                "realized_pnl": 210.0, "average_pnl": 210.0,
+                "exit_reasons": {"TAKE_PROFIT": 1},
+                "evidence_label": "illustrative policy demonstration; not broker fill evidence",
+            },
             "track_record": {"theses_scored": 1, "theses_pending": 1, "average_hit_rate": 1.0},
             "latest_cycle": latest_cycle, "fixture": True}

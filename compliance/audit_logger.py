@@ -87,6 +87,66 @@ class AuditLogger:
             )
         """)
 
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS managed_positions (
+                id INTEGER PRIMARY KEY,
+                trade_id INTEGER NOT NULL,
+                contract_id TEXT,
+                role TEXT NOT NULL,
+                underlying_symbol TEXT NOT NULL,
+                strategy TEXT,
+                spread_type TEXT NOT NULL,
+                qty INTEGER NOT NULL,
+                multiplier REAL NOT NULL DEFAULT 100,
+                opening_legs_json TEXT NOT NULL,
+                entry_order_id TEXT,
+                entry_price REAL NOT NULL,
+                max_profit REAL NOT NULL,
+                max_loss REAL NOT NULL,
+                take_profit_target REAL NOT NULL,
+                stop_loss_limit REAL NOT NULL,
+                max_holding_days INTEGER NOT NULL,
+                exit_before_expiry_days INTEGER NOT NULL,
+                expiration_date TEXT,
+                opened_at TEXT,
+                status TEXT NOT NULL,
+                exit_reason TEXT,
+                exit_order_id TEXT,
+                exit_client_order_id TEXT,
+                exit_attempts INTEGER NOT NULL DEFAULT 0,
+                exit_submitted_at TEXT,
+                closed_at TEXT,
+                last_mark REAL,
+                last_pnl REAL,
+                last_checked_at TEXT,
+                realized_pnl REAL,
+                UNIQUE(entry_order_id, role)
+            )
+        """)
+        position_columns = {
+            row[1] for row in cursor.execute("PRAGMA table_info(managed_positions)")
+        }
+        for column, ddl in (
+            ('exit_client_order_id', 'TEXT'),
+            ('exit_attempts', 'INTEGER NOT NULL DEFAULT 0'),
+            ('exit_submitted_at', 'TEXT'),
+        ):
+            if column not in position_columns:
+                cursor.execute(f"ALTER TABLE managed_positions ADD COLUMN {column} {ddl}")
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS position_events (
+                id INTEGER PRIMARY KEY,
+                position_id INTEGER NOT NULL,
+                timestamp TEXT NOT NULL,
+                event_type TEXT NOT NULL,
+                state_before TEXT,
+                state_after TEXT,
+                reason TEXT,
+                detail_json TEXT,
+                FOREIGN KEY(position_id) REFERENCES managed_positions(id)
+            )
+        """)
+
         conn.commit()
         conn.close()
 
@@ -257,6 +317,164 @@ class AuditLogger:
             'total_trades': trades_count
         }
 
+    def register_managed_position(self, trade_id, contract_id, role, leg, policy):
+        """Persist the exit contract for one submitted vertical spread."""
+        execution = leg.get('execution', {})
+        if not execution.get('submitted') or not execution.get('order_legs'):
+            return None
+        status = 'OPEN' if str(execution.get('status', '')).lower() == 'filled' else 'PENDING_ENTRY'
+        opened_at = execution.get('filled_at') if status == 'OPEN' else None
+        values = (
+            trade_id, contract_id, role, leg.get('symbol', ''), leg.get('strategy', ''),
+            execution.get('spread_type') or leg.get('spread_type', ''), int(execution.get('qty', leg.get('qty', 1))),
+            float(execution.get('multiplier', 100)), json.dumps(redact(execution['order_legs'])),
+            execution.get('order_id'), float(execution.get('limit_price', 0)),
+            float(execution.get('max_profit', 0)), float(execution.get('max_loss', 0)),
+            float(execution.get('max_profit', 0)) * float(policy['take_profit_fraction']),
+            float(execution.get('max_loss', 0)) * float(policy['stop_loss_fraction']),
+            int(policy['max_holding_days']), int(policy['exit_before_expiry_days']),
+            execution.get('expiration_date'), opened_at, status,
+        )
+        conn = sqlite3.connect(self.db_path)
+        cursor = conn.cursor()
+        cursor.execute("""
+            INSERT OR IGNORE INTO managed_positions
+            (trade_id, contract_id, role, underlying_symbol, strategy, spread_type,
+             qty, multiplier, opening_legs_json, entry_order_id, entry_price,
+             max_profit, max_loss, take_profit_target, stop_loss_limit,
+             max_holding_days, exit_before_expiry_days, expiration_date, opened_at, status)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, values)
+        inserted = cursor.rowcount == 1
+        position_id = cursor.lastrowid if inserted else None
+        if position_id is None:
+            row = cursor.execute(
+                "SELECT id FROM managed_positions WHERE entry_order_id = ? AND role = ?",
+                (execution.get('order_id'), role),
+            ).fetchone()
+            position_id = row[0] if row else None
+        if position_id and inserted:
+            cursor.execute("""
+                INSERT INTO position_events
+                (position_id, timestamp, event_type, state_before, state_after, reason, detail_json)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+            """, (position_id, datetime.now().isoformat(), 'POSITION_REGISTERED', None, status,
+                  'Exit policy sealed when the entry was logged.', json.dumps(redact(policy))))
+        conn.commit()
+        conn.close()
+        return position_id
+
+    def get_managed_positions(self, active_only=False):
+        conn = sqlite3.connect(self.db_path)
+        conn.row_factory = sqlite3.Row
+        sql = "SELECT * FROM managed_positions"
+        params = ()
+        if active_only:
+            sql += " WHERE status IN ('PENDING_ENTRY', 'OPEN', 'EXIT_SUBMITTING', 'EXIT_PENDING')"
+        sql += " ORDER BY id DESC"
+        rows = [dict(row) for row in conn.execute(sql, params).fetchall()]
+        conn.close()
+        for row in rows:
+            row['opening_legs'] = json.loads(row.pop('opening_legs_json'))
+        return rows
+
+    def update_managed_position(self, position_id, **changes):
+        allowed = {
+            'entry_price', 'opened_at', 'status', 'exit_reason', 'exit_order_id',
+            'exit_client_order_id',
+            'exit_submitted_at', 'closed_at', 'last_mark', 'last_pnl',
+            'last_checked_at', 'realized_pnl',
+        }
+        values = {key: value for key, value in changes.items() if key in allowed}
+        if not values:
+            return
+        conn = sqlite3.connect(self.db_path)
+        assignments = ', '.join(f"{key} = ?" for key in values)
+        conn.execute(f"UPDATE managed_positions SET {assignments} WHERE id = ?",
+                     (*values.values(), position_id))
+        conn.commit()
+        conn.close()
+
+    def claim_managed_position_exit(self, position_id, reason):
+        """Atomically reserve an OPEN row before any broker close call.
+
+        This compare-and-set is the concurrency boundary that prevents two
+        scheduled monitors from submitting duplicate exits.
+        """
+        conn = sqlite3.connect(self.db_path)
+        cursor = conn.cursor()
+        cursor.execute("""
+            UPDATE managed_positions
+            SET status = 'EXIT_SUBMITTING', exit_reason = ?,
+                exit_attempts = exit_attempts + 1, last_checked_at = ?
+            WHERE id = ? AND status = 'OPEN'
+        """, (reason, datetime.now().isoformat(), position_id))
+        claimed = cursor.rowcount == 1
+        attempt = None
+        if claimed:
+            attempt = cursor.execute(
+                "SELECT exit_attempts FROM managed_positions WHERE id = ?",
+                (position_id,),
+            ).fetchone()[0]
+        conn.commit()
+        conn.close()
+        return attempt
+
+    def get_position_performance(self):
+        """Aggregate realized lifecycle results without projecting returns."""
+        conn = sqlite3.connect(self.db_path)
+        conn.row_factory = sqlite3.Row
+        status_rows = conn.execute("""
+            SELECT status, COUNT(*) AS count
+            FROM managed_positions GROUP BY status
+        """).fetchall()
+        closed = conn.execute("""
+            SELECT realized_pnl, exit_reason
+            FROM managed_positions
+            WHERE status = 'CLOSED' AND realized_pnl IS NOT NULL
+        """).fetchall()
+        conn.close()
+
+        pnl = [float(row['realized_pnl']) for row in closed]
+        wins = sum(value > 0 for value in pnl)
+        losses = sum(value < 0 for value in pnl)
+        return {
+            'by_status': {row['status']: row['count'] for row in status_rows},
+            'closed_positions': len(pnl),
+            'wins': wins,
+            'losses': losses,
+            'win_rate': round(wins / len(pnl), 4) if pnl else None,
+            'realized_pnl': round(sum(pnl), 2),
+            'average_pnl': round(sum(pnl) / len(pnl), 2) if pnl else None,
+            'exit_reasons': {
+                reason: sum(1 for row in closed if row['exit_reason'] == reason)
+                for reason in sorted({row['exit_reason'] for row in closed if row['exit_reason']})
+            },
+        }
+
+    def log_position_event(self, position_id, event_type, state_before, state_after,
+                           reason='', detail=None):
+        conn = sqlite3.connect(self.db_path)
+        conn.execute("""
+            INSERT INTO position_events
+            (position_id, timestamp, event_type, state_before, state_after, reason, detail_json)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+        """, (position_id, datetime.now().isoformat(), event_type, state_before,
+              state_after, reason, json.dumps(redact(detail or {}))))
+        conn.commit()
+        conn.close()
+
+    def get_position_events(self, limit=100):
+        conn = sqlite3.connect(self.db_path)
+        conn.row_factory = sqlite3.Row
+        rows = [dict(row) for row in conn.execute(
+            "SELECT * FROM position_events ORDER BY id DESC LIMIT ?", (limit,)
+        ).fetchall()]
+        conn.close()
+        for row in rows:
+            row['detail'] = json.loads(row.pop('detail_json') or '{}')
+        return rows
+
     def get_dashboard_data(self, limit=25):
         """Read-only presentation model used by the browser dashboard."""
         conn = sqlite3.connect(self.db_path)
@@ -270,6 +488,12 @@ class AuditLogger:
         contracts = [dict(row) for row in conn.execute(
             "SELECT * FROM decision_contracts ORDER BY created_at DESC LIMIT ?", (limit,)
         ).fetchall()]
+        positions = [dict(row) for row in conn.execute(
+            "SELECT * FROM managed_positions ORDER BY id DESC LIMIT ?", (limit,)
+        ).fetchall()]
+        position_events = [dict(row) for row in conn.execute(
+            "SELECT * FROM position_events ORDER BY id DESC LIMIT ?", (limit * 4,)
+        ).fetchall()]
         conn.close()
         for row in theses:
             for key in ('repricing_signals', 'market_state', 'evaluation_detail'):
@@ -281,8 +505,14 @@ class AuditLogger:
             row['contract'] = json.loads(row.pop('contract_json'))
             if row.get('evaluation_json'):
                 row['evaluation'] = json.loads(row['evaluation_json'])
+        for row in positions:
+            row['opening_legs'] = json.loads(row.pop('opening_legs_json'))
+        for row in position_events:
+            row['detail'] = json.loads(row.pop('detail_json') or '{}')
         return {'theses': theses, 'trades': trades, 'contracts': contracts,
-                'track_record': self.get_track_record()}
+                'positions': positions, 'position_events': position_events,
+                'track_record': self.get_track_record(),
+                'position_performance': self.get_position_performance()}
 
     def log_decision_contract(self, contract):
         """Persist a sealed decision before any broker submission."""

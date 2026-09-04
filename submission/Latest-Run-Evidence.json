@@ -1,0 +1,70 @@
+{
+  "schema": "crosssignal-submission-evidence-1.0",
+  "prepared_at": "2026-09-03T23:35:00Z",
+  "creator": "Omobolaji E Adeyan",
+  "competition_account": {
+    "id": "PA3PDTUDIXDU",
+    "environment": "paper",
+    "starting_balance": 100000.0,
+    "cash_verified": 100000.0,
+    "portfolio_value_verified": 100000.0,
+    "buying_power_verified": 400000.0,
+    "open_positions": 0,
+    "orders": 0
+  },
+  "latest_local_cycle": {
+    "contract_id": "CS-20260903-FE01A097",
+    "decision_hash": "fe01a097876fa3f9fce20e449f9d9ef523a911375db384ffe91091ecf6c4e94e",
+    "created_at": "2026-09-03T23:15:09.084841Z",
+    "authorization": "ABSTAIN",
+    "execution_status": "abstained",
+    "signal": "equity_fear_vs_credit",
+    "signal_quality": 82.4,
+    "decision_stability": 90,
+    "stable_cases": 9,
+    "total_cases": 10,
+    "confidence_before_challenge": 0.68,
+    "confidence_after_challenge": 0.53,
+    "confidence_minimum": 0.55,
+    "base_checks_passed": 5,
+    "base_checks_total": 6,
+    "all_feeds_sourced_live": true,
+    "fallback_sources": [],
+    "broker_orders_submitted": 0,
+    "reason": "Adversarial review rejected the cheap-vol framing: IV rank used a short local history, ATM put/call was a narrow proxy, and IV was 1.26x realized volatility. Confidence fell below the fixed 55% floor."
+  },
+  "latest_cloud_preflight": {
+    "github_run": "https://github.com/omobolajiadeyan/alpaca-cross-market-agent/actions/runs/33805502192",
+    "contract_id": "CS-20260903-5C194F65",
+    "decision_hash": "5c194f65d0c6aee65aa93d2d32c8e9065cec9fe4b6a9345bce3c3dd7aead27fa",
+    "authorization": "ABSTAIN",
+    "broker_mutations": false,
+    "signal_quality": 82,
+    "decision_stability": 90,
+    "execution_quality": 87,
+    "outcome_evidence": null,
+    "risk_checks_passed": 13,
+    "risk_checks_total": 15,
+    "confidence_after_challenge": 0.56,
+    "minimum_option_volume": 0,
+    "minimum_option_volume_required": 10,
+    "maximum_relative_bid_ask_spread": 0.9333,
+    "maximum_relative_bid_ask_spread_allowed": 0.25,
+    "greeks_coverage": "6/6",
+    "defined_maximum_loss": 464.0,
+    "exposure_after_decision": "none"
+  },
+  "video": {
+    "filename": "CrossSignal-Submission-Video.mp4",
+    "duration_seconds": 295.923,
+    "resolution": "1920x1080",
+    "sha256": "1FE57FF6973C8ACED2984B5619804CA6C5071BF430823448DB9BB796040E2679",
+    "evidence_cutoff": "2026-09-02"
+  },
+  "limitations": [
+    "No competition-account orders or positions; no P&L claim.",
+    "Video predates the tenth local cycle and accurately says nine cycles.",
+    "Credit and positioning inputs are explicitly labeled proxies.",
+    "Outcome evidence remains pending until sealed horizons mature."
+  ]
+}

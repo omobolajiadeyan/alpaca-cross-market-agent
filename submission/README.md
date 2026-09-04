@@ -1,20 +1,18 @@
-# Presentation assets
+# CrossSignal final submission assets
 
-`CrossSignal-Hackathon-Pitch-Final.pptx` is the final editable eight-slide competition
-deck. It includes presenter notes and reflects a sealed contract from the dedicated
-hackathon Alpaca account, the four-part decision scorecard, the 43-test suite, and
-zero-mutation cloud boundary.
+Start with `FINAL-PACKAGE-README.md` in the `final-package` directory.
 
-`CrossSignal-Hackathon-Pitch-Final.pdf` is the reviewed eight-page upload copy
-for the submission form.
+Primary files:
 
-To use it in Canva, choose **Create a design → Import file**, upload the PPTX,
-review the imported typography, and export the final version as PDF. Keep the
-PowerPoint file as the editable source.
+- `CrossSignal-Hackathon-Pitch-Final.pdf` — eight-slide upload deck
+- `CrossSignal-Hackathon-Pitch-Final.pptx` — editable deck source
+- `CrossSignal-One-Page-Writeup.pdf` — required one-page technical write-up
+- `ONE_PAGE_WRITEUP.md` — accessible source text
+- `FINAL_VIDEO_SCRIPT.md` — reviewed script and video audit
+- `EVIDENCE_RECORDING.md` — current evidence and no-trade justification
+- `SUBMISSION_FORM_COPY.md` — paste-ready lablab form content
+- `JUDGE_NO_TRADE_MEMO.md` — concise, defensible explanation of zero fills
+- `Latest-Run-Evidence.json` — secret-free current-cycle summary
 
-Regenerate it locally with:
-
-```bash
-pip install python-pptx
-python scripts/generate_pitch_deck.py
-```
+The final package intentionally excludes `.env`, the local audit database,
+credentials, caches, raw broker responses, and obsolete video drafts.

@@ -37,13 +37,26 @@ vega, theta, margin utilization, minimum option volume, maximum relative bid-ask
 spread, daily and maximum drawdown, and Greeks coverage. One failed required gate
 produces an explicit `ABSTAIN`; thresholds cannot be relaxed by the language model.
 
+Governance continues after a fill. Each CrossSignal spread stores its opening
+legs, fill price, maximum profit/loss, expiry, and a fixed management policy. By
+default it takes profit at 50% of maximum profit, stops at 50% of maximum loss,
+exits after five trading days, or closes two calendar days before expiry. The
+monitor values the full spread from executable bid/ask quotes and reverses both
+legs in one atomic multi-leg limit order. Before doing so it reconciles registered
+legs against Alpaca and rejects missing or stale quote timestamps. An atomic
+claim, incrementing attempt counter, deterministic client order ID, and
+`EXIT_PENDING` state prevent duplicate closes. Every recommendation, deferral,
+order, and fill is persisted.
+
 ## Alpaca infrastructure and safety boundary
 
 Alpaca's official MCP server is held in one persistent stdio session for market
 data, account state, options snapshots and Greeks, orders, positions, and
 reconciliation. Mutations are rejected unless the endpoint is exactly Alpaca's
-paper URL and local execution authorization is enabled. The public Streamlit demo
-is credential-free and read-only. GitHub Evidence Watch runs unattended with
+paper URL and local execution authorization is enabled. Automated exits require
+a second switch, valid quotes, and an open Alpaca market clock. The public Streamlit demo
+is credential-free and read-only. `PAUSE_NEW_ENTRIES` can halt new risk without
+disabling management of existing positions. GitHub Evidence Watch runs unattended with
 broker mutations hard-disabled and exports only secret-free evidence artifacts.
 
 ## Submission evidence and honest limitation
@@ -67,3 +80,7 @@ Therefore CrossSignal has no competition-account P&L to claim; that is a judging
 weakness, not an eligibility failure. The evidence shows that the agent did not
 force a paper trade, queue an after-hours options order, or weaken controls to
 manufacture performance.
+
+The position lifecycle is covered by automated tests and an explicitly labeled
+illustrative dashboard replay; because the competition account has no fill, it
+is not presented as live trade or P&L evidence.

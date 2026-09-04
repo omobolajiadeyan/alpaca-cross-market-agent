@@ -25,6 +25,25 @@ REQUIRE_LIVE_DATA = os.getenv("REQUIRE_LIVE_DATA", "true").lower() in ("1", "tru
 ALLOW_PAPER_EXECUTION = os.getenv("ALLOW_PAPER_EXECUTION", "false").lower() in ("1", "true", "yes")
 PUBLIC_DEMO_MODE = os.getenv("PUBLIC_DEMO_MODE", "true").lower() in ("1", "true", "yes")
 
+# Healthy-position lifecycle. Entry authorization and exit authorization are
+# deliberately separate: a public/replay deployment can prove the policy
+# without gaining the ability to mutate a broker account.
+ENABLE_AUTOMATED_PAPER_EXITS = os.getenv("ENABLE_AUTOMATED_PAPER_EXITS", "false").lower() in ("1", "true", "yes")
+PAUSE_NEW_ENTRIES = os.getenv("PAUSE_NEW_ENTRIES", "false").lower() in ("1", "true", "yes")
+TAKE_PROFIT_FRACTION = float(os.getenv("TAKE_PROFIT_FRACTION", "0.50"))
+STOP_LOSS_FRACTION = float(os.getenv("STOP_LOSS_FRACTION", "0.50"))
+MAX_HOLDING_DAYS = int(os.getenv("MAX_HOLDING_DAYS", "5"))
+EXIT_BEFORE_EXPIRY_DAYS = int(os.getenv("EXIT_BEFORE_EXPIRY_DAYS", "2"))
+MAX_EXIT_QUOTE_AGE_SECONDS = int(os.getenv("MAX_EXIT_QUOTE_AGE_SECONDS", "300"))
+if not 0 < TAKE_PROFIT_FRACTION <= 1:
+    raise ValueError("TAKE_PROFIT_FRACTION must be greater than 0 and at most 1")
+if not 0 < STOP_LOSS_FRACTION <= 1:
+    raise ValueError("STOP_LOSS_FRACTION must be greater than 0 and at most 1")
+if MAX_HOLDING_DAYS < 1 or EXIT_BEFORE_EXPIRY_DAYS < 0:
+    raise ValueError("Exit timing values must be non-negative and MAX_HOLDING_DAYS at least 1")
+if MAX_EXIT_QUOTE_AGE_SECONDS < 1:
+    raise ValueError("MAX_EXIT_QUOTE_AGE_SECONDS must be at least 1")
+
 # Minimum age before a thesis is scored against subsequent market data.
 # Five trading days gives the stated repricing thesis time to develop; it is
 # still preliminary evidence rather than an investment-grade backtest.

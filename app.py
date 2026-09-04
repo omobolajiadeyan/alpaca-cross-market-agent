@@ -21,7 +21,8 @@ from agent.evidence_protocol import (
 )
 from demo.judge_fixture import judge_dashboard
 from config import (ALLOW_PAPER_EXECUTION, PUBLIC_DEMO_MODE, REQUIRE_LIVE_DATA,
-                    ALPACA_API_KEY, ALPACA_SECRET_KEY, ALPACA_BASE_URL)
+                    ALPACA_API_KEY, ALPACA_SECRET_KEY, ALPACA_BASE_URL,
+                    ENABLE_AUTOMATED_PAPER_EXITS)
 from security.controls import security_posture
 
 
@@ -509,6 +510,46 @@ with track_record:
                                    'status': row['status']} for row in dashboard['trades']]),
                      width='stretch', hide_index=True)
 
+    st.subheader("Position lifecycle")
+    st.caption(
+        "Every submitted spread receives a persisted exit contract. The monitor values the whole spread, "
+        "checks take-profit, stop-loss, holding-period and expiry rules, then closes both legs atomically."
+        + (" This table is an illustrative policy demonstration, not broker fill evidence." if dashboard.get('fixture') else "")
+    )
+    lifecycle = dashboard.get('position_performance', {})
+    life_a, life_b, life_c, life_d = st.columns(4)
+    life_a.metric("Managed positions", sum(lifecycle.get('by_status', {}).values()))
+    life_b.metric("Closed", lifecycle.get('closed_positions', 0))
+    life_c.metric("Realized P&L", f"${lifecycle.get('realized_pnl', 0):,.2f}")
+    win_rate = lifecycle.get('win_rate')
+    life_d.metric("Lifecycle win rate", f"{win_rate:.0%}" if win_rate is not None else "Pending")
+    if dashboard.get('fixture'):
+        st.caption(
+            "Lifecycle metrics shown in replay mode are illustrative and are "
+            "not Alpaca account results."
+        )
+    position_rows = []
+    for item in dashboard.get('positions', []):
+        position_rows.append({
+            'contract': item.get('contract_id'), 'role': item.get('role'),
+            'underlying': item.get('underlying_symbol'), 'status': item.get('status'),
+            'P&L': item.get('realized_pnl') if item.get('status') == 'CLOSED' else item.get('last_pnl'),
+            'take profit': item.get('take_profit_target'),
+            'stop loss': -float(item.get('stop_loss_limit') or 0),
+            'max hold': f"{item.get('max_holding_days')} trading days",
+            'exit before expiry': f"{item.get('exit_before_expiry_days')} days",
+            'exit reason': item.get('exit_reason'),
+        })
+    if position_rows:
+        st.dataframe(pd.DataFrame(position_rows), width='stretch', hide_index=True)
+        event_rows = [{key: row.get(key) for key in
+                       ('timestamp', 'position_id', 'event_type', 'state_before', 'state_after', 'reason')}
+                      for row in dashboard.get('position_events', [])]
+        with st.expander("Lifecycle event ledger"):
+            st.dataframe(pd.DataFrame(event_rows), width='stretch', hide_index=True)
+    else:
+        st.info("No submitted spreads are currently registered for lifecycle management.")
+
 with readiness:
     st.markdown('<p class="section-label">Submission assurance</p>', unsafe_allow_html=True)
     st.header("Hackathon readiness")
@@ -516,7 +557,8 @@ with readiness:
         ('Autonomous AI trading workflow', 'Met', 'Observe, reason, construct, govern, preflight and audit'),
         ('Alpaca API / MCP integration', 'Met', 'Official Alpaca MCP server powers market data and paper orders'),
         ('Meaningful AI integration', 'Met', 'Claude generates structured macro theses and repricing signals'),
-        ('Risk controls', 'Met', 'Defined loss, confidence, buying power, diversification and data-integrity gates'),
+        ('Risk controls', 'Met', 'Defined loss, confidence, buying power, diversification, data integrity, and governed exits'),
+        ('Position management', 'Met', 'Persisted take-profit, stop-loss, five-day holding and pre-expiry exits; atomic multi-leg paper closes'),
         ('Working browser prototype', 'Met', 'Judge-facing application with safe preview mode'),
         ('Public GitHub repository', 'Met', 'Published at github.com/omobolajiadeyan/alpaca-cross-market-agent'),
         ('Dedicated new Alpaca paper account', 'Met', 'PA3PDTUDIXDU, created 2026-09-01, $100,000 starting balance'),
@@ -562,6 +604,8 @@ with security_tab:
          'Control': 'Live-data integrity gate', 'NIST route': 'AI RMF MEASURE 1 / MANAGE 1'},
         {'Decision': 'Recovery requires approval', 'Threat': 'Automatic correction compounds exposure',
          'Control': 'Paper-only endpoint, explicit approval, logged actions', 'NIST route': 'SP 800-53 AC/AU/IR'},
+        {'Decision': 'Exit automation is independently gated', 'Threat': 'Duplicate or unauthorized closing orders',
+         'Control': f"Persisted lifecycle state, atomic close, Alpaca clock and separate switch ({ENABLE_AUTOMATED_PAPER_EXITS})", 'NIST route': 'SP 800-53 AC/AU/SI'},
         {'Decision': 'Secrets never enter receipts', 'Threat': 'Credential disclosure in logs or exports',
          'Control': 'Recursive redaction and Git exclusions', 'NIST route': 'SP 800-218 PW.4 / SP 800-53 IA'},
     ]), width='stretch', hide_index=True)
@@ -577,7 +621,8 @@ with methodology:
 4. **Construct:** map the signals to SPY, HYG, and TLT defined-risk vertical spreads.
 5. **Govern:** require portfolio structure, loss, confidence, buying power, diversification, and live-data checks.
 6. **Preflight:** price every leg before allowing any paper order submission.
-7. **Audit:** persist the thesis, market snapshot, risk decision, order response, and future forecast score.
+7. **Manage:** monitor the spread as a unit and enforce take-profit, stop-loss, holding-period and pre-expiry exits.
+8. **Audit:** persist the thesis, market snapshot, risk decision, entry/exit lifecycle, and future forecast score.
     """)
     st.warning("Educational prototype. Paper trading only. This application does not provide investment advice.")
 

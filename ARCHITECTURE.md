@@ -25,6 +25,11 @@ U.S. Treasury ── yield curve ───────┤
                           preview ──┴── paper submit
                                     │
                                     ▼
+                      persisted exit contract
+                      + spread lifecycle monitor
+                      + atomic paper close
+                                    │
+                                    ▼
                          SQLite audit + scoring
                                     │
                                     ▼
@@ -47,6 +52,10 @@ GitHub Actions scheduler ── read-only `run(execute=False)`
 - Alpaca option Greeks are captured at preflight and missing coverage fails the stress gate.
 - Delta, vega, theta, margin, option volume, bid-ask quality, drawdown, and Greek completeness are enforced before authorization.
 - Partial exposure enters an explicit recovery state; cancellation or position closure requires paper mode and explicit approval.
+- Healthy filled spreads enter a separate lifecycle state machine: `PENDING_ENTRY → OPEN → EXIT_PENDING → CLOSED`.
+- Each lifecycle row seals dollar take-profit and stop-loss thresholds, maximum holding days, and a pre-expiry deadline at entry time.
+- Closing orders reverse both option legs in one Alpaca multi-leg limit order; a persisted `EXIT_PENDING` state prevents duplicate submissions.
+- Exit execution requires the paper endpoint, `ALLOW_PAPER_EXECUTION=true`, `ENABLE_AUTOMATED_PAPER_EXITS=true`, and an open Alpaca market clock.
 - Alpaca News is contextual evidence only and cannot override deterministic controls.
 - Scheduled Evidence Watch has observation authority only; it cannot submit, cancel, or close paper orders.
 - The judge replay contains both an authorized contract and a fail-closed abstention so the policy boundary is directly comparable.
@@ -57,4 +66,6 @@ GitHub Actions scheduler ── read-only `run(execute=False)`
 - “Hedge” denotes the rates diversifier; cross-asset beta is not yet calculated.
 - Credit and positioning inputs are clearly labeled proxies.
 - Scenario P&L uses local delta-gamma-vega approximation rather than full option repricing.
+- Exit valuation uses executable bid/ask quotes for the registered vertical spread, not a full volatility-surface repricer; illiquid or invalid quotes fail closed.
+- The lifecycle manager governs only spreads registered by CrossSignal after this feature; it does not silently adopt unrelated account positions.
 - The track record is forward-scored and is not a substitute for an investment-grade historical backtest.

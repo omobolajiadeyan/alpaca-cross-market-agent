@@ -118,6 +118,7 @@ Controlled local paper execution:
 ```env
 PUBLIC_DEMO_MODE=false
 ALLOW_PAPER_EXECUTION=true
+ENABLE_AUTOMATED_PAPER_EXITS=true
 APCA_API_BASE_URL=https://paper-api.alpaca.markets
 ```
 
@@ -133,7 +134,8 @@ Before every public release:
 4. Review dependency vulnerabilities and licenses.
 5. Verify the public deployment cannot enable execution.
 6. Download and verify a Decision Contract receipt.
-7. Record known failures and residual risk instead of deleting them.
+7. Run `python scripts/manage_positions.py` in observe mode and inspect lifecycle events.
+8. Record known failures and residual risk instead of deleting them.
 
 ## Incident response
 
@@ -143,6 +145,13 @@ the event. If unexpected broker exposure occurs: engage the recovery lock,
 cancel active paper orders, inspect actual positions, obtain explicit approval
 before closure, reconcile final state, preserve evidence, and add a regression
 test before re-enabling mutation.
+
+Normal take-profit, stop-loss, time, and expiry exits do not use emergency
+recovery. They are governed by a separate persisted state machine. The public
+application can display that ledger but cannot execute it. A close requires an
+exact paper endpoint, both mutation switches, an open Alpaca clock, complete
+executable quotes, and an atomic multi-leg order. `EXIT_PENDING` blocks repeat
+submissions until the broker reaches a final state.
 
 ## Authoritative references
 

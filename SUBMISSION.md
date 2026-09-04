@@ -25,6 +25,14 @@ thesis, tests stability under bounded perturbations, constructs defined-risk
 options spreads, and gives deterministic code final authority. Every decision
 is sealed before the outcome and later scored.
 
+For every submitted spread it also seals a management contract: take profit at
+50% of maximum profit, cut loss at 50% of defined maximum loss, exit after five
+trading days, or close before the final two calendar days to expiry. The monitor
+values the complete spread at executable bid/ask prices and reverses both legs
+in one Alpaca paper multi-leg limit order. A durable `EXIT_PENDING` state
+prevents duplicate closes. Public mode remains read-only, and automated paper
+exits require a second explicit deployment switch.
+
 ## Why the latest cycles did not trade
 
 Two September 3 records show different layers of the same policy working:

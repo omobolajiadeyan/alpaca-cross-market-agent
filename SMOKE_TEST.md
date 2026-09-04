@@ -1,6 +1,25 @@
 # Smoke-test record
 
-Last executed: September 2, 2026 by Omobolaji E Adeyan.
+Last executed: September 3, 2026 by Omobolaji E Adeyan.
+
+## September 3, 2026 verification (position lifecycle)
+
+- `python -m pytest` — 59 tests passed (46 prior + 13 added for the new
+  `agent/position_manager.py` exit-lifecycle engine and its CLI).
+- `python -m pytest tests/test_position_manager.py` — 11/11 passed in isolation
+  (authorization, pricing, profit/loss triggers, time and expiry exits,
+  market-closed deferral, atomic leg reversal, audit persistence, privacy,
+  duplicate-order prevention).
+- `python scripts/manage_positions.py` (observe-only, no `--execute`) — connected
+  to the live Alpaca MCP server against the dedicated paper account
+  (`PA3PDTUDIXDU`) and completed cleanly with zero open positions to manage,
+  confirming the monitor's broker-reconciliation and quote-freshness path runs
+  end-to-end without submitting anything.
+- Regenerated the pitch deck, one-page write-up, and research report from
+  their source scripts and re-exported both PDFs; all reflect 59 tests and the
+  tenth live-cycle contract `CS-20260903-5C194F65`.
+
+## September 2, 2026 verification
 
 ## Automated verification
 

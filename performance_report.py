@@ -24,6 +24,7 @@ def main():
     report = logger.get_report()
     track_record = logger.get_track_record()
     dashboard = logger.get_dashboard_data()
+    position_performance = dashboard['position_performance']
 
     print(f"Total theses generated: {report['total_theses']}")
     print(f"Total trade cycles logged: {report['total_trades']}\n")
@@ -75,6 +76,17 @@ def main():
     print(f"  Legs actually submitted to Alpaca: {submitted_legs}")
     print(f"  Total max loss at risk on submitted legs: ${total_max_loss_submitted:,.0f}")
     print(f"  Total max loss across all attempted legs: ${total_max_loss_attempted:,.0f}\n")
+
+    print("Managed-position lifecycle:")
+    print(f"  Position states: {position_performance['by_status'] or 'none'}")
+    print(f"  Closed positions: {position_performance['closed_positions']}")
+    print(f"  Realized broker P&L: ${position_performance['realized_pnl']:,.2f}")
+    if position_performance['win_rate'] is not None:
+        print(f"  Win rate: {position_performance['win_rate']:.0%}")
+        print(f"  Average P&L per closed position: ${position_performance['average_pnl']:,.2f}")
+    else:
+        print("  Win rate: n/a until at least one managed position closes")
+    print(f"  Exit reasons: {position_performance['exit_reasons'] or 'none'}\n")
 
     print("=" * 70)
 

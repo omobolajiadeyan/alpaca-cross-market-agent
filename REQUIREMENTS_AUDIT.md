@@ -16,7 +16,7 @@ material, not as executable instructions.
 | Include paper account ID | Ready | Enter `PA3PDTUDIXDU` in the form. |
 | One-page write-up covering AI logic, risk gates, and Alpaca infrastructure | Met | `submission/CrossSignal-One-Page-Writeup.pdf`. |
 | Public GitHub repository | Met | Public, MIT licensed, default branch `main`. |
-| Video and slide presentation | Met | 4:55.923 H.264 video and eight-slide PDF/PPTX. |
+| Video and slide presentation | **Pending re-record** | The existing 4:55.923 video predates the final lifecycle safeguards. Use `submission/FINAL_VIDEO_SCRIPT.md` and keep the replacement under five minutes. |
 | Public demo URL | **Not met at final audit** | Anonymous requests entered a Streamlit authentication redirect loop. Change app visibility and retest before submission. |
 
 The official page does **not** explicitly say that a filled trade is required
@@ -28,7 +28,8 @@ demonstrate decisions, position management, and competition-period performance.
 | Criterion | Critical assessment |
 |---|---|
 | **P&L Performance** | Weak. The fresh account has zero orders, zero positions, and therefore no trade-derived P&L. A judge cannot award a strong performance score from abstentions alone. This does not invalidate the project, but it is the largest competitive gap. |
-| **Technology Implementation** | Strong. Sponsor-native MCP integration, options snapshots/Greeks, all-leg preflight, persistent session, deterministic authorization, SHA-256 contracts, read-only automation, and 46 passing tests. |
+| **Technology Implementation** | Strong. Sponsor-native MCP integration, options snapshots/Greeks, all-leg preflight, persistent session, deterministic authorization, SHA-256 contracts, governed exits, broker-inventory and quote-freshness controls, read-only automation, and 59 passing tests. |
+| **Position Management** | Implemented and tested. Each submitted spread receives persisted take-profit, stop-loss, maximum-hold, and pre-expiry rules; qualifying paper exits reconcile broker legs, reject stale quotes, and reverse both legs atomically under an idempotent client order ID. No competition-account position has existed yet, so this capability has test and replay evidence but no live fill evidence. |
 | **Creativity & Originality** | Strong mechanism, moderate headline originality. Several entries use “LLM proposes, rules veto.” CrossSignal must differentiate on cross-market disagreement, adversarial falsification, perturbation stability, sealed forward scoring, and independently inspectable receipts—not merely “AI can say no.” |
 | **Presentation & Execution** | Good video structure and clear problem/solution, but the chosen video predates the tenth cycle and says nine cycles. The package now labels it as a September 2 snapshot. Missing captions and a currently private demo reduce polish/accessibility. |
 | **Social engagement** | No links documented. This affects only the separate social component/bonus. Do not invent posts after the fact. |
@@ -68,7 +69,8 @@ fell below the fixed floor, preflight correctly did not run.
 
 ## Final verdict
 
-**Conditional submit.** The technical entry is eligible and coherent. Fix the
-anonymous Streamlit access first. Then submit even without a fill, while stating
+**Conditional submit.** The technical entry is eligible and coherent. Record and
+verify the replacement video first, and manually confirm anonymous Streamlit
+access. Then submit even without a fill, while stating
 the P&L limitation plainly and using the no-trade records as evidence of risk
 discipline—not as a substitute for performance.

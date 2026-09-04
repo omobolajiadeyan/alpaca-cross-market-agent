@@ -175,6 +175,13 @@ class AlpacaTools:
         except Exception as e:
             return {'id': order_id, 'status': 'unknown', 'error': str(e)}
 
+    def get_market_clock(self):
+        """Return Alpaca's authoritative market clock, failing closed."""
+        try:
+            return self.call("get_clock")
+        except Exception as e:
+            return {'is_open': False, 'error': str(e)}
+
     def cancel_order(self, order_id):
         """Cancel one open paper order and return the broker response."""
         self._require_paper_mutation()
@@ -188,6 +195,60 @@ class AlpacaTools:
             args['qty'] = str(qty)
         return self.call('close_position', args)
 
+    def quote_spread_exit(self, opening_legs):
+        """Price an executable, atomic close for an existing option spread.
+
+        Cash flow is positive when the close receives a credit and negative
+        when it pays a debit. Missing/crossed quotes fail closed.
+        """
+        closing_legs = []
+        quotes = {}
+        cashflow = 0.0
+        for leg in opening_legs:
+            opening_side = leg['side'].lower()
+            if opening_side == 'buy':
+                side, intent = 'sell', 'sell_to_close'
+            elif opening_side == 'sell':
+                side, intent = 'buy', 'buy_to_close'
+            else:
+                raise ValueError(f"unsupported opening side: {opening_side}")
+            quote = self.get_option_quote(leg['symbol'])
+            if not quote:
+                raise ValueError(f"no exit quote for {leg['symbol']}")
+            bid, ask = quote['bid'], quote['ask']
+            if bid < 0 or ask <= 0 or ask < bid:
+                raise ValueError(f"invalid exit quote for {leg['symbol']}")
+            executable = bid if side == 'sell' else ask
+            cashflow += executable if side == 'sell' else -executable
+            quotes[leg['symbol']] = {
+                'bid': bid,
+                'ask': ask,
+                'exit_price': executable,
+                'timestamp': quote.get('timestamp'),
+            }
+            closing_legs.append({'symbol': leg['symbol'], 'side': side, 'position_intent': intent})
+        return {
+            'closing_legs': closing_legs,
+            'quotes': quotes,
+            'cashflow_per_share': round(cashflow, 4),
+            # Alpaca represents debit multi-leg limits as positive and credits
+            # as negative, hence the inverse of cash flow.
+            'limit_price': round(-cashflow, 2),
+        }
+
+    def close_option_spread(self, opening_legs, qty=1, limit_price=None,
+                            client_order_id=None):
+        """Submit one atomic multi-leg closing order in the paper account."""
+        quote = self.quote_spread_exit(opening_legs)
+        price = quote['limit_price'] if limit_price is None else float(limit_price)
+        order = self.place_multileg_option_order(
+            quote['closing_legs'], qty=qty, limit_price=price,
+            client_order_id=client_order_id,
+        )
+        return {**quote, 'submitted': True, 'order': order,
+                'order_id': order.get('id') if isinstance(order, dict) else None,
+                'status': order.get('status', 'submitted') if isinstance(order, dict) else 'submitted'}
+
     def get_portfolio_equity_history(self):
         """Return recent account-equity observations for deterministic drawdown gates."""
         try:
@@ -197,8 +258,12 @@ class AlpacaTools:
             print(f"[ERROR] Get portfolio history: {e}")
             return []
 
-    def get_positions(self):
-        """Get open positions"""
+    def get_positions(self, raise_on_error=False):
+        """Get open positions, optionally surfacing broker failures.
+
+        Lifecycle reconciliation uses ``raise_on_error=True`` so a transport
+        failure can never be mistaken for an empty account.
+        """
         try:
             data = self.call("get_all_positions")
             positions = data if isinstance(data, list) else data.get('positions', [])
@@ -212,6 +277,8 @@ class AlpacaTools:
                 for p in positions
             ]
         except Exception as e:
+            if raise_on_error:
+                raise
             print(f"[ERROR] Get positions: {e}")
             return []
 
@@ -479,10 +546,19 @@ class AlpacaTools:
 
     def get_option_bid_ask(self, contract_symbol):
         """Latest (bid, ask) for one option contract"""
+        quote = self.get_option_quote(contract_symbol)
+        return (quote['bid'], quote['ask']) if quote else None
+
+    def get_option_quote(self, contract_symbol):
+        """Latest quote plus its broker timestamp for freshness controls."""
         try:
             data = self.call("get_option_latest_quote", {'symbols': contract_symbol})
             quote = data['quotes'][contract_symbol]
-            return float(quote['bp']), float(quote['ap'])
+            return {
+                'bid': float(quote['bp']),
+                'ask': float(quote['ap']),
+                'timestamp': quote.get('t') or quote.get('timestamp'),
+            }
         except Exception as e:
             print(f"[ERROR] Get option quote for {contract_symbol}: {e}")
             return None
@@ -497,7 +573,8 @@ class AlpacaTools:
             args['position_intent'] = position_intent
         return self.call("place_option_order", args)
 
-    def place_multileg_option_order(self, legs, qty=1, limit_price=None):
+    def place_multileg_option_order(self, legs, qty=1, limit_price=None,
+                                    client_order_id=None):
         """Submit a multi-leg (e.g. vertical spread) market options order.
         `legs` is a list of {'symbol', 'side', 'position_intent'} dicts (max 4).
         Raises AlpacaMCPError (or another exception) on rejection."""
@@ -505,6 +582,7 @@ class AlpacaTools:
         args = {
             'qty': str(qty),
             'type': 'limit' if limit_price is not None else 'market',
+            'time_in_force': 'day',
             'order_class': 'mleg',
             'legs': [
                 {'symbol': leg['symbol'], 'ratio_qty': '1', 'side': leg['side'],
@@ -514,6 +592,8 @@ class AlpacaTools:
         }
         if limit_price is not None:
             args['limit_price'] = str(round(limit_price, 2))
+        if client_order_id:
+            args['client_order_id'] = str(client_order_id)
         return self.call("place_option_order", args)
 
     def execute_spread(self, underlying_symbol, option_type, spread_type,
@@ -600,6 +680,15 @@ class AlpacaTools:
             'order_legs': legs,
             'qty': qty,
             'limit_price': round(signed_limit_price, 2),
+            'spread_type': spread_type,
+            'entry_cashflow_per_share': round(-signed_limit_price, 4),
+            'max_profit': max(
+                (strike_width - max(net_price, 0)) * multiplier * qty
+                if spread_type == 'debit' else max(net_credit, 0) * multiplier * qty,
+                0,
+            ),
+            'expiration_date': str(near.get('expiration_date') or '')[:10] or None,
+            'multiplier': multiplier,
             'order_type': 'limit',
             'quotes': {
                 near['symbol']: {'bid': near_bid, 'ask': near_ask},
@@ -627,12 +716,8 @@ class AlpacaTools:
 
         order_id = order.get('id') if isinstance(order, dict) else None
         return {
+            **prepared,
             'submitted': True,
-            'preflight_passed': True,
-            'legs': [near['symbol'], far['symbol']],
-            'max_loss': max_loss,
-            'order_type': 'limit',
-            'limit_price': round(signed_limit_price, 2),
             'order': order,
             'order_id': order_id,
             'status': order.get('status', 'submitted') if isinstance(order, dict) else 'submitted',

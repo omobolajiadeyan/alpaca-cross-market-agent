@@ -8,7 +8,7 @@
 
 **Live judge demo:** <https://crosssignal-ai-agent.streamlit.app>
 
-CrossSignal is an auditable cross-market macro agent built for the **Alpaca AI Trading Agents Hackathon**. It synchronizes six market lenses, asks Claude to identify incomplete repricing, constructs a defined-risk SPY/HYG/TLT options portfolio, and preflights every leg through Alpaca's official MCP server before paper submission.
+CrossSignal is an auditable cross-market macro agent built for the **Alpaca AI Trading Agents Hackathon**. It synchronizes six market lenses, asks Claude to identify incomplete repricing, constructs a defined-risk SPY/HYG/TLT options portfolio, preflights every leg through Alpaca's official MCP server, and manages every submitted spread through a persisted exit policy.
 
 The differentiator is accountability: every thesis stores the market snapshot that produced it and is later scored against subsequent market data. The dashboard distinguishes live, proxy, and fallback values instead of presenting synthetic certainty.
 
@@ -21,7 +21,8 @@ Every decision must pass a scientific proof chain:
 3. **Gauntlet** — run a Claude falsification review and bounded stability perturbations.
 4. **Notarized contract** — seal the prediction, invalidation, risk, and evidence with SHA-256.
 5. **Alpaca execution** — submit capped-risk limit orders and reconcile broker lifecycle state.
-6. **Learning ledger** — issue a predetermined verdict and compare agent, inverse, and cash directional proxies.
+6. **Position management** — value the complete spread and enforce take-profit, stop-loss, maximum-hold, and pre-expiry exits.
+7. **Learning ledger** — issue a predetermined verdict and compare agent, inverse, and cash directional proxies.
 
 ## Judge evidence lab
 
@@ -29,6 +30,7 @@ Every decision must pass a scientific proof chain:
 - **Alpaca Greeks defense** captures option snapshots at preflight and runs delta/gamma/vega shocks.
 - **Catalyst context** labels relevant Alpaca News without allowing headlines to bypass risk gates.
 - **Recovery state machine** detects partial exposure, blocks silent retries, and proposes paper-safe actions.
+- **Position lifecycle ledger** seals exit thresholds at entry, prevents duplicate closes, and records every recommendation, deferral, submission, and fill.
 - **Proof of abstention** lets judges weaken evidence and watch authorization fail closed.
 - **Evidence receipts** export a secret-free JSON chain from sealed prediction to later verdict.
 - **Walk-forward verdicts** compare the agent direction with inverse and cash counterfactuals.
@@ -59,6 +61,7 @@ Streamlit Community Cloud with:
 ```toml
 PUBLIC_DEMO_MODE = "true"
 ALLOW_PAPER_EXECUTION = "false"
+ENABLE_AUTOMATED_PAPER_EXITS = "false"
 REQUIRE_LIVE_DATA = "true"
 EVALUATION_HORIZON_DAYS = "5"
 ```
@@ -66,7 +69,9 @@ EVALUATION_HORIZON_DAYS = "5"
 Use controlled local mode for the presenter-led connected demonstration by
 setting `PUBLIC_DEMO_MODE=false` and supplying private Alpaca and Anthropic
 credentials. `ALLOW_PAPER_EXECUTION` should remain false unless an intentional
-paper-order demonstration is being supervised.
+paper-order demonstration is being supervised. Automated exits additionally
+require `ENABLE_AUTOMATED_PAPER_EXITS=true`; neither switch can authorize a live
+Alpaca endpoint.
 
 ### Autonomous Evidence Watch
 
@@ -93,8 +98,16 @@ For the terminal version:
 
 ```bash
 python live/cross_market_agent.py
+python scripts/manage_positions.py           # observe and audit only
+python scripts/manage_positions.py --execute # paper exits, only when both switches allow it
 python performance_report.py
 ```
+
+Before an exit can be submitted, the monitor reconciles registered option-leg
+quantities against Alpaca, rejects missing or stale quote timestamps, checks the
+Alpaca market clock, claims the exit atomically, and supplies a deterministic
+`client_order_id`. `PAUSE_NEW_ENTRIES=true` is an independent kill switch: it
+halts new positions while allowing already-authorized lifecycle exits to run.
 
 ## Product flow
 
@@ -104,7 +117,8 @@ python performance_report.py
 4. **Construct** — translate signals into three defined-risk vertical spreads.
 5. **Govern** — check structure, maximum loss, confidence, buying power, diversification, and data integrity.
 6. **Preflight** — price all three legs before allowing the first paper order.
-7. **Audit and learn** — persist decisions, order responses, and later score forecast direction.
+7. **Manage** — monitor spread liquidation value; close on 50% of maximum profit, 50% of maximum loss, five trading days, or two calendar days before expiry.
+8. **Audit and learn** — persist entry/exit events and later score forecast direction.
 
 ## Data sources
 
@@ -125,15 +139,18 @@ python performance_report.py
 - Buying-power, confidence, structure, and diversification checks.
 - Complete portfolio preflight before any submission.
 - Explicit UI confirmation for paper orders.
+- Exit policy persisted with the order: configurable profit, loss, time, and expiry triggers.
+- Atomic multi-leg limit closes, market-clock checks, and idempotent `EXIT_PENDING` state.
+- Separate authorization for automated paper exits; public mode cannot mutate the broker.
 - Full thesis, risk, and execution audit trail.
 
 The agent captures Alpaca option Greeks and enforces delta, vega, theta, margin,
 liquidity, bid-ask, drawdown, and snapshot-completeness gates before sealing an
 authorization. Scenario P&L is a transparent delta-gamma-vega approximation,
-not a full volatility-surface repricer. Recovery can cancel approved paper
-orders and close explicitly selected paper positions, but never acts without
-human approval. The walk-forward ledger is not presented as investment-grade
-backtesting.
+not a full volatility-surface repricer. Emergency recovery remains human-approved.
+Normal management is a separate deterministic paper-only state machine and can
+be automated only through its independent deployment switch. The walk-forward
+ledger is not presented as investment-grade backtesting.
 
 ## Tests
 
@@ -143,8 +160,9 @@ pytest
 
 Tests cover metric-aware thesis scoring, fallback-data fail-closed behavior,
 maximum-loss and buying-power gates, spread preflight, Greek/liquidity/margin/
-drawdown enforcement, recovery authorization, receipt verification, and audit
-status classification.
+drawdown enforcement, recovery authorization, take-profit/stop-loss/time/expiry
+decisions, atomic close construction, idempotency, receipt verification, and
+audit status classification. The current suite contains **53 passing tests**.
 
 ## Repository map
 
@@ -157,9 +175,11 @@ agent/constructor.py           Signal mapping and risk assessment
 agent/thesis_scorer.py         Outcome-based forecast scoring
 agent/signal_protocol.py       Disagreement, stability, sealing and verdicts
 agent/evidence_protocol.py     Greeks, stress, catalysts, recovery and receipts
+agent/position_manager.py      Deterministic spread valuation and exit lifecycle
 tools/alpaca_tools.py          Persistent Alpaca MCP integration
 compliance/audit_logger.py     SQLite decision and execution ledger
 scripts/evidence_watch.py      Read-only scheduled evidence exporter
+scripts/manage_positions.py    Observe-only or explicitly authorized paper exit job
 .github/workflows/             Tests and cloud Evidence Watch automation
 tests/                         Fast isolated safety tests
 ```

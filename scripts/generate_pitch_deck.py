@@ -121,7 +121,7 @@ def build():
     cards = [
         ("Fragmented", "Single-market analysis misses information moving between rates, credit and equities."),
         ("Unaccountable", "LLM conclusions are difficult to reproduce, challenge or audit after the outcome."),
-        ("Unmeasured", "Most agents do not precommit a forecast and later score whether it was right."),
+        ("Unmanaged", "Many agents govern entry but provide no explicit profit, loss, time or expiry exit policy."),
     ]
     for i, (head, body) in enumerate(cards):
         x = .65 + i * 4.15
@@ -130,7 +130,7 @@ def build():
         text(s, head, x + .25, 4.0, 3.2, .4, 21, NAVY, True)
         text(s, body, x + .25, 4.55, 3.2, .85, 14, MUTED)
     footer(s, 2)
-    add_notes(s, "Markets transmit information at different speeds. CrossSignal addresses fragmentation, weak AI accountability, and the absence of honest forward scoring.")
+    add_notes(s, "Markets transmit information at different speeds. CrossSignal addresses fragmented evidence, weak AI accountability, and the common gap between governed entry and disciplined exit.")
 
     # 3 — Solution
     s = prs.slides.add_slide(blank); label(s, "The solution", 3)
@@ -163,18 +163,18 @@ def build():
     bullet_list(s, ["Claude macro synthesis", "Deterministic construction", "Risk and stability gates", "Sealed Decision Contract"], 5.3, 3.35, 2.65, 1.8, 15, WHITE)
     rect(s, 9.35, 2.45, 3.25, 3.35, ICE, RGBColor(213, 224, 233))
     text(s, "PAPER LIFECYCLE", 9.65, 2.8, 2.65, .3, 11, CYAN, True)
-    bullet_list(s, ["All-leg preflight", "Multi-leg paper orders", "Fill reconciliation", "Explicit recovery state"], 9.65, 3.35, 2.65, 1.8, 15)
+    bullet_list(s, ["All-leg preflight", "Take-profit and stop-loss", "Time and expiry exits", "Fresh quotes, broker reconciliation, atomic close"], 9.65, 3.35, 2.65, 1.8, 13)
     text(s, "→", 4.18, 3.8, .5, .5, 25, CYAN, True)
     text(s, "→", 8.53, 3.8, .5, .5, 25, CYAN, True)
     footer(s, 4)
-    add_notes(s, "The official Alpaca MCP server powers sponsor-native market evidence and the paper execution lifecycle. Claude reasons, but deterministic code controls broker access.")
+    add_notes(s, "The official Alpaca MCP server powers market evidence and the paper lifecycle. Claude reasons, but deterministic code controls entry and exit. Every spread persists thresholds fixed at entry. Before an exit, CrossSignal reconciles broker legs, rejects stale quote timestamps, atomically claims the transition, and reverses both legs under a deterministic client order ID.")
 
     # 5 — Differentiation/evidence
     s = prs.slides.add_slide(blank); label(s, "Defensibility", 5)
     title(s, "One scorecard. A decision that defends itself.",
           "Signal strength never gets to hide weak execution evidence.")
-    metrics = [("82", "Signal quality"), ("100", "Decision stability"),
-               ("83", "Execution quality"), ("Pending", "Outcome evidence")]
+    metrics = [("82", "Signal quality"), ("90", "Decision stability"),
+               ("87", "Execution quality"), ("Pending", "Outcome evidence")]
     for i, (value, caption) in enumerate(metrics):
         x = .65 + i * 3.02
         rect(s, x, 2.65, 2.72, 1.3, ICE, RGBColor(213, 224, 233))
@@ -187,18 +187,18 @@ def build():
     text(s, "Sanitized case, credential-free", .95, 5.03, 4.9, .3, 17, WHITE, True)
     rect(s, 6.78, 4.35, 5.85, 1.38, ICE, RGBColor(213, 224, 233))
     text(s, "LIVE DEDICATED ACCOUNT", 7.08, 4.62, 2.3, .25, 11, CYAN, True)
-    text(s, "ABSTAIN · missed by 1 point · 5 of 6 gates passed", 7.08, 5.03, 4.95, .3, 15, NAVY, True)
-    text(s, "CS-20260902-BF9B142D · account PA3PDTUDIXDU · sealed receipt · zero broker mutations",
+    text(s, "ABSTAIN · 13 of 15 checks · quotes not executable", 7.08, 5.03, 4.95, .3, 15, NAVY, True)
+    text(s, "CS-20260903-5C194F65 · PA3PDTUDIXDU · 0 orders · 0 positions · no P&L claim",
          .75, 6.18, 11.7, .25, 11, MUTED, True, align=PP_ALIGN.CENTER)
     footer(s, 5)
-    add_notes(s, "This is the key proof slide, drawn from the latest live cycle against the dedicated hackathon paper account on September 2nd. Signal quality scored 82 and decision stability 100 across ten real perturbations. Five of six deterministic execution checks passed -- every gate cleared except post-falsification confidence, which landed at 54 percent against a 55 percent minimum. One point short. That razor-close abstention is the point: CrossSignal does not round in its own favor. Outcome evidence remains pending until the sealed horizon matures.")
+    add_notes(s, "This is the key proof slide from the September 3 unattended Evidence Watch. Confidence cleared at 56 percent and all six base gates passed. The all-leg option preflight then found zero displayed volume on the weakest leg and a 93.33 percent relative bid-ask spread, against limits of ten contracts and 25 percent. Only 13 of 15 checks passed, so the agent abstained. The run occurred after the regular options session; it did not queue a non-executable order. The dedicated account therefore has no trade P&L to claim.")
 
     # 6 — Safety
     s = prs.slides.add_slide(blank); label(s, "Trust and safety", 6)
     title(s, "Safe by architecture—not by prompt")
     controls = [("Public UI", "Read-only replay", GREEN), ("Cloud watch", "Observe only", GREEN),
                 ("LLM", "No direct tool access", GREEN), ("Evidence", "Secret-free receipts", GREEN),
-                ("Recovery", "Explicit approval", AMBER), ("News", "Untrusted context", AMBER)]
+                ("Exit state", "No duplicate closes", GREEN), ("Recovery", "Explicit approval", AMBER)]
     for i, (head, body, tone) in enumerate(controls):
         row, col = divmod(i, 3)
         x, y = .65 + col * 4.12, 2.6 + row * 1.45
@@ -236,7 +236,7 @@ def build():
     rect(s, 0, 0, 13.333, 7.5, NAVY)
     text(s, "THE PROOF IS PUBLIC", .75, .7, 4, .3, 11, LIGHT_CYAN, True)
     text(s, "Inspect the intelligence.\nChallenge the decision.", .72, 1.35, 8.8, 1.55, 36, WHITE, True, "Aptos Display")
-    stats = [("46", "automated tests"), ("82/100", "live signal quality"), ("5/6", "risk gates passed")]
+    stats = [("59", "automated tests"), ("4", "sealed exit rules"), ("13/15", "latest full checks")]
     for i, (value, caption) in enumerate(stats):
         x = .75 + i * 2.55
         text(s, value, x, 3.35, 2.2, .55, 27, LIGHT_CYAN, True)
@@ -247,10 +247,10 @@ def build():
     rect(s, 9.2, 3.25, 3.05, .03, CYAN)
     text(s, "SOURCE CODE", 9.2, 3.72, 3.05, .3, 11, BLUE, True, align=PP_ALIGN.CENTER)
     text(s, "github.com/omobolajiadeyan/\nalpaca-cross-market-agent", 9.05, 4.28, 3.35, .85, 13, NAVY, True, align=PP_ALIGN.CENTER)
-    text(s, "CrossSignal does not merely recommend a trade.\nIt proves whether the trade deserves authorization.",
+    text(s, "CrossSignal proves when a trade deserves entry—\nand manages exactly how it exits.",
          .75, 5.35, 7.45, .85, 17, WHITE, True)
     text(s, "Omobolaji E Adeyan · Paper trading only · Not investment advice", .75, 6.75, 8, .3, 11, LIGHT_CYAN)
-    add_notes(s, "Close on verified evidence: forty-six tests pass in GitHub, a live cycle against the dedicated hackathon paper account sealed a real contract on September 2nd, and the system abstained by a single confidence point after five of six deterministic checks passed. CrossSignal makes AI trading decisions inspectable, challengeable, reproducible, and measurable. Invite judges to open the live application, repository, and dedicated account PA3PDTUDIXDU.")
+    add_notes(s, "Close on verified evidence: fifty-nine tests pass, including profit, loss, time, expiry, broker-reconciliation, quote-freshness, uncertain-submission locking, market-clock, atomic-close, audit, and idempotency tests. Ten connected cycles are sealed against the dedicated account; the latest rejected non-executable after-hours quotes. The account remains at 100,000 dollars with no orders or positions, so there is no P&L claim and the lifecycle replay is illustrative rather than broker fill evidence.")
 
     OUT.parent.mkdir(parents=True, exist_ok=True)
     prs.save(OUT)

@@ -22,9 +22,15 @@ from agent.signal_protocol import (
 from agent.evidence_protocol import (
     CatalystClassifier, ExecutionRecoveryPlanner, ExecutionRiskGate, PortfolioStressEngine,
 )
+from agent.position_manager import PositionLifecycleManager
 from tools.alpaca_tools import AlpacaTools
 from compliance.audit_logger import AuditLogger
-from config import THESIS_EVALUATION_DAYS, REQUIRE_LIVE_DATA, ALLOW_PAPER_EXECUTION, PUBLIC_DEMO_MODE
+from config import (
+    THESIS_EVALUATION_DAYS, REQUIRE_LIVE_DATA, ALLOW_PAPER_EXECUTION, PUBLIC_DEMO_MODE,
+    ENABLE_AUTOMATED_PAPER_EXITS, TAKE_PROFIT_FRACTION, STOP_LOSS_FRACTION,
+    MAX_HOLDING_DAYS, EXIT_BEFORE_EXPIRY_DAYS, MAX_EXIT_QUOTE_AGE_SECONDS,
+    PAUSE_NEW_ENTRIES,
+)
 
 
 class CrossMarketAgent:
@@ -57,6 +63,11 @@ class CrossMarketAgent:
         self.stress_engine = PortfolioStressEngine()
         self.execution_risk_gate = ExecutionRiskGate()
         self.recovery_planner = ExecutionRecoveryPlanner()
+        self.position_manager = PositionLifecycleManager(
+            self.alpaca, self.logger,
+            automated_exits_enabled=ENABLE_AUTOMATED_PAPER_EXITS,
+            max_quote_age_seconds=MAX_EXIT_QUOTE_AGE_SECONDS,
+        )
 
         print("[INIT] ✓ All components ready\n")
 
@@ -69,6 +80,21 @@ class CrossMarketAgent:
         try:
             execute = bool(execute and ALLOW_PAPER_EXECUTION and not PUBLIC_DEMO_MODE)
             self.alpaca.authorize_paper_mutations(execute)
+            print("[AGENT] POSITION MONITOR: Reconciling existing paper spreads...")
+            position_monitor = self.position_manager.run(
+                execute=bool(execute and ENABLE_AUTOMATED_PAPER_EXITS),
+            )
+            if position_monitor:
+                for item in position_monitor:
+                    print(f"  {item['position_id']}: {item['action']}")
+            else:
+                print("  No active managed positions\n")
+            if execute and PAUSE_NEW_ENTRIES:
+                execute = False
+                print(
+                    "[AGENT] ENTRY KILL SWITCH: New entries are paused; "
+                    "lifecycle monitoring remains active.\n"
+                )
             # STEP 0: Score any past theses old enough to check against real
             # subsequent data -- this is what turns "prints a thesis" into an
             # agent with an actual, honest track record.
@@ -264,6 +290,20 @@ class CrossMarketAgent:
                         print("[AGENT] STEP 7: Logging to audit trail...")
                         thesis_id = self.logger.log_thesis(thesis, market_state)
                         trade_id = self.logger.log_trade(thesis_id, portfolio)
+                        exit_policy = {
+                            'take_profit_fraction': TAKE_PROFIT_FRACTION,
+                            'stop_loss_fraction': STOP_LOSS_FRACTION,
+                            'max_holding_days': MAX_HOLDING_DAYS,
+                            'exit_before_expiry_days': EXIT_BEFORE_EXPIRY_DAYS,
+                        }
+                        managed_position_ids = []
+                        for role in ('primary_trade', 'secondary_trade', 'hedge'):
+                            position_id = self.logger.register_managed_position(
+                                trade_id, contract['contract_id'], role, portfolio[role], exit_policy,
+                            )
+                            if position_id:
+                                managed_position_ids.append(position_id)
+                        portfolio['managed_position_ids'] = managed_position_ids
                         execution_states = [portfolio[name].get('execution', {}).get('status')
                                             for name in ('primary_trade', 'secondary_trade', 'hedge')]
                         contract_status = ('abstained' if contract['authorization'] != 'AUTHORIZED'
@@ -300,6 +340,7 @@ class CrossMarketAgent:
             return {'market_state': market_state, 'account': account,
                     'thesis': thesis if 'thesis' in locals() else None,
                     'portfolio': portfolio if 'portfolio' in locals() else None,
+                    'position_monitor': position_monitor,
                     'disagreement': disagreement, 'stability': stability,
                     'falsification': falsification if 'falsification' in locals() else None,
                     'catalyst_context': catalyst_context,

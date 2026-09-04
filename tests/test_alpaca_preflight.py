@@ -51,6 +51,43 @@ def test_submission_uses_a_defined_limit_price():
     result = tools.execute_spread('SPY', 'call', 'debit', max_premium=500, submit=True)
     assert result['submitted'] is True
     assert captured['limit_price'] == 1.6
+    assert result['order_legs'][0]['position_intent'] == 'buy_to_open'
+
+
+def test_atomic_spread_exit_reverses_both_legs_at_executable_limit():
+    tools = object.__new__(AlpacaTools)
+    tools.get_option_quote = lambda symbol: {
+        'bid': 2.0 if symbol == 'NEAR' else .5,
+        'ask': 2.1 if symbol == 'NEAR' else .6,
+        'timestamp': '2026-09-03T15:00:00+00:00',
+    }
+    captured = {}
+    tools.place_multileg_option_order = lambda legs, qty, limit_price, client_order_id=None: captured.update(
+        {'legs': legs, 'qty': qty, 'limit_price': limit_price,
+         'client_order_id': client_order_id}
+    ) or {'id': 'exit-paper', 'status': 'accepted'}
+    result = tools.close_option_spread([
+        {'symbol': 'NEAR', 'side': 'buy', 'position_intent': 'buy_to_open'},
+        {'symbol': 'FAR', 'side': 'sell', 'position_intent': 'sell_to_open'},
+    ])
+    assert result['order_id'] == 'exit-paper'
+    assert captured['limit_price'] == -1.4
+    assert [leg['position_intent'] for leg in captured['legs']] == ['sell_to_close', 'buy_to_close']
+
+
+def test_multileg_order_uses_day_tif_and_client_order_id():
+    tools = object.__new__(AlpacaTools)
+    tools._mutation_authorized = True
+    captured = {}
+    tools.call = lambda name, arguments: captured.update(
+        {'name': name, 'arguments': arguments}
+    ) or {'id': 'paper-order'}
+    tools.place_multileg_option_order([
+        {'symbol': 'NEAR', 'side': 'sell', 'position_intent': 'sell_to_close'},
+        {'symbol': 'FAR', 'side': 'buy', 'position_intent': 'buy_to_close'},
+    ], qty=1, limit_price=-1.4, client_order_id='cs-exit-7-1')
+    assert captured['arguments']['time_in_force'] == 'day'
+    assert captured['arguments']['client_order_id'] == 'cs-exit-7-1'
 
 
 def test_contract_selection_uses_target_dte_to_break_same_strike_ties():
