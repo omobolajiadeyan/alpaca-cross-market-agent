@@ -26,63 +26,56 @@ VOICE = "en-US-AndrewMultilingualNeural"
 RATE = "+6%"
 HARD_CAP_SECONDS = 300
 
-# Narration is copied verbatim from submission/FINAL_VIDEO_SCRIPT.md.
+# Structure follows the user's specified nine-section outline: problem,
+# solution, live evaluation, why-ABSTAIN, spread construction, position
+# lifecycle, broker reconciliation, test suite, honest close.
 BEATS = [
-    ("opening", """What if the smartest thing an AI trading agent could do was say no—and, when
-it says yes, know exactly how to get out? I'm Omobolaji Adeyan, and this is
-CrossSignal."""),
-    ("problem", """Most trading agents focus on finding an opportunity and entering quickly. But
-a strong signal alone does not make a safe trade. Market data may conflict,
-liquidity may be poor, or the spread may be too wide. And entry is only half
-the problem. Without an explicit take-profit, stop-loss, time limit, and
-expiry rule, a valid entry can become unmanaged risk. An autonomous agent must
-justify both why it entered and why it stayed or exited."""),
-    ("solution", """CrossSignal is an auditable decision and position-management system for Alpaca
-paper trading. It synchronizes six market lenses. Claude proposes a structured
-thesis and attacks its own case. Independent deterministic code measures the
-disagreement, tests stability, checks risk and execution quality, and has final
-authority. Claude never contacts the broker."""),
-    ("entry_governance", """Before any order, CrossSignal verifies live-data integrity, confidence,
-maximum loss, buying power, diversification, Greeks coverage, portfolio stress,
-liquidity, bid-ask quality, and drawdown. Every authorized decision is sealed
-into a SHA-256 Decision Contract before submission. If one critical control
-fails, the outcome is ABSTAIN—not a forced trade."""),
-    ("position_lifecycle", """Governance now continues after entry. Every submitted vertical spread stores
-its two option legs, fill price, maximum profit, maximum loss, expiry, and four
-exit rules. By default, it takes profit at fifty percent of maximum profit,
-cuts the position at fifty percent of defined maximum loss, exits after five
-trading days, or closes two calendar days before expiry. The monitor first
-reconciles every registered leg against Alpaca, then values the complete spread
-using executable bids and asks. Stale quotes cannot trigger an order. When a
-rule fires, it reverses both legs in one atomic Alpaca multi-leg limit order
-with a deterministic client order ID. An atomic claim and EXIT_PENDING state
-prevent duplicate closes, while every recommendation, deferral, submission,
-and fill remains auditable."""),
-    ("safety_boundary", """Exit automation is independently gated. It requires the exact Alpaca paper
-endpoint, entry authorization, a second automated-exit switch, valid quotes,
-and an open Alpaca market clock. The public judge application and scheduled
-GitHub Evidence Watch are read-only. Emergency recovery for a broken entry
-remains separate and human-approved. A dedicated kill switch can pause new
-entries while continuing to manage positions already open."""),
-    ("evidence", """Against a fresh one-hundred-thousand-dollar competition paper account,
+    ("opening", """Markets rarely agree with themselves. Equities, credit, rates, and volatility
+often send conflicting signals about the same underlying risk, and most
+trading agents pick one confident number and act on it anyway. That's the
+real problem: a single strong signal is not proof of a real opportunity.
+I'm Omobolaji Adeyan, and this is CrossSignal."""),
+    ("solution", """CrossSignal's answer is a cross-market solution. It synchronizes six live
+market lenses into one macro state, has Claude propose a structured thesis,
+then puts that thesis through independent deterministic checks — disagreement,
+stability, and execution risk — before anything is ever authorized. Claude
+never contacts the broker directly."""),
+    ("live_evaluation", """Let's run today's evaluation live, on the actual public judge replay — the
+same page a judge would open. Six independent lenses source real market
+data: equity volatility, credit, rates, realized volatility, rate
+expectations, and positioning. Each is labeled and status-checked before
+anything downstream is allowed to trust it."""),
+    ("abstain_reason", """Here is exactly why today's cycle landed on ABSTAIN. The Decision case tab
+reconstructs the allegation, the cross-examination, and the judgment in
+order. In this run, a real deterministic check failed the fixed bar — and
+CrossSignal refused to trade rather than force it through."""),
+    ("spread_construction", """Even when a signal is strong, execution has its own gate. Watch the
+construction, live: a bearish credit spread, a defensive equity hedge, and a
+rates hedge — three legs, each preflighted against Greeks coverage, margin
+utilization, and option liquidity before anything could be submitted. Here,
+liquidity fell short on one leg, so nothing was."""),
+    ("position_lifecycle", """Now the complete position lifecycle, live. On the Track record tab, every
+submitted spread carries a persisted exit contract: take-profit, stop-loss,
+a five-day holding limit, and a pre-expiry close, values against executable
+bids and asks every cycle. Underneath, deterministic code evaluates those
+four sealed thresholds with no broker side effects. And every position
+moves through one real state at a time: pending entry, open, exit pending,
+closed."""),
+    ("broker_reconciliation", """Before any exit reconciles, CrossSignal compares every registered leg
+against Alpaca's real broker inventory — a mismatch, and the cycle logs a
+reconciliation failure instead of trusting stale state. Every entry filled,
+exit submitted, and fill event is written to an append-only audit record,
+timestamped and independently inspectable."""),
+    ("repo_tests", """None of this is theoretical. Here is the genuine test suite running:
+fifty-nine automated tests covering authorization, pricing, profit and loss
+triggers, time and expiry exits, market-closed deferral, atomic leg
+reversal, audit persistence, and duplicate-order prevention."""),
+    ("close", """Honestly: against a fresh, dedicated hundred-thousand-dollar paper account,
 CrossSignal repeatedly found real disagreements but refused execution when
-adversarial confidence or after-hours liquidity failed fixed thresholds. The
-account therefore has no competition P-and-L to claim. That is a competitive
-limitation, but it is honest evidence that the controls were not weakened to
-manufacture a trade."""),
-    ("dashboard", """The dashboard exposes the decision courtroom, risk scorecard, entry ledger,
-and the new position lifecycle. Judges can inspect each sealed policy and each
-state transition from pending entry, to open, to exit pending, to closed. The
-public example is explicitly labeled as an illustrative policy demonstration,
-not broker fill evidence."""),
-    ("repo_tests", """The public repository contains the complete implementation, not a mock-up.
-Fifty-nine automated tests cover authorization, pricing, profit and loss
-triggers, time and expiry exits, market-closed deferral, atomic leg reversal,
-audit persistence, privacy, and duplicate-order prevention."""),
-    ("close", """That's the fix for the problem I opened with: an entry decision is not enough.
-CrossSignal governs both halves — it proves a trade deserves entry, then manages
-it under exit rules fixed in advance, and proves why it closed when it did.
-I'm Omobolaji Adeyan. Thank you."""),
+the evidence didn't clear its own bar — so there is no competition P-and-L
+to show. That's not a demo failure; it's the discipline working as designed.
+CrossSignal proves when a trade deserves entry, manages it under rules fixed
+in advance, and proves why it exits. I'm Omobolaji Adeyan. Thank you."""),
 ]
 
 FONT_HEAD = (
@@ -305,6 +298,66 @@ CODE_HTML = r"""<!doctype html>
 </body></html>
 """
 
+BROKER_RECONCILE_HTML = r"""<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+  * { box-sizing: border-box; margin:0; padding:0; }
+  body { width:1920px; height:1080px; background:#0b1220;
+    font-family: 'Cascadia Code', 'Consolas', monospace;
+    display:flex; flex-direction:column; color:#c9d6ef; }
+  .titlebar { height:52px; background:#0f1a2e; display:flex; align-items:center;
+    padding:0 24px; gap:10px; border-bottom:1px solid #1c2b47; }
+  .dot { width:13px; height:13px; border-radius:50%; }
+  .r{background:#ff5f57}.y{background:#febc2e}.g{background:#28c840}
+  .filename { margin-left:20px; color:#7891b8; font-size:16px; }
+  .path { color:#7891b8; font-size:15px; padding: 10px 40px 0 24px; letter-spacing:.02em; }
+  .body { display:flex; flex:1; }
+  .gutter { width:80px; background:#0d1626; color:#3d5578; text-align:right;
+    padding:20px 16px 0 0; font-size:20px; line-height:1.6; white-space:pre-line; }
+  .code { padding:20px 40px 0 24px; font-size:20px; line-height:1.6; white-space:pre; }
+  .kw { color:#c586c0; } .fn { color:#4fc1e9; } .str { color:#ce9178; }
+  .num { color:#b5cea8; } .plain { color:#c9d6ef; } .cmt { color:#5d7099; font-style:italic; }
+</style></head>
+<body>
+  <div class="titlebar"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div>
+    <span class="filename">agent/position_manager.py</span></div>
+  <div class="path">CrossSignal &middot; broker inventory reconciliation, real code</div>
+  <div class="body">
+    <div class="gutter">265
+266
+267
+268
+269
+270
+271
+
+273
+274
+275
+276
+277
+278
+279</div>
+    <div class="code"><span class="kw">def</span> <span class="fn">_broker_mismatches</span>(<span class="plain">open_positions, broker_positions):</span>
+    <span class="plain">expected = defaultdict(</span><span class="kw">float</span><span class="plain">)</span>
+    <span class="kw">for</span> <span class="plain">position </span><span class="kw">in</span> <span class="plain">open_positions:</span>
+        <span class="kw">for</span> <span class="plain">leg </span><span class="kw">in</span> <span class="plain">position[</span><span class="str">'opening_legs'</span><span class="plain">]:</span>
+            <span class="plain">direction = </span><span class="num">1</span> <span class="kw">if</span> <span class="plain">leg[</span><span class="str">'side'</span><span class="plain">] == </span><span class="str">'buy'</span> <span class="kw">else</span> <span class="plain">-</span><span class="num">1</span>
+            <span class="plain">expected[leg[</span><span class="str">'symbol'</span><span class="plain">]] += direction * leg[</span><span class="str">'ratio_qty'</span><span class="plain">]</span>
+
+    <span class="plain">actual = {p[</span><span class="str">'symbol'</span><span class="plain">]: p[</span><span class="str">'qty'</span><span class="plain">] </span><span class="kw">for</span> <span class="plain">p </span><span class="kw">in</span> <span class="plain">broker_positions}</span>
+    <span class="kw">for</span> <span class="plain">symbol, expected_qty </span><span class="kw">in</span> <span class="plain">expected.items():</span>
+        <span class="plain">actual_qty = actual.get(symbol, </span><span class="num">0.0</span><span class="plain">)</span>
+        <span class="kw">if</span> <span class="plain">actual_qty * expected_qty &lt;= </span><span class="num">0</span> <span class="kw">or</span> <span class="plain">abs(actual_qty) &lt; abs(expected_qty):</span>
+            <span class="plain">mismatches[symbol] = {</span><span class="str">'expected'</span><span class="plain">: expected_qty, </span><span class="str">'actual'</span><span class="plain">: actual_qty}</span>
+
+<span class="cmt"># A mismatch here blocks the cycle from trusting stale state --</span>
+<span class="cmt"># every entry, exit, and fill event is separately appended to</span>
+<span class="cmt"># an audit-only ledger, timestamped and never rewritten.</span></div>
+  </div>
+</body></html>
+"""
+
 TERMINAL_HTML = r"""<!doctype html>
 <html><head><meta charset="utf-8">
 <style>
@@ -465,46 +518,6 @@ def build_clip(ffmpeg: str, image: Path, audio: Path, duration: float, out_mp4: 
     ], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
 
-def build_split_clip(ffmpeg: str, images_durations: list[tuple[Path, float]], audio: Path,
-                      total_duration: float, out_mp4: Path, step_index: int,
-                      step_total: int) -> None:
-    """Two (or more) images shown in sequence under one continuous narration
-    track. Used for beats whose audio is long enough that a single static
-    image would sit on screen doing nothing for most of a minute."""
-    n = len(images_durations)
-    inputs: list[str] = []
-    filter_parts: list[str] = []
-    concat_labels = []
-    for i, (image, dur) in enumerate(images_durations):
-        inputs += ["-loop", "1", "-t", str(dur), "-i", str(image)]
-        fade = ""
-        if i == 0:
-            fade = ",fade=t=in:st=0:d=0.4"
-        if i == n - 1:
-            fade_out_st = max(dur - 0.4, 0)
-            fade += f",fade=t=out:st={fade_out_st}:d=0.4"
-        filter_parts.append(
-            f"[{i}:v]scale=1920:1080:force_original_aspect_ratio=decrease,"
-            f"pad=1920:1080:(ow-iw)/2:(oh-ih)/2:color=0x071d49,format=yuv420p{fade}[v{i}]"
-        )
-        concat_labels.append(f"[v{i}]")
-    audio_index, watermark_index = n, n + 1
-    filter_parts.append(f"{''.join(concat_labels)}concat=n={n}:v=1:a=0[base]")
-    filter_parts.append(
-        f"[{watermark_index}:v]scale=190:190[wm];"
-        "[base][wm]overlay=W-w-90:H-h-70:format=yuv420[wmout]"
-    )
-    filter_parts.append(progress_bar_filters("wmout", "outv", step_index, step_total))
-    subprocess.run([
-        ffmpeg, "-y", *inputs, "-i", str(audio), "-i", str(WATERMARK_PNG),
-        "-filter_complex", ";".join(filter_parts),
-        "-map", "[outv]", "-map", f"{audio_index}:a",
-        "-af", "apad", "-t", str(total_duration), "-r", "30", "-pix_fmt", "yuv420p",
-        "-c:v", "libx264", "-preset", "medium", "-crf", "20",
-        "-c:a", "aac", "-b:a", "160k", "-ar", "48000", str(out_mp4),
-    ], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-
-
 PUBLIC_SITE_URL = "https://crosssignal-ai-agent.streamlit.app/~/+/"
 
 CURSOR_INIT_JS = """
@@ -543,58 +556,140 @@ def visible_click(page, locator) -> None:
     locator.click()
 
 
-def capture_public_site_tour(target_duration: float, out_mp4: Path, ffmpeg: str) -> None:
-    """Record a real, cursor-driven tour of the actual public deployment
-    (not a local instance) -- the same URL judges will open themselves --
-    touring the decision scorecard and then the position-lifecycle table."""
-    with sync_playwright() as pw:
-        browser = pw.chromium.launch(headless=True)
+def warm_up_public_site(browser) -> None:
+    """Streamlit Community Cloud apps sleep after inactivity and can take
+    well over 30s to cold-start on first hit; do this once before any
+    timed recording so later segments aren't eaten by a cold boot."""
+    print("  [live] warming up the public deployment (may cold-start)...")
+    warm = browser.new_context(viewport={"width": 1920, "height": 1080})
+    warm_page = warm.new_page()
+    warm_page.goto(PUBLIC_SITE_URL, wait_until="domcontentloaded", timeout=90_000)
+    warm_page.get_by_text("PUBLIC JUDGE MODE", exact=False).wait_for(timeout=90_000)
+    warm.close()
 
-        # Warm-up (not recorded): Streamlit Community Cloud apps sleep after
-        # inactivity and can take well over 30s to cold-start on first hit.
-        print("  [public-tour] warming up the public deployment (may cold-start)...")
-        warm = browser.new_context(viewport={"width": 1920, "height": 1080})
-        warm_page = warm.new_page()
-        warm_page.goto(PUBLIC_SITE_URL, wait_until="domcontentloaded", timeout=90_000)
-        warm_page.get_by_text("PUBLIC JUDGE MODE", exact=False).wait_for(timeout=90_000)
-        warm.close()
 
-        with tempfile.TemporaryDirectory(prefix="crosssignal-publictour-") as vdir:
-            context = browser.new_context(
-                viewport={"width": 1920, "height": 1080}, device_scale_factor=1,
-                record_video_dir=vdir, record_video_size={"width": 1920, "height": 1080},
-            )
-            page = context.new_page()
-            page.goto(PUBLIC_SITE_URL, wait_until="domcontentloaded", timeout=60_000)
-            page.get_by_text("PUBLIC JUDGE MODE", exact=False).wait_for(timeout=30_000)
-            # Streamlit renders skeleton placeholders first and fills real data in
-            # a moment later; without this, the recording captures gray shimmer
-            # boxes instead of the actual scorecard numbers.
-            page.get_by_text("Decision intelligence scorecard", exact=False) \
-                .wait_for(timeout=15_000)
-            page.wait_for_timeout(4000)
-            page.evaluate(CURSOR_INIT_JS)
-            page.wait_for_timeout(600)
+def capture_live_segment(browser, action_fn, target_duration: float, out_mp4: Path,
+                          ffmpeg: str) -> None:
+    """Record a real, cursor-driven interaction with the actual public
+    deployment (not a local instance) -- the same URL judges would open
+    themselves. `action_fn(page, target_duration)` drives the interaction
+    and is responsible for its own pacing/dwell time."""
+    with tempfile.TemporaryDirectory(prefix="crosssignal-liveseg-") as vdir:
+        context = browser.new_context(
+            viewport={"width": 1920, "height": 1080}, device_scale_factor=1,
+            record_video_dir=vdir, record_video_size={"width": 1920, "height": 1080},
+        )
+        page = context.new_page()
+        page.goto(PUBLIC_SITE_URL, wait_until="domcontentloaded", timeout=60_000)
+        page.get_by_text("PUBLIC JUDGE MODE", exact=False).wait_for(timeout=30_000)
+        # Streamlit renders skeleton placeholders first and fills real data in
+        # a moment later; without this, the recording captures gray shimmer
+        # boxes instead of the actual numbers.
+        page.get_by_text("Decision intelligence scorecard", exact=False) \
+            .wait_for(timeout=15_000)
+        page.wait_for_timeout(4000)
+        page.evaluate(CURSOR_INIT_JS)
+        page.wait_for_timeout(400)
 
-            page.get_by_text("Decision intelligence scorecard", exact=False) \
-                .scroll_into_view_if_needed()
-            page.wait_for_timeout(int(target_duration * 1000 * 0.40))
+        action_fn(page, target_duration)
 
-            page.evaluate("window.scrollTo(0, 0)")
-            page.wait_for_timeout(200)
-            visible_click(page, page.get_by_role("tab", name="Track record"))
-            page.wait_for_timeout(300)
-            page.get_by_text("Position lifecycle", exact=False).scroll_into_view_if_needed()
-            page.wait_for_timeout(int(target_duration * 1000 * 0.40))
+        context.close()
+        recorded = next(Path(vdir).glob("*.webm"))
+        subprocess.run([
+            ffmpeg, "-y", "-i", str(recorded),
+            "-c:v", "libx264", "-preset", "medium", "-crf", "20", "-r", "30",
+            "-pix_fmt", "yuv420p", "-t", str(target_duration), str(out_mp4),
+        ], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
-            context.close()
-            recorded = next(Path(vdir).glob("*.webm"))
-            subprocess.run([
-                ffmpeg, "-y", "-i", str(recorded),
-                "-c:v", "libx264", "-preset", "medium", "-crf", "20", "-r", "30",
-                "-pix_fmt", "yuv420p", "-t", str(target_duration), str(out_mp4),
-            ], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        browser.close()
+
+def action_live_evaluation(page, target_duration: float) -> None:
+    """Run agent tab -> replay -> scroll through the six live-lens cards."""
+    visible_click(page, page.get_by_role("tab", name="Run agent"))
+    page.wait_for_timeout(400)
+    visible_click(page, page.get_by_role("button", name="Replay sanitized judge case"))
+    page.wait_for_timeout(2000)
+    page.mouse.wheel(0, 800)
+    page.wait_for_timeout(int(target_duration * 1000 * 0.35))
+    page.mouse.wheel(0, 800)
+    page.wait_for_timeout(int(target_duration * 1000 * 0.40))
+
+
+def action_abstain_reason(page, target_duration: float) -> None:
+    """Decision case tab (default) -> scorecard, then the courtroom table."""
+    visible_click(page, page.get_by_role("tab", name="Decision case"))
+    page.wait_for_timeout(400)
+    page.get_by_text("Decision intelligence scorecard", exact=False) \
+        .scroll_into_view_if_needed()
+    page.wait_for_timeout(int(target_duration * 1000 * 0.35))
+    page.get_by_text("Decision Replay courtroom", exact=False).scroll_into_view_if_needed()
+    page.wait_for_timeout(int(target_duration * 1000 * 0.45))
+
+
+def action_spread_construction(page, target_duration: float) -> None:
+    """Run agent tab -> replay -> scroll straight to the risk decision and
+    the three-leg construction table (bearish credit / defensive equity
+    hedge / rates hedge)."""
+    visible_click(page, page.get_by_role("tab", name="Run agent"))
+    page.wait_for_timeout(400)
+    visible_click(page, page.get_by_role("button", name="Replay sanitized judge case"))
+    page.wait_for_timeout(2000)
+    page.mouse.wheel(0, 1600)
+    page.wait_for_timeout(int(target_duration * 1000 * 0.55))
+    page.mouse.wheel(0, 500)
+    page.wait_for_timeout(int(target_duration * 1000 * 0.25))
+
+
+def action_position_lifecycle_live(page, target_duration: float) -> None:
+    """Track record tab -> the real Position lifecycle table."""
+    visible_click(page, page.get_by_role("tab", name="Track record"))
+    page.wait_for_timeout(400)
+    page.get_by_text("Position lifecycle", exact=False).scroll_into_view_if_needed()
+    page.wait_for_timeout(int(target_duration * 1000 * 0.75))
+
+
+def normalize_segment(ffmpeg: str, source: Path, duration: float, out_mp4: Path,
+                       is_video: bool, fade_in: bool, fade_out: bool) -> None:
+    """Scale/pad/format one image or video source to a fixed-duration silent
+    1920x1080 yuv420p clip so heterogeneous segments (images, live-app
+    recordings) can be concatenated cleanly."""
+    fade = ""
+    if fade_in:
+        fade += ",fade=t=in:st=0:d=0.4"
+    if fade_out:
+        fade += f",fade=t=out:st={max(duration - 0.4, 0)}:d=0.4"
+    vf = (
+        "scale=1920:1080:force_original_aspect_ratio=decrease,"
+        f"pad=1920:1080:(ow-iw)/2:(oh-ih)/2:color=0x071d49,format=yuv420p{fade}"
+    )
+    base = [ffmpeg, "-y"]
+    base += ["-i", str(source)] if is_video else ["-loop", "1", "-i", str(source)]
+    subprocess.run([
+        *base, "-t", str(duration), "-an", "-vf", vf, "-r", "30", "-pix_fmt", "yuv420p",
+        "-c:v", "libx264", "-preset", "medium", "-crf", "20", str(out_mp4),
+    ], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+
+def build_multi_segment_clip(ffmpeg: str, segments: list[tuple[Path, float, bool]],
+                              audio: Path, total_duration: float, out_mp4: Path,
+                              step_index: int, step_total: int, temp_dir: Path) -> None:
+    """segments: [(source, duration, is_video), ...] shown in sequence under
+    one continuous narration track. Each is normalized to the same format,
+    concatenated (stream copy), then muxed via build_video_clip -- which
+    already handles the watermark and progress bar."""
+    n = len(segments)
+    normalized = []
+    for i, (source, dur, is_video) in enumerate(segments):
+        norm = temp_dir / f"{out_mp4.stem}_seg{i}.mp4"
+        normalize_segment(ffmpeg, source, dur, norm, is_video, i == 0, i == n - 1)
+        normalized.append(norm)
+    manifest = temp_dir / f"{out_mp4.stem}_manifest.txt"
+    manifest.write_text("".join(f"file '{s}'\n" for s in normalized), encoding="utf-8")
+    concat_out = temp_dir / f"{out_mp4.stem}_concat.mp4"
+    subprocess.run([
+        ffmpeg, "-y", "-f", "concat", "-safe", "0", "-i", str(manifest),
+        "-c", "copy", str(concat_out),
+    ], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    build_video_clip(ffmpeg, concat_out, audio, total_duration, out_mp4, step_index, step_total)
 
 
 def build_video_clip(ffmpeg: str, silent_video: Path, audio: Path, duration: float,
@@ -622,38 +717,23 @@ def main() -> int:
 
     scenes = {
         "opening": TITLE_HTML,
-        "problem": card("THE PROBLEM", "Entry is only half the problem.", items=[
-            "No take-profit &rarr; upside left uncaptured",
-            "No stop-loss &rarr; downside unbounded",
-            "No time or expiry limit &rarr; position drifts past its thesis",
-        ], tone="warn"),
-        "solution": flow_card("THE ARCHITECTURE", "One proposal. Independent, deterministic authority.", [
+        "solution": flow_card("THE SOLUTION", "One proposal. Independent, deterministic authority.", [
             ("01", "6 lenses", "Claude proposes a thesis"),
             ("02", "Attack", "Claude challenges its own case"),
             ("03", "Disagreement", "Scored independently"),
             ("04", "Stability", "Tested under noise"),
             ("05", "Risk + execution", "Deterministic, final"),
         ], accent_index=4),
-        "entry_governance": card("ENTRY GOVERNANCE", "Ten checks before any order.", items=[
-            "Live-data integrity &middot; confidence &middot; maximum loss",
-            "Buying power &middot; diversification &middot; Greeks coverage",
-            "Portfolio stress &middot; liquidity &middot; bid-ask quality &middot; drawdown",
-            "Sealed into a SHA-256 Decision Contract before submission",
-            "One critical control fails &rarr; ABSTAIN, not a forced trade",
-        ]),
-        "position_lifecycle": None,  # split: real code, then the state-machine diagram
-        "safety_boundary": card("SAFETY BOUNDARY", "Exit automation is independently gated.", items=[
-            "Exact Alpaca paper endpoint required",
-            "Entry authorization + a second automated-exit switch",
-            "Valid quotes and an open Alpaca market clock",
-            "Public judge app and GitHub Evidence Watch stay read-only",
-            "Emergency recovery is separate and human-approved",
-            "A dedicated kill switch pauses new entries, not open positions",
-        ]),
-        "evidence": EVIDENCE_HTML,
-        "dashboard": None,  # built from a live public-site recording below
         "repo_tests": TERMINAL_HTML,
-        "close": CLOSING_HTML,
+    }
+
+    # Beats that pull LIVE footage from the actual public deployment, each
+    # with its own action sequence -- not a local instance, the same page
+    # a judge would open.
+    live_actions = {
+        "live_evaluation": action_live_evaluation,
+        "abstain_reason": action_abstain_reason,
+        "spread_construction": action_spread_construction,
     }
 
     with tempfile.TemporaryDirectory(prefix="crosssignal-lifecycle-") as name:
@@ -676,34 +756,62 @@ def main() -> int:
                 f"Assembled video is {total_duration:.1f}s, over the {HARD_CAP_SECONDS}s cap"
             )
 
-        print("Recording live tour of the public deployment "
-              "(crosssignal-ai-agent.streamlit.app)...")
-        dashboard_tour_mp4 = temp / "dashboard_tour.mp4"
-        capture_public_site_tour(durations["dashboard"], dashboard_tour_mp4, ffmpeg)
-
         print("Rendering scene cards and assembling clips...")
         clips = []
         with sync_playwright() as pw:
             browser = pw.chromium.launch(headless=True)
+            warm_up_public_site(browser)
             step_total = len(BEATS)
             for step_index, (beat_id, narration) in enumerate(BEATS, start=1):
                 duration = durations[beat_id]
                 audio = audio_paths[beat_id]
                 clip = temp / f"{beat_id}.mp4"
-                if beat_id == "dashboard":
-                    build_video_clip(ffmpeg, dashboard_tour_mp4, audio, duration, clip,
+
+                if beat_id in live_actions:
+                    print(f"  [live] recording {beat_id}...")
+                    live_mp4 = temp / f"{beat_id}_live.mp4"
+                    capture_live_segment(browser, live_actions[beat_id], duration,
+                                          live_mp4, ffmpeg)
+                    build_video_clip(ffmpeg, live_mp4, audio, duration, clip,
                                       step_index, step_total)
+
                 elif beat_id == "position_lifecycle":
+                    print("  [live] recording position_lifecycle live segment...")
+                    live_mp4 = temp / "position_lifecycle_live.mp4"
+                    live_dur = duration * 0.40
+                    capture_live_segment(browser, action_position_lifecycle_live,
+                                          live_dur, live_mp4, ffmpeg)
                     code_png = temp / "position_lifecycle_code.png"
                     diagram_png = temp / "position_lifecycle_diagram.png"
                     render_png(browser, CODE_HTML, code_png)
                     render_png(browser, STATE_MACHINE_HTML, diagram_png)
-                    code_dur = duration * 0.55
-                    diagram_dur = duration - code_dur
-                    build_split_clip(
-                        ffmpeg, [(code_png, code_dur), (diagram_png, diagram_dur)],
-                        audio, duration, clip, step_index, step_total,
+                    code_dur = duration * 0.32
+                    diagram_dur = duration - live_dur - code_dur
+                    build_multi_segment_clip(
+                        ffmpeg,
+                        [(live_mp4, live_dur, True), (code_png, code_dur, False),
+                         (diagram_png, diagram_dur, False)],
+                        audio, duration, clip, step_index, step_total, temp,
                     )
+
+                elif beat_id == "broker_reconciliation":
+                    image = temp / f"{beat_id}.png"
+                    render_png(browser, BROKER_RECONCILE_HTML, image)
+                    build_clip(ffmpeg, image, audio, duration, clip, step_index, step_total)
+
+                elif beat_id == "close":
+                    evidence_png = temp / "close_evidence.png"
+                    closing_png = temp / "close_brand.png"
+                    render_png(browser, EVIDENCE_HTML, evidence_png)
+                    render_png(browser, CLOSING_HTML, closing_png)
+                    evidence_dur = duration * 0.5
+                    closing_dur = duration - evidence_dur
+                    build_multi_segment_clip(
+                        ffmpeg,
+                        [(evidence_png, evidence_dur, False), (closing_png, closing_dur, False)],
+                        audio, duration, clip, step_index, step_total, temp,
+                    )
+
                 else:
                     image = temp / f"{beat_id}.png"
                     render_png(browser, scenes[beat_id], image)

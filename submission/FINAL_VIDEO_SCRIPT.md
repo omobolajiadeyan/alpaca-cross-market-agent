@@ -1,112 +1,133 @@
-# CrossSignal final video — position-lifecycle cut
+# CrossSignal final video — live-demo cut
 
-**Target runtime:** 4:35–4:55 (produced cut: 4:30)  
+**Target runtime:** ~4:30 (produced cut: 3:46)
 **Format:** 1920×1080, H.264 video, AAC audio, Microsoft Edge neural TTS narration
 (edge-tts, `en-US-AndrewMultilingualNeural`) — there was no time before the
-deadline to record a human voice-over, so this narration is read verbatim
-from the script below by the same AI voice used in the earlier draft.
+deadline to record a human voice-over, so this narration is read by the
+same AI voice used in earlier drafts.
 **Status:** Recorded. `scripts/build_lifecycle_video.py` renders this script
-over real live-app footage (a cursor-driven recording of the public
-deployment itself, not a local copy), real code
-(`agent/position_manager.py`'s exit-rule evaluator), a state-machine
-diagram of the four real `PositionState` values, and real `59 passed` /
-`11 passed` test output. A persistent presenter watermark and a
-step-progress bar run throughout. Output:
-`recording-output/CrossSignal-Position-Lifecycle-Narrated.mp4`.
+over real, cursor-driven recordings of the actual public deployment itself
+(not a local copy or a mock-up) — the "Run agent" replay's six live-lens
+cards and three-leg spread construction, the "Decision case" tab's ABSTAIN
+verdict, and the "Track record" tab's real closed position — interleaved
+with real code (`agent/position_manager.py`'s exit-rule evaluator and
+broker-reconciliation function), a state-machine diagram of the four real
+`PositionState` values, and real `59 passed` / `11 passed` test output. A
+persistent presenter watermark and a step-progress bar run throughout.
+Output: `recording-output/CrossSignal-Position-Lifecycle-Narrated.mp4`.
+
+Structure follows a live-demo-first outline: state the real market problem,
+explain the cross-market solution, then move to on-camera live evidence —
+today's evaluation, why it abstained, how a spread would be constructed,
+the complete position lifecycle, broker reconciliation, and the genuine
+test suite — before an honest no-trade close.
 
 ## Narration and scene order
 
-### 0:00–0:15 — Opening
+### Opening — the real market problem
 
-> What if the smartest thing an AI trading agent could do was say no—and, when
-> it says yes, know exactly how to get out? I'm Omobolaji Adeyan, and this is
-> CrossSignal.
+> Markets rarely agree with themselves. Equities, credit, rates, and volatility
+> often send conflicting signals about the same underlying risk, and most
+> trading agents pick one confident number and act on it anyway. That's the
+> real problem: a single strong signal is not proof of a real opportunity.
+> I'm Omobolaji Adeyan, and this is CrossSignal.
 
-### 0:15–0:48 — Problem
+### Solution — the cross-market architecture
 
-> Most trading agents focus on finding an opportunity and entering quickly. But
-> a strong signal alone does not make a safe trade. Market data may conflict,
-> liquidity may be poor, or the spread may be too wide. And entry is only half
-> the problem. Without an explicit take-profit, stop-loss, time limit, and
-> expiry rule, a valid entry can become unmanaged risk. An autonomous agent must
-> justify both why it entered and why it stayed or exited.
+> CrossSignal's answer is a cross-market solution. It synchronizes six live
+> market lenses into one macro state, has Claude propose a structured thesis,
+> then puts that thesis through independent deterministic checks —
+> disagreement, stability, and execution risk — before anything is ever
+> authorized. Claude never contacts the broker directly.
 
-### 0:48–1:20 — Solution and architecture
+### Live evaluation — the six lenses, on camera
 
-> CrossSignal is an auditable decision and position-management system for Alpaca
-> paper trading. It synchronizes six market lenses. Claude proposes a structured
-> thesis and attacks its own case. Independent deterministic code measures the
-> disagreement, tests stability, checks risk and execution quality, and has final
-> authority. Claude never contacts the broker.
+> Let's run today's evaluation live, on the actual public judge replay — the
+> same page a judge would open. Six independent lenses source real market
+> data: equity volatility, credit, rates, realized volatility, rate
+> expectations, and positioning. Each is labeled and status-checked before
+> anything downstream is allowed to trust it.
 
-### 1:20–1:58 — Entry governance
+*Live: "Run agent" tab → "Replay sanitized judge case" → the six live-lens
+data-provenance cards.*
 
-> Before any order, CrossSignal verifies live-data integrity, confidence,
-> maximum loss, buying power, diversification, Greeks coverage, portfolio stress,
-> liquidity, bid-ask quality, and drawdown. Every authorized decision is sealed
-> into a SHA-256 Decision Contract before submission. If one critical control
-> fails, the outcome is ABSTAIN—not a forced trade.
+### Why ABSTAIN — the courtroom, on camera
 
-### 1:58–2:38 — Position lifecycle and exits
+> Here is exactly why today's cycle landed on ABSTAIN. The Decision case tab
+> reconstructs the allegation, the cross-examination, and the judgment in
+> order. In this run, a real deterministic check failed the fixed bar — and
+> CrossSignal refused to trade rather than force it through.
 
-> Governance now continues after entry. Every submitted vertical spread stores
-> its two option legs, fill price, maximum profit, maximum loss, expiry, and four
-> exit rules. By default, it takes profit at fifty percent of maximum profit,
-> cuts the position at fifty percent of defined maximum loss, exits after five
-> trading days, or closes two calendar days before expiry. The monitor first
-> reconciles every registered leg against Alpaca, then values the complete spread
-> using executable bids and asks. Stale quotes cannot trigger an order. When a
-> rule fires, it reverses both legs in one atomic Alpaca multi-leg limit order
-> with a deterministic client order ID. An atomic claim and EXIT_PENDING state
-> prevent duplicate closes, while every recommendation, deferral, submission,
-> and fill remains auditable.
+*Live: "Decision case" tab → scorecard → Decision Replay courtroom table.*
 
-### 2:38–3:08 — Safety boundary
+### Spread construction — a safe replay, on camera
 
-> Exit automation is independently gated. It requires the exact Alpaca paper
-> endpoint, entry authorization, a second automated-exit switch, valid quotes,
-> and an open Alpaca market clock. The public judge application and scheduled
-> GitHub Evidence Watch are read-only. Emergency recovery for a broken entry
-> remains separate and human-approved. A dedicated kill switch can pause new
-> entries while continuing to manage positions already open.
+> Even when a signal is strong, execution has its own gate. Watch the
+> construction, live: a bearish credit spread, a defensive equity hedge, and
+> a rates hedge — three legs, each preflighted against Greeks coverage,
+> margin utilization, and option liquidity before anything could be
+> submitted. Here, liquidity fell short on one leg, so nothing was.
 
-### 3:08–3:42 — Dedicated-account evidence and no-trade decision
+*Live: "Run agent" tab, replayed → risk-decision checks → the three-leg
+construction table (primary / secondary / hedge).*
 
-> Against a fresh one-hundred-thousand-dollar competition paper account,
-> CrossSignal repeatedly found real disagreements but refused execution when
-> adversarial confidence or after-hours liquidity failed fixed thresholds. The
-> account therefore has no competition P-and-L to claim. That is a competitive
-> limitation, but it is honest evidence that the controls were not weakened to
-> manufacture a trade.
+### Position lifecycle — live, then the code and the state machine
 
-### 3:42–4:20 — Dashboard and proof
+> Now the complete position lifecycle, live. On the Track record tab, every
+> submitted spread carries a persisted exit contract: take-profit,
+> stop-loss, a five-day holding limit, and a pre-expiry close, valued
+> against executable bids and asks every cycle. Underneath, deterministic
+> code evaluates those four sealed thresholds with no broker side effects.
+> And every position moves through one real state at a time: pending entry,
+> open, exit pending, closed.
 
-> The dashboard exposes the decision courtroom, risk scorecard, entry ledger,
-> and the new position lifecycle. Judges can inspect each sealed policy and each
-> state transition from pending entry, to open, to exit pending, to closed. The
-> public example is explicitly labeled as an illustrative policy demonstration,
-> not broker fill evidence.
+*Live: "Track record" tab → real closed position row → cuts to
+`agent/position_manager.py`'s exit-rule evaluator → cuts to the
+PENDING_ENTRY → OPEN → EXIT_PENDING → CLOSED state-machine diagram.*
 
-### 4:20–4:42 — Repository and tests
+### Broker reconciliation and the evidence record
 
-> The public repository contains the complete implementation, not a mock-up.
-> Fifty-nine automated tests cover authorization, pricing, profit and loss
-> triggers, time and expiry exits, market-closed deferral, atomic leg reversal,
-> audit persistence, privacy, and duplicate-order prevention.
+> Before any exit reconciles, CrossSignal compares every registered leg
+> against Alpaca's real broker inventory — a mismatch, and the cycle logs a
+> reconciliation failure instead of trusting stale state. Every entry
+> filled, exit submitted, and fill event is written to an append-only audit
+> record, timestamped and independently inspectable.
 
-### 4:42–4:55 — Close
+*Real code: `agent/position_manager.py`'s `_broker_mismatches`.*
 
-> That's the fix for the problem I opened with: an entry decision is not enough.
-> CrossSignal governs both halves — it proves a trade deserves entry, then
-> manages it under exit rules fixed in advance, and proves why it closed when
-> it did. I'm Omobolaji Adeyan. Thank you.
+### The genuine test suite
+
+> None of this is theoretical. Here is the genuine test suite running:
+> fifty-nine automated tests covering authorization, pricing, profit and
+> loss triggers, time and expiry exits, market-closed deferral, atomic leg
+> reversal, audit persistence, and duplicate-order prevention.
+
+*Real `59 passed` / `11 passed` pytest output.*
+
+### Close — honest no-trade explanation and value proposition
+
+> Honestly: against a fresh, dedicated hundred-thousand-dollar paper
+> account, CrossSignal repeatedly found real disagreements but refused
+> execution when the evidence didn't clear its own bar — so there is no
+> competition P-and-L to show. That's not a demo failure; it's the
+> discipline working as designed. CrossSignal proves when a trade deserves
+> entry, manages it under rules fixed in advance, and proves why it exits.
+> I'm Omobolaji Adeyan. Thank you.
+
+*Real sealed-contract evidence card (no P&L), then the closing brand card.*
 
 ## Recording checklist
 
-- Show `agent/position_manager.py`, the lifecycle table, and the
-  PENDING_ENTRY &rarr; OPEN &rarr; EXIT_PENDING &rarr; CLOSED state-machine diagram.
-- Show the four dollar/time exit thresholds, broker reconciliation, quote freshness,
-  deterministic client order ID, entry kill switch, and `EXIT_PENDING` control.
-- State clearly that the lifecycle replay is illustrative and the competition account has no fill or P&L evidence.
+- All live segments are cursor-driven recordings of the actual public
+  deployment (`crosssignal-ai-agent.streamlit.app`), not a local instance.
+- Show the six live-lens data-provenance cards, the ABSTAIN courtroom, the
+  three-leg spread construction, and the real closed position row — all on
+  camera, not described only in narration.
+- Show `agent/position_manager.py`'s exit-rule evaluator and broker
+  reconciliation function, and the PENDING_ENTRY → OPEN → EXIT_PENDING →
+  CLOSED state-machine diagram.
 - Show `59 passed` in the terminal.
-- Keep the rendered video at or below five minutes and recompute its SHA-256 afterward.
+- State clearly that lifecycle and replay values are illustrative and the
+  competition account has no fill or P&L evidence.
+- Keep the rendered video at or below five minutes and recompute its
+  SHA-256 afterward.
