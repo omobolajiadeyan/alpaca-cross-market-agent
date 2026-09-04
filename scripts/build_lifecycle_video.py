@@ -88,18 +88,7 @@ FONT_HEAD = (
     '&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">'
 )
 
-import base64
-PRESENTER_PHOTO_B64 = base64.b64encode(
-    (ROOT / "assets" / "presenter-headshot.png").read_bytes()
-).decode("ascii")
-HEADSHOT_HTML = (
-    f'<img class="headshot" src="data:image/png;base64,{PRESENTER_PHOTO_B64}">'
-)
-HEADSHOT_STYLE = """
-.headshot { position:absolute; right:90px; bottom:70px; width:190px; height:190px;
-  border-radius:50%; border:4px solid #19b5d8; object-fit:cover;
-  box-shadow:0 6px 20px rgba(0,0,0,.35); z-index:2; }
-"""
+WATERMARK_PNG = ROOT / "assets" / "presenter-watermark.png"
 
 CARD_STYLE = """
 * { box-sizing: border-box; margin:0; padding:0; }
@@ -115,16 +104,20 @@ h1 { font-family:'Manrope',sans-serif; font-weight:800; font-size:50px;
   letter-spacing:-.02em; line-height:1.25; max-width:1200px; margin-bottom:26px; z-index:1; }
 .sub { font-size:23px; color:#d7e7f0; max-width:1100px; line-height:1.6; z-index:1; }
 ul { list-style:none; z-index:1; max-width:1200px; }
-li { font-size:21px; color:#e3eef6; line-height:1.55; margin-bottom:10px;
-  padding-left:26px; position:relative; }
-li::before { content:'\\2192'; position:absolute; left:0; color:#19b5d8; font-weight:700; }
+li { font-size:21px; color:#e3eef6; line-height:1.4; margin-bottom:16px;
+  padding-left:44px; position:relative; min-height:28px; display:flex; align-items:center; }
+li::before { position:absolute; left:0; top:0; width:28px; height:28px; line-height:28px;
+  text-align:center; border-radius:50%; font-size:14px; font-weight:800; }
+ul.check li::before { content:'\\2713'; background:#19b5d8; color:#04222c; }
+ul.warn li::before { content:'\\2715'; background:#e8985c; color:#2c1607; }
 """
 
 
-def card(eyebrow: str, title: str, sub: str = "", items: list[str] | None = None) -> str:
+def card(eyebrow: str, title: str, sub: str = "", items: list[str] | None = None,
+          tone: str = "check") -> str:
     items_html = ""
     if items:
-        items_html = "<ul>" + "".join(f"<li>{i}</li>" for i in items) + "</ul>"
+        items_html = f'<ul class="{tone}">' + "".join(f"<li>{i}</li>" for i in items) + "</ul>"
     sub_html = f'<div class="sub">{sub}</div>' if sub else ""
     return f"""<!doctype html><html><head><meta charset="utf-8">{FONT_HEAD}
 <style>{CARD_STYLE}</style></head><body>
@@ -197,10 +190,8 @@ body {{ width:1920px; height:1080px; background:#071d49;
 .eyebrow {{ font-family:'Manrope',sans-serif; font-size:16px; letter-spacing:.16em;
   color:#72d4e8; font-weight:700; margin-bottom:24px; z-index:1; }}
 .presenter {{ font-size:18px; color:#b9dced; z-index:1; margin-top:36px; }}
-{HEADSHOT_STYLE}
 </style></head><body>
 <div class="ring"></div>
-{HEADSHOT_HTML}
 <div class="eyebrow">DECISION AND POSITION-LIFECYCLE INTELLIGENCE</div>
 <div class="brand"><span class="mark">&#9670;</span>CROSSSIGNAL</div>
 <div class="presenter">Omobolaji Adeyan &middot; Alpaca AI Trading Agents Hackathon &middot; Paper trading only</div>
@@ -226,10 +217,8 @@ body {{ width:1920px; height:1080px; background:#071d49;
   text-transform:uppercase; margin-bottom:8px; }}
 .link-value {{ font-size:19px; color:#fff; font-weight:600; }}
 .presenter {{ font-size:16px; color:#b9dced; z-index:1; }}
-{HEADSHOT_STYLE}
 </style></head><body>
 <div class="ring"></div>
-{HEADSHOT_HTML}
 <div class="brand"><span class="mark">&#9670;</span>CROSSSIGNAL</div>
 <div class="tagline">Entry, governed. Exit, proven.</div>
 <div class="links">
@@ -433,16 +422,30 @@ def render_png(browser, html: str, out_png: Path) -> None:
     page.close()
 
 
-def build_clip(ffmpeg: str, image: Path, audio: Path, duration: float, out_mp4: Path) -> None:
+def progress_bar_filters(in_label: str, out_label: str, step_index: int, step_total: int) -> str:
+    """Thin top-of-frame progress bar (a dim full-width track plus a cyan fill)
+    so a viewer always has a sense of how far through the story they are."""
+    bar_w = max(int(1920 * step_index / step_total), 6)
+    return (
+        f"[{in_label}]drawbox=x=0:y=0:w=1920:h=5:color=white@0.15:t=fill[bg{step_index}];"
+        f"[bg{step_index}]drawbox=x=0:y=0:w={bar_w}:h=5:color=0x19b5d8:t=fill[{out_label}]"
+    )
+
+
+def build_clip(ffmpeg: str, image: Path, audio: Path, duration: float, out_mp4: Path,
+               step_index: int, step_total: int) -> None:
     fade_out = max(duration - 0.4, 0)
-    vf = (
-        "scale=1920:1080:force_original_aspect_ratio=decrease,"
+    filter_complex = (
+        "[0:v]scale=1920:1080:force_original_aspect_ratio=decrease,"
         "pad=1920:1080:(ow-iw)/2:(oh-ih)/2:color=0x071d49,format=yuv420p,"
-        f"fade=t=in:st=0:d=0.4,fade=t=out:st={fade_out}:d=0.4"
+        f"fade=t=in:st=0:d=0.4,fade=t=out:st={fade_out}:d=0.4[base];"
+        "[2:v]scale=190:190[wm];[base][wm]overlay=W-w-90:H-h-70:format=auto[wmout];"
+        f"{progress_bar_filters('wmout', 'outv', step_index, step_total)}"
     )
     subprocess.run([
-        ffmpeg, "-y", "-loop", "1", "-i", str(image), "-i", str(audio),
-        "-vf", vf, "-af", "apad", "-t", str(duration), "-r", "30",
+        ffmpeg, "-y", "-loop", "1", "-i", str(image), "-i", str(audio), "-i", str(WATERMARK_PNG),
+        "-filter_complex", filter_complex, "-map", "[outv]", "-map", "1:a",
+        "-af", "apad", "-t", str(duration), "-r", "30",
         "-c:v", "libx264", "-preset", "medium", "-crf", "20",
         "-c:a", "aac", "-b:a", "160k", "-ar", "48000", str(out_mp4),
     ], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
@@ -541,10 +544,14 @@ def capture_public_site_tour(target_duration: float, out_mp4: Path, ffmpeg: str)
 
 
 def build_video_clip(ffmpeg: str, silent_video: Path, audio: Path, duration: float,
-                      out_mp4: Path) -> None:
+                      out_mp4: Path, step_index: int, step_total: int) -> None:
+    filter_complex = (
+        "[2:v]scale=190:190[wm];[0:v][wm]overlay=W-w-90:H-h-70:format=auto[wmout];"
+        f"{progress_bar_filters('wmout', 'outv', step_index, step_total)}"
+    )
     subprocess.run([
-        ffmpeg, "-y", "-i", str(silent_video), "-i", str(audio),
-        "-map", "0:v:0", "-map", "1:a:0",
+        ffmpeg, "-y", "-i", str(silent_video), "-i", str(audio), "-i", str(WATERMARK_PNG),
+        "-filter_complex", filter_complex, "-map", "[outv]", "-map", "1:a:0",
         "-c:v", "libx264", "-preset", "medium", "-crf", "20", "-r", "30",
         "-af", "apad", "-t", str(duration),
         "-c:a", "aac", "-b:a", "160k", "-ar", "48000", str(out_mp4),
@@ -565,7 +572,7 @@ def main() -> int:
             "No take-profit &rarr; upside left uncaptured",
             "No stop-loss &rarr; downside unbounded",
             "No time or expiry limit &rarr; position drifts past its thesis",
-        ]),
+        ], tone="warn"),
         "solution": flow_card("THE ARCHITECTURE", "One proposal. Independent, deterministic authority.", [
             ("01", "6 lenses", "Claude proposes a thesis"),
             ("02", "Attack", "Claude challenges its own case"),
@@ -624,16 +631,18 @@ def main() -> int:
         clips = []
         with sync_playwright() as pw:
             browser = pw.chromium.launch(headless=True)
-            for beat_id, narration in BEATS:
+            step_total = len(BEATS)
+            for step_index, (beat_id, narration) in enumerate(BEATS, start=1):
                 duration = durations[beat_id]
                 audio = audio_paths[beat_id]
                 clip = temp / f"{beat_id}.mp4"
                 if beat_id == "dashboard":
-                    build_video_clip(ffmpeg, dashboard_tour_mp4, audio, duration, clip)
+                    build_video_clip(ffmpeg, dashboard_tour_mp4, audio, duration, clip,
+                                      step_index, step_total)
                 else:
                     image = temp / f"{beat_id}.png"
                     render_png(browser, scenes[beat_id], image)
-                    build_clip(ffmpeg, image, audio, duration, clip)
+                    build_clip(ffmpeg, image, audio, duration, clip, step_index, step_total)
                 clips.append(clip)
             browser.close()
 
