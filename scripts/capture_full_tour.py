@@ -5,6 +5,7 @@ judge replay, for building a fuller narrated submission video."""
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
 
 from playwright.sync_api import sync_playwright
@@ -12,7 +13,7 @@ from playwright.sync_api import sync_playwright
 ROOT = Path(__file__).resolve().parents[1]
 OUT_DIR = ROOT / "recording-output" / "full-tour"
 SHOTS = OUT_DIR / "screenshots"
-BASE_URL = "http://localhost:8501"
+BASE_URL = os.getenv("CROSSSIGNAL_CAPTURE_URL", "http://localhost:8501")
 
 
 def snap(page, name: str):
@@ -45,13 +46,31 @@ def main() -> int:
         context = browser.new_context(viewport={"width": 1920, "height": 1080}, device_scale_factor=1)
         page = context.new_page()
         page.goto(BASE_URL, wait_until="networkidle", timeout=60_000)
-        page.get_by_text("PUBLIC JUDGE MODE", exact=False).wait_for(timeout=30_000)
+        # Works in both the public judge replay and controlled local mode.
+        page.get_by_text("A complete decision, not another signal", exact=False).wait_for(timeout=30_000)
         page.wait_for_timeout(800)
         snap(page, "00-landing")
+        tablist = page.locator('[role="tablist"]').first
+        first_tab = page.locator('[role="tab"]').first
+        extracted["tablist_html"] = tablist.evaluate("element => element.outerHTML")
+        extracted["tablist_style"] = tablist.evaluate(
+            "element => ({background:getComputedStyle(element).backgroundColor, padding:getComputedStyle(element).padding, position:getComputedStyle(element).position})"
+        )
+        extracted["first_tab_style"] = first_tab.evaluate(
+            "element => ({background:getComputedStyle(element).backgroundColor, color:getComputedStyle(element).color, padding:getComputedStyle(element).padding})"
+        )
 
         # --- Decision case tab ---
         page.get_by_role("tab", name="Decision case").click()
         page.wait_for_timeout(1200)
+        extracted["component_frames"] = [
+            {
+                "url": frame.url,
+                "text": frame.locator("body").inner_text()[:1000],
+                "html": frame.locator("body").inner_html()[:2500],
+            }
+            for frame in page.frames[1:]
+        ]
         select = page.locator('[data-testid="stSelectbox"]').first
         options_text = select.inner_text()
         extracted["decision_case_selector_text"] = options_text
@@ -138,6 +157,23 @@ def main() -> int:
         extracted["methodology_text"] = main_text(page)
 
         context.close()
+
+        mobile_context = browser.new_context(
+            viewport={"width": 390, "height": 844},
+            device_scale_factor=1,
+            is_mobile=True,
+        )
+        mobile_page = mobile_context.new_page()
+        mobile_page.goto(BASE_URL, wait_until="networkidle", timeout=60_000)
+        mobile_page.get_by_text("A complete decision, not another signal", exact=False).wait_for(timeout=30_000)
+        mobile_page.wait_for_timeout(800)
+        mobile_page.screenshot(path=str(SHOTS / "12-mobile-landing.png"), full_page=False)
+        mobile_page.get_by_role("tab", name="Decision case").click()
+        mobile_page.wait_for_timeout(1200)
+        mobile_page.get_by_text("One decision. Every claim inspectable.").scroll_into_view_if_needed()
+        mobile_page.wait_for_timeout(500)
+        mobile_page.screenshot(path=str(SHOTS / "13-mobile-decision.png"), full_page=False)
+        mobile_context.close()
         browser.close()
 
     (OUT_DIR / "extracted.json").write_text(json.dumps(extracted, indent=2))

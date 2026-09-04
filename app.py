@@ -39,49 +39,65 @@ st.set_page_config(
 st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap');
-:root { --ink:#071d49; --muted:#53657d; --canvas:#f4f7fb; --surface:#fff; --ice:#edf4f8; --cyan:#19b5d8; --light-cyan:#72d4e8; --blue:#003b70; --navy:#031126; --line:#d5e0e9; --amber:#f6b84a; }
+:root { --ink:#071d49; --body:#263f58; --muted:#465d73; --canvas:#f3f6fa; --surface:#fff; --ice:#eaf1f6; --cyan:#079fc4; --light-cyan:#72d4e8; --blue:#003b70; --navy:#031126; --line:#c9d7e2; --amber:#f6b84a; }
 .stApp { background:var(--canvas); color:var(--ink); font-family:'DM Sans',sans-serif; }
 [data-testid="stHeader"] { background:transparent; }
-.block-container { max-width:1280px; padding-top:1.2rem; padding-bottom:4rem; overflow-x:hidden; }
+.block-container { max-width:1380px; padding-top:.75rem; padding-bottom:4rem; overflow-x:hidden; }
 h1,h2,h3 { font-family:'Manrope',sans-serif !important; letter-spacing:-.04em !important; }
-.nav { display:flex; justify-content:space-between; align-items:center; padding:.55rem 0 1rem; border-bottom:1px solid var(--line); }
+.stMarkdown p,.stMarkdown li { color:var(--body); line-height:1.65; }
+.nav { display:flex; justify-content:space-between; align-items:center; padding:.5rem 0 .8rem; border-bottom:1px solid var(--line); }
 .brand-lockup{display:flex;align-items:center;gap:.65rem}.brand-lockup svg{width:42px;height:42px}.brand-name{font:800 1.05rem Manrope;letter-spacing:-.035em}.brand-sub{display:block;color:var(--muted);font-size:.6rem;letter-spacing:.1em;margin-top:.08rem}
-.nav-note { color:var(--muted); font-size:.82rem; }
-.hero { margin:1.5rem 0 0; padding:3.6rem 3.7rem; background:radial-gradient(circle at 88% 18%,#0b4262 0,transparent 30%),linear-gradient(125deg,#031126,#071d49); color:#fff; position:relative; overflow:hidden; display:grid;grid-template-columns:minmax(0,1.65fr) minmax(270px,.75fr);gap:3rem;align-items:center;border-radius:18px 18px 0 0; }
-.hero:after { content:''; position:absolute; width:500px; height:500px; border:1px solid rgba(114,212,232,.25); border-radius:50%; right:-245px; top:-180px; box-shadow:0 0 0 55px rgba(25,181,216,.035),0 0 0 120px rgba(25,181,216,.025); }
+.nav-note { color:var(--muted); font-size:.78rem; font-weight:600; }
+.hero { margin:1rem 0 0; padding:2rem 2.25rem; background:radial-gradient(circle at 88% 18%,#0b4262 0,transparent 30%),linear-gradient(125deg,#031126,#071d49); color:#fff; position:relative; overflow:hidden; display:grid;grid-template-columns:minmax(0,1.65fr) minmax(270px,.72fr);gap:2rem;align-items:center;border-radius:16px 16px 0 0; }
+.hero:after { content:''; position:absolute; width:360px; height:360px; border:1px solid rgba(114,212,232,.25); border-radius:50%; right:-185px; top:-150px; box-shadow:0 0 0 42px rgba(25,181,216,.035),0 0 0 90px rgba(25,181,216,.025); }
 .eyebrow { display:inline-block; border-left:3px solid var(--cyan); padding:.1rem 0 .1rem .75rem; font-size:.72rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:#b9dced; }
-.hero h1 { font-size:clamp(2.8rem,5vw,5.3rem); line-height:.96; max-width:820px; margin:1.25rem 0 1.35rem; position:relative; z-index:1; }
+.hero h1 { font-size:clamp(2.35rem,4vw,3.9rem); line-height:1; max-width:820px; margin:.8rem 0 .9rem; position:relative; z-index:1; }
 .hero h1 em { color:#72d4e8; font-style:normal; }
-.hero-copy { max-width:680px; color:#d7e7f0; font-size:1.12rem; line-height:1.65; position:relative; z-index:1; }
-.hero-status{position:relative;z-index:2;background:rgba(1,12,29,.74);border:1px solid rgba(114,212,232,.26);border-radius:14px;padding:1.25rem;backdrop-filter:blur(8px)}
+.hero .hero-copy { max-width:720px; color:#e7f1f6!important; font-size:1rem; line-height:1.55; position:relative; z-index:1; margin:0; }
+.hero-status{position:relative;z-index:2;background:rgba(1,12,29,.78);border:1px solid rgba(114,212,232,.34);border-radius:12px;padding:1rem 1.1rem;backdrop-filter:blur(8px)}
 .hero-status-label{color:#9bcbd9;font-size:.65rem;letter-spacing:.13em;text-transform:uppercase;font-weight:700}.hero-verdict{font:800 2rem Manrope;color:var(--amber);margin:.4rem 0 1rem}.hero-row{display:flex;justify-content:space-between;gap:1rem;border-top:1px solid rgba(255,255,255,.1);padding:.72rem 0;color:#d7e7f0;font-size:.78rem}.hero-row strong{color:#fff;text-align:right}
-.proof-grid { display:grid; grid-template-columns:repeat(4,1fr); background:var(--surface); border:1px solid var(--line);border-top:0; margin:0 0 2.2rem;border-radius:0 0 18px 18px;overflow:hidden;box-shadow:0 18px 44px rgba(7,29,73,.08); }
-.proof { padding:1.65rem 2rem; border-right:1px solid var(--line); }.proof:last-child{border-right:0}.proof b { display:block; font:700 1.2rem Manrope; margin-bottom:.35rem; }.proof span { color:var(--muted); font-size:.88rem; }
-.judge-route{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:0 0 2.1rem}.route-step{background:#fff;border:1px solid var(--line);border-radius:12px;padding:1rem 1.15rem}.route-step i{font-style:normal;display:inline-grid;place-items:center;width:26px;height:26px;border-radius:50%;background:var(--navy);color:#fff;font-weight:700;font-size:.75rem;margin-right:.55rem}.route-step b{font:700 .92rem Manrope}.route-step span{display:block;color:var(--muted);font-size:.78rem;margin:.55rem 0 0 2.1rem;line-height:1.45}
-.section-label { color:#007fa8; font-size:.72rem; font-weight:700; letter-spacing:.12em; text-transform:uppercase; }
+.proof-grid { display:grid; grid-template-columns:repeat(4,1fr); background:var(--surface); border:1px solid var(--line);border-top:0; margin:0 0 1rem;border-radius:0 0 16px 16px;overflow:hidden;box-shadow:0 12px 32px rgba(7,29,73,.07); }
+.proof { padding:1rem 1.35rem; border-right:1px solid var(--line); }.proof:last-child{border-right:0}.proof b { display:block; font:700 1rem Manrope; margin-bottom:.18rem; color:var(--ink); }.proof span { color:var(--muted); font-size:.78rem; }
+.judge-route{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:1rem 0 2rem}.route-step{background:#fff;border:1px solid var(--line);border-radius:12px;padding:1rem 1.15rem;box-shadow:0 5px 16px rgba(7,29,73,.04)}.route-step i{font-style:normal;display:inline-grid;place-items:center;width:26px;height:26px;border-radius:50%;background:var(--navy);color:#fff;font-weight:700;font-size:.75rem;margin-right:.55rem}.route-step b{font:700 .92rem Manrope;color:var(--ink)}.route-step span{display:block;color:var(--muted);font-size:.82rem;margin:.55rem 0 0 2.1rem;line-height:1.5}
+.section-label { color:#006f91; font-size:.74rem; font-weight:800; letter-spacing:.12em; text-transform:uppercase; }
 .card { background:#fff; border:1px solid var(--line); border-radius:12px; padding:1.4rem; height:100%; box-shadow:0 8px 24px rgba(7,29,73,.05); }
+.card h3{color:var(--ink);margin-top:0}.card p{color:var(--body)!important;font-size:.94rem;line-height:1.6;margin-bottom:0}
+.evidence-detail{display:grid;grid-template-columns:150px minmax(190px,.7fr) minmax(280px,1.5fr);gap:1px;background:#28425a;border:1px solid #28425a;border-left:5px solid var(--cyan);border-radius:10px;overflow:hidden;margin:.65rem 0 1.5rem}.evidence-detail>div{background:var(--navy);padding:1rem 1.1rem;min-height:105px}.evidence-detail span,.protocol-detail span{display:block;color:#83d7e8;font-size:.67rem;font-weight:800;letter-spacing:.1em;margin-bottom:.5rem}.evidence-detail strong{display:block;color:#fff;font:800 2rem Manrope}.evidence-detail strong small{font-size:.8rem;color:#b9dced}.evidence-detail b{color:#fff;font:700 1rem Manrope}.evidence-detail p{color:#dcebf2!important;font-size:.85rem;line-height:1.5;margin:.25rem 0 0}.protocol-detail{background:#fff;border:1px solid var(--line);border-left:5px solid var(--cyan);border-radius:9px;padding:1rem 1.15rem;margin:.65rem 0 1rem}.protocol-detail span{color:#007c9f}.protocol-detail b{display:block;color:var(--ink);font:800 1rem Manrope}.protocol-detail p{color:var(--body)!important;margin:.3rem 0 0}
+[data-testid="stPills"],[data-testid="stSegmentedControl"]{margin:.2rem 0 .45rem}
 .status-live,.status-fallback,.status-neutral { display:inline-block; padding:.27rem .55rem; border-radius:99px; font-size:.68rem; font-weight:700; text-transform:uppercase; }
 .status-live { background:#dff8e8;color:#17653b }.status-fallback {background:#fff0cc;color:#8a5600}.status-neutral{background:#e8f2f8;color:#315b75}
+.mode-banner{display:flex;align-items:center;gap:.75rem;background:#e5f1fa;border:1px solid #b9d2e4;border-left:4px solid var(--blue);border-radius:9px;padding:.7rem .9rem;margin:.75rem 0 1rem;color:#153a5a;font-size:.83rem;line-height:1.45}.mode-dot{width:9px;height:9px;border-radius:50%;background:#17875d;box-shadow:0 0 0 4px rgba(23,135,93,.12);flex:0 0 auto}.mode-banner strong{font:800 .72rem Manrope;letter-spacing:.06em;white-space:nowrap}.mode-banner span{color:#33566f}.mode-banner b{margin-left:auto;background:#fff;border:1px solid #afc8da;border-radius:99px;padding:.25rem .55rem;font-size:.67rem;letter-spacing:.05em;white-space:nowrap}
 .thesis { background:var(--blue); color:#fff; padding:2rem; border-left:5px solid var(--cyan); margin:1rem 0; }
 .thesis p { color:#d7e7f0; line-height:1.65; }.thesis .confidence { color:#72d4e8; font:700 .8rem Manrope; }
 div.stButton > button { border-radius:9px; border:0; background:var(--blue); color:white; font-weight:700; min-height:3rem; }
 div.stButton > button:hover { background:var(--navy); color:#fff; }
-[data-testid="stMetric"] { background:#fff; border:1px solid var(--line); border-top:3px solid var(--cyan); border-radius:10px; padding:1rem; }
+[data-testid="stMetric"] { background:#fff; border:1px solid var(--line); border-top:3px solid var(--cyan); border-radius:10px; padding:1rem; box-shadow:0 4px 14px rgba(7,29,73,.035); }
+[data-testid="stMetricLabel"] p{color:#40576e!important;font-weight:700!important;font-size:.8rem!important}
+[data-testid="stMetricValue"]{color:var(--ink)!important;font-family:'Manrope',sans-serif!important}
+[data-testid="stCaptionContainer"] p{color:#435b72!important;font-size:.88rem!important;line-height:1.55!important}
+[data-testid="stAlert"] p{color:inherit!important;font-weight:500}
+[data-testid="stExpander"]{background:#fff;border-color:var(--line)!important;border-radius:10px!important}
+[data-testid="stExpander"] summary p{color:var(--ink)!important;font-weight:700!important}
+label p{color:#203a53!important;font-weight:650!important}
 .footer { border-top:1px solid var(--line); margin-top:4rem; padding-top:1.5rem; color:var(--muted); font-size:.78rem; }
-[data-testid="stTabs"] [data-baseweb="tab-list"] { gap:.25rem; overflow-x:auto; scrollbar-width:none; }
-[data-testid="stTabs"] [data-baseweb="tab"] { white-space:nowrap; min-width:max-content; }
+[data-testid="stTabs"] [role="tablist"] { gap:.3rem!important; overflow-x:auto!important; scrollbar-width:thin; background:#e5edf3!important; border:1px solid #c4d3df; border-radius:12px; padding:.38rem!important; position:sticky!important; top:.45rem; z-index:50; box-shadow:0 8px 22px rgba(7,29,73,.12); }
+[data-testid="stTabs"] [data-testid="stTab"] { white-space:nowrap; min-width:max-content; min-height:2.75rem; padding:.55rem .95rem!important; border-radius:8px; color:#29465f!important; font-size:.86rem; font-weight:750; }
+[data-testid="stTabs"] [data-testid="stTab"] p{color:inherit!important;font-weight:inherit!important}
+[data-testid="stTabs"] [data-testid="stTab"][aria-selected="true"]{background:var(--navy)!important;color:#fff!important;box-shadow:0 4px 12px rgba(3,17,38,.22)}
+[data-testid="stTabs"] .react-aria-SelectionIndicator{display:none!important}
+[data-testid="stTabs"] [role="tabpanel"]{padding-top:1.15rem}
 [data-testid="stDataFrame"] { border:1px solid var(--line); }
 button:focus-visible,[role="tab"]:focus-visible { outline:3px solid rgba(25,181,216,.45)!important; outline-offset:2px; }
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
 @media(max-width:900px){
   .block-container{padding:1rem 1.25rem 3rem}.proof-grid{grid-template-columns:repeat(2,1fr)}.proof:nth-child(2){border-right:0}.judge-route{grid-template-columns:1fr}
-  .hero{padding:3.25rem 2rem;grid-template-columns:1fr}.hero:after{width:250px;height:250px;right:-160px;top:-120px}.hero h1{font-size:clamp(2.6rem,11vw,4.4rem)}
-  .nav-note{display:none}.card{margin-bottom:.5rem}
+  .hero{padding:1.75rem 1.5rem;grid-template-columns:1fr}.hero:after{width:250px;height:250px;right:-160px;top:-120px}.hero h1{font-size:clamp(2.25rem,8vw,3.25rem)}
+  .nav-note{display:none}.card{margin-bottom:.5rem}.evidence-detail{grid-template-columns:1fr 1fr}.evidence-detail>div:last-child{grid-column:1/-1}
 }
 @media(max-width:520px){
-  .block-container{padding:.7rem .85rem 2rem}.hero{margin-top:1rem;padding:2.5rem 1.25rem}.hero-copy{font-size:1rem}
+  .block-container{padding:.55rem .72rem 2rem}.hero{margin-top:.75rem;padding:1.5rem 1.1rem}.hero-copy{font-size:.94rem}.hero-status{padding:.9rem}.hero-verdict{font-size:1.6rem}
   .proof-grid{grid-template-columns:1fr}.proof{padding:1.25rem;border-right:0;border-bottom:1px solid var(--line)}.nav{padding:.5rem 0 1rem}[data-testid="stMetric"]{padding:.75rem}
-  h1{font-size:2.25rem!important}h2{font-size:1.65rem!important}.footer{line-height:1.6}
+  h1{font-size:2.05rem!important}h2{font-size:1.55rem!important}.footer{line-height:1.6}.mode-banner{align-items:flex-start;flex-wrap:wrap}.mode-banner b{margin-left:1.4rem}.evidence-detail{grid-template-columns:1fr}.evidence-detail>div:last-child{grid-column:auto}[data-testid="stTabs"] [data-testid="stTab"]{padding:.5rem .75rem!important;font-size:.8rem}
 }
 </style>
 """, unsafe_allow_html=True)
@@ -104,51 +120,35 @@ def fmt(value, suffix=""):
 
 
 def render_disagreement_map(disagreement):
-    """Responsive, dependency-free JavaScript evidence explorer."""
-    payload = json.dumps(disagreement['candidates']).replace('</', '<\\/')
-    st.html(f"""
-    <div id="signal-map">
-      <div class="map-title">SELECT A MARKET DISAGREEMENT</div>
-      <div id="nodes"></div>
-      <div id="detail" aria-live="polite"></div>
-    </div>
-    <style>
-      #signal-map,#signal-map *{{box-sizing:border-box}} #signal-map{{font-family:Arial,sans-serif;color:#071d49}}
-      #signal-map{{border:1px solid #d5e0e9;background:#f2f7fb;padding:20px;min-height:245px}}
-      .map-title{{font-size:11px;font-weight:700;letter-spacing:.12em;color:#007fa8;margin-bottom:14px}}
-      #nodes{{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}}
-      #signal-map button{{width:100%;text-align:left;border:1px solid #bfd0dd;background:#fff;color:#071d49;padding:14px;cursor:pointer;transition:.18s ease;min-height:78px}}
-      #signal-map button:hover,#signal-map button.active{{background:#003b70;color:#fff;border-color:#003b70;transform:translateY(-2px)}}
-      #signal-map button strong{{display:block;font-size:15px;margin-bottom:8px}}#signal-map button span{{font-size:12px;opacity:.8}}
-      #detail{{margin-top:12px;background:#071d49;color:#fff;padding:16px;border-left:5px solid #19b5d8;min-height:90px}}
-      .detail-grid{{display:grid;grid-template-columns:100px 1fr 1fr;gap:14px;align-items:start}}
-      .score{{font-size:30px;font-weight:800;color:#72d4e8}}.label{{font-size:10px;letter-spacing:.1em;color:#b9dced}}
-      #signal-map p{{font-size:13px;line-height:1.5;margin:4px 0 0}}
-      @media(max-width:650px){{#signal-map{{padding:12px}}#nodes{{grid-template-columns:1fr}}button{{min-height:auto}}.detail-grid{{grid-template-columns:1fr}}}}
-    </style>
-    <script>
-      const cases={payload};
-      const nodes=document.getElementById('nodes');
-      const detail=document.getElementById('detail');
-      function selectCase(item,index){{
-        document.querySelectorAll('#nodes button').forEach((b,i)=>b.classList.toggle('active',i===index));
-        detail.innerHTML=`<div class="detail-grid"><div><div class="label">SCORE</div><div class="score">${{Math.round(item.score)}}</div></div><div><div class="label">EXPECTED REPRICING</div><p><strong>${{item.repricing_market}}</strong><br>${{item.direction}}</p></div><div><div class="label">WHY IT MATTERS</div><p>${{item.explanation}}</p></div></div>`;
-      }}
-      cases.forEach((item,index)=>{{
-        const button=document.createElement('button');
-        button.innerHTML=`<strong>${{item.title}}</strong><span>${{item.repricing_market}} · score ${{Math.round(item.score)}}</span>`;
-        button.setAttribute('aria-label',`Inspect ${{item.title}}`);
-        button.onclick=()=>selectCase(item,index);
-        button.onkeydown=(event)=>{{if(event.key==='Enter'||event.key===' '){{event.preventDefault();selectCase(item,index)}}}};
-        nodes.appendChild(button);
-      }});
-      if(cases.length) selectCase(cases[0],0);
-    </script>
-    """, unsafe_allow_javascript=True)
+    """Render an accessible, native evidence explorer."""
+    candidates = disagreement.get('candidates', [])
+    if not candidates:
+        st.info("No cross-market disagreements were recorded for this decision.")
+        return
+
+    labels = [item['title'] for item in candidates]
+    selected_label = st.pills(
+        "Inspect a market disagreement",
+        labels,
+        default=labels[0],
+        selection_mode="single",
+        key="market-disagreement-selector",
+    ) or labels[0]
+    selected = next(item for item in candidates if item['title'] == selected_label)
+    st.markdown(
+        f"""
+        <div class="evidence-detail">
+          <div><span>DISAGREEMENT SCORE</span><strong>{float(selected['score']):.0f}<small>/100</small></strong></div>
+          <div><span>EXPECTED REPRICING</span><b>{html.escape(str(selected['repricing_market']))}</b><p>{html.escape(str(selected['direction']))}</p></div>
+          <div><span>WHY IT MATTERS</span><p>{html.escape(str(selected['explanation']))}</p></div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 
 
 def render_protocol_journey(contract, execution_status):
-    """Interactive JavaScript walkthrough of the sealed decision lifecycle."""
+    """Render a native, keyboard-accessible decision-lifecycle walkthrough."""
     quality_ok = contract.get('data_quality', {}).get('all_live', False)
     stability_ok = contract.get('stability', {}).get('score', 0) >= .60
     authorized = contract.get('authorization') == 'AUTHORIZED'
@@ -161,39 +161,27 @@ def render_protocol_journey(contract, execution_status):
         {'name': 'Contract', 'ok': authorized, 'copy': f"The decision was sealed as {contract['authorization']} before submission."},
         {'name': 'Execution', 'ok': execution_done, 'copy': f"Broker lifecycle state: {execution_status}."},
     ]
-    payload = json.dumps(stages).replace('</', '<\\/')
     decision_hash = contract['decision_hash']
-    st.html(f"""
-    <section id="journey" aria-label="SIGNAL protocol journey">
-      <div class="journey-head"><div><span>SIGNAL PROTOCOL</span><h3>Follow the decision from evidence to execution</h3></div><div class="progress-label" id="progress-label"></div></div>
-      <div class="progress-track"><div id="progress-fill"></div></div>
-      <div id="stage-list" role="tablist"></div>
-      <div id="stage-detail" role="tabpanel" aria-live="polite"></div>
-      <div class="receipt"><div><span>SEALED PROOF</span><code>{decision_hash[:16]}…</code></div><button id="copy-proof" type="button">Copy full SHA-256</button></div>
-    </section>
-    <style>
-      #journey,#journey *{{box-sizing:border-box}}#journey{{font-family:Arial,sans-serif;border:1px solid #d5e0e9;background:#fff;padding:22px;margin:18px 0;color:#071d49}}
-      .journey-head{{display:flex;justify-content:space-between;gap:20px;align-items:flex-end}}.journey-head span,.receipt span{{font-size:10px;font-weight:700;letter-spacing:.12em;color:#007fa8}}
-      .journey-head h3{{font-size:20px;margin:5px 0 0}}.progress-label{{font-size:12px;font-weight:700;color:#53657d}}
-      .progress-track{{height:5px;background:#e5eef4;margin:18px 0}}#progress-fill{{height:100%;background:#19b5d8;width:0;transition:width .5s ease}}
-      #stage-list{{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:7px}}
-      #stage-list button{{position:relative;border:1px solid #c8d7e2;background:#f7fafc;color:#071d49;padding:12px 8px;cursor:pointer;font-weight:700;min-height:52px}}
-      #stage-list button:before{{content:'';display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:7px;background:#a9b7c2}}
-      #stage-list button.pass:before{{background:#19b5d8}}#stage-list button.active{{background:#071d49;color:#fff;border-color:#071d49;transform:translateY(-2px)}}
-      #stage-detail{{background:#f2f7fb;border-left:4px solid #19b5d8;padding:14px 16px;margin-top:10px;font-size:14px;line-height:1.5;min-height:50px}}
-      .receipt{{display:flex;justify-content:space-between;align-items:center;gap:16px;border-top:1px solid #d5e0e9;margin-top:16px;padding-top:14px}}.receipt code{{display:block;margin-top:5px;color:#003b70}}
-      .receipt button{{border:1px solid #003b70;background:#fff;color:#003b70;padding:10px 13px;cursor:pointer;font-weight:700}}.receipt button:hover{{background:#003b70;color:#fff}}
-      @media(max-width:760px){{#journey{{padding:15px}}.journey-head{{display:block}}.progress-label{{margin-top:8px}}#stage-list{{grid-template-columns:repeat(2,1fr)}}.receipt{{align-items:flex-start;flex-direction:column}}.receipt button{{width:100%}}}}
-    </style>
-    <script>
-      const stages={payload}; const list=document.getElementById('stage-list'); const detail=document.getElementById('stage-detail');
-      const passed=stages.filter(stage=>stage.ok).length; document.getElementById('progress-fill').style.width=`${{passed/stages.length*100}}%`;
-      document.getElementById('progress-label').textContent=`${{passed}} of ${{stages.length}} controls complete`;
-      function activate(index){{document.querySelectorAll('#stage-list button').forEach((button,i)=>{{button.classList.toggle('active',i===index);button.setAttribute('aria-selected',i===index)}});detail.innerHTML=`<strong>${{stages[index].name}}</strong><br>${{stages[index].copy}}`;}}
-      stages.forEach((stage,index)=>{{const button=document.createElement('button');button.type='button';button.role='tab';button.textContent=stage.name;button.classList.toggle('pass',stage.ok);button.onclick=()=>activate(index);button.onkeydown=event=>{{if(event.key==='ArrowRight'){{activate((index+1)%stages.length);list.children[(index+1)%stages.length].focus()}}if(event.key==='ArrowLeft'){{activate((index-1+stages.length)%stages.length);list.children[(index-1+stages.length)%stages.length].focus()}}}};list.appendChild(button)}});activate(0);
-      const copyButton=document.getElementById('copy-proof');copyButton.onclick=async()=>{{try{{await navigator.clipboard.writeText('{decision_hash}');copyButton.textContent='Copied'}}catch(error){{copyButton.textContent='Copy unavailable'}}setTimeout(()=>copyButton.textContent='Copy full SHA-256',1600)}};
-    </script>
-    """, unsafe_allow_javascript=True)
+    passed = sum(stage['ok'] for stage in stages)
+    st.subheader("Follow the decision from evidence to execution")
+    st.progress(passed / len(stages), text=f"{passed} of {len(stages)} controls complete")
+    stage_names = [stage['name'] for stage in stages]
+    selected_name = st.segmented_control(
+        "SIGNAL protocol stage",
+        stage_names,
+        default=stage_names[0],
+        selection_mode="single",
+        key=f"protocol-stage-{decision_hash[:12]}",
+        label_visibility="collapsed",
+    ) or stage_names[0]
+    selected = next(stage for stage in stages if stage['name'] == selected_name)
+    state = "CONTROL PASSED" if selected['ok'] else "BINDING CONTROL"
+    st.markdown(
+        f'<div class="protocol-detail"><span>{state}</span><b>{html.escape(selected_name)}</b><p>{html.escape(selected["copy"])}</p></div>',
+        unsafe_allow_html=True,
+    )
+    st.caption("SEALED PROOF · SHA-256 decision contract")
+    st.code(decision_hash, language=None)
 
 
 logger = AuditLogger()
@@ -206,7 +194,14 @@ st.markdown(
 )
 
 if PUBLIC_DEMO_MODE:
-    st.info("PUBLIC JUDGE MODE — Read-only sanitized replay derived from a verified Alpaca paper workflow. Values are historical demonstration evidence, not live quotes. Broker access and order submission are disabled.")
+    st.markdown("""
+    <div class="mode-banner" role="status">
+      <i class="mode-dot" aria-hidden="true"></i>
+      <strong>PUBLIC JUDGE MODE</strong>
+      <span>Sanitized historical replay from a verified Alpaca paper workflow—not live quotes.</span>
+      <b>READ ONLY · NO BROKER ACCESS</b>
+    </div>
+    """, unsafe_allow_html=True)
 
 latest_contract_row = (dashboard.get('contracts') or [{}])[0]
 latest_contract = latest_contract_row.get('contract', {})
@@ -230,7 +225,6 @@ st.markdown(f"""
   <div class="proof"><b>4 exit rules</b><span>Profit, loss, time and expiry.</span></div>
   <div class="proof"><b>59 tests</b><span>Verified safety and lifecycle behaviour.</span></div>
 </div>
-<div class="judge-route"><div class="route-step"><i>1</i><b>Run the replay</b><span>See six sources become one governed candidate.</span></div><div class="route-step"><i>2</i><b>Inspect the refusal</b><span>Trace the exact gate that produced ABSTAIN.</span></div><div class="route-step"><i>3</i><b>Verify the lifecycle</b><span>Follow a clearly labelled illustrative spread from entry policy to exit.</span></div></div>
 """, unsafe_allow_html=True)
 
 overview, live_lab, case_file, track_record, readiness, security_tab, methodology = st.tabs([
@@ -427,6 +421,13 @@ with case_file:
 with overview:
     st.markdown('<p class="section-label">The intelligence stack</p>', unsafe_allow_html=True)
     st.header("A complete decision, not another signal")
+    st.markdown("""
+    <div class="judge-route">
+      <div class="route-step"><i>1</i><b>Run the replay</b><span>See six sources become one governed candidate.</span></div>
+      <div class="route-step"><i>2</i><b>Inspect the refusal</b><span>Trace the exact gate that produced ABSTAIN.</span></div>
+      <div class="route-step"><i>3</i><b>Verify the lifecycle</b><span>Follow a clearly labelled illustrative spread from entry policy to exit.</span></div>
+    </div>
+    """, unsafe_allow_html=True)
     cols = st.columns(3)
     items = [
         ("Observe", "Alpaca market data and public Treasury yields form a provenance-tagged cross-market snapshot."),
