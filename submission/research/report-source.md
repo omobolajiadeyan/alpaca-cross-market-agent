@@ -84,7 +84,7 @@ Verification completed on 3 September 2026:
 
 Architecturally, CrossSignal is now submission-ready. The code addresses opportunity identification, structured AI reasoning, deterministic decisions, defined-risk execution, position management, and auditability without drifting from the challenge.
 
-Competitively, submit only after replacing the obsolete video with a new recording that visibly covers the problem, cross-market solution, one authorized replay, one abstention, atomic MLeg construction, broker reconciliation, stale-quote protection, the entry kill switch, the take-profit/stop-loss/time/expiry lifecycle, and the honest zero-trade account state. The presenter should say plainly that no market cycle met every sealed threshold; this justifies the lack of trade but does not claim P&L performance.
+Competitively, the final live-demo-first recording now covers the problem, cross-market solution, an authorized replay, an abstention, defined-risk construction, broker reconciliation, the take-profit/stop-loss/time/expiry lifecycle and the honest zero-trade account state. The account limitation remains explicit and is never presented as P&L performance.
 
 If a genuine eligible trade fills before the deadline, capture the Alpaca order, both legs, the registered exit policy, and subsequent monitor event. If none fills, submit the truthful abstention evidence. A forced trade would undermine the strongest part of the project and could create a worse technology and presentation score without producing meaningful performance evidence.
 

@@ -15,6 +15,7 @@ from pptx.util import Inches, Pt
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "submission" / "CrossSignal-Hackathon-Pitch-Final.pptx"
 COVER = ROOT / "assets" / "crosssignal-hackathon-cover.png"
+LOGO_MARK = ROOT / "assets" / "crosssignal-logo-mark.png"
 
 NAVY = RGBColor(7, 29, 73)
 BLUE = RGBColor(0, 59, 112)
@@ -85,7 +86,10 @@ def bullet_list(slide, items, x, y, w, h, size=19, color=NAVY):
 
 
 def footer(slide, number):
-    text(slide, "CROSSSIGNAL · OMOBOLAJI E ADEYAN · ALPACA PAPER TRADING", .65, 7.08,
+    if LOGO_MARK.exists():
+        slide.shapes.add_picture(str(LOGO_MARK), Inches(.58), Inches(6.98),
+                                 Inches(.26), Inches(.26))
+    text(slide, "CROSSSIGNAL · OMOBOLAJI E ADEYAN · ALPACA PAPER TRADING", .9, 7.08,
          10.8, .2, 8, MUTED, True)
     text(slide, str(number), 12.1, 7.04, .5, .25, 9, MUTED, True, align=PP_ALIGN.RIGHT)
 
@@ -101,33 +105,15 @@ def build():
     prs.slide_height = Inches(7.5)
     blank = prs.slide_layouts[6]
 
-    # 1 — Hook
+    # 1 — Hook. The same branded cover is used across the submission surface.
     s = prs.slides.add_slide(blank)
-    rect(s, 0, 0, 13.333, 7.5, NAVY)
-    rect(s, .7, .7, .06, .42, CYAN)
-    text(s, "DECISION INTELLIGENCE FOR CROSS-MARKET TRADING", .9, .73, 7.2, .35, 11, LIGHT_CYAN, True)
-    text(s, "Markets disagree.\nWe trade the gap.", .72, 1.55, 8.8, 2.25, 42, WHITE, True, "Aptos Display")
-    text(s, "An auditable AI trading agent that challenges, governs and scores every decision.",
-         .75, 4.18, 8.2, .75, 20, LIGHT_CYAN)
-    rect(s, 9.7, -.6, 4.5, 4.5, CYAN, radius=True)
-    rect(s, 10.42, .12, 3.1, 3.1, NAVY, radius=True)
     if COVER.exists():
-        from PIL import Image
-        cover_w, cover_h = Image.open(COVER).size
-        cover_aspect = cover_w / cover_h
-        inset = 0.18
-        pic = s.shapes.add_picture(str(COVER), Inches(10.42 + inset), Inches(.12 + inset),
-                                    Inches(3.1 - 2 * inset), Inches(3.1 - 2 * inset))
-        if cover_aspect > 1:
-            crop = (1 - 1 / cover_aspect) / 2
-            pic.crop_left = crop
-            pic.crop_right = crop
-        elif cover_aspect < 1:
-            crop = (1 - cover_aspect) / 2
-            pic.crop_top = crop
-            pic.crop_bottom = crop
-    text(s, "CROSSSIGNAL", .75, 6.25, 4, .4, 18, WHITE, True)
-    text(s, "Created by Omobolaji E Adeyan", .75, 6.7, 5, .3, 12, LIGHT_CYAN)
+        s.shapes.add_picture(str(COVER), 0, 0, prs.slide_width, prs.slide_height)
+    else:
+        rect(s, 0, 0, 13.333, 7.5, NAVY)
+        text(s, "CROSSSIGNAL", .75, .75, 4, .4, 18, WHITE, True)
+        text(s, "Markets disagree.\nWe verify the trade.", .72, 1.55, 8.8, 2.25,
+             42, WHITE, True, "Aptos Display")
     add_notes(s, "Markets often disagree before they reprice. CrossSignal identifies that disagreement, challenges the conclusion, applies deterministic controls, and records whether the prediction was ultimately correct.")
 
     # 2 — Problem
@@ -249,7 +235,10 @@ def build():
     # 8 — Proof and CTA
     s = prs.slides.add_slide(blank)
     rect(s, 0, 0, 13.333, 7.5, NAVY)
-    text(s, "THE PROOF IS PUBLIC", .75, .7, 4, .3, 11, LIGHT_CYAN, True)
+    if LOGO_MARK.exists():
+        s.shapes.add_picture(str(LOGO_MARK), Inches(.68), Inches(.44),
+                             Inches(.52), Inches(.52))
+    text(s, "THE PROOF IS PUBLIC", 1.3, .64, 4, .3, 11, LIGHT_CYAN, True)
     text(s, "Inspect the intelligence.\nChallenge the decision.", .72, 1.35, 8.8, 1.55, 36, WHITE, True, "Aptos Display")
     stats = [("59", "automated tests"), ("4", "sealed exit rules"), ("13/15", "latest full checks")]
     for i, (value, caption) in enumerate(stats):

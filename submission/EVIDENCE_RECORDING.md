@@ -1,16 +1,20 @@
+![CrossSignal](../assets/crosssignal-logo-lockup-light.png)
+
 # CrossSignal submission evidence record
 
 ## Selected video
 
 - File: `CrossSignal-Submission-Video.mp4`
-- Duration: 4:55.923
+- Duration: 3:46.768
 - Resolution: 1920×1080
-- SHA-256: `1FE57FF6973C8ACED2984B5619804CA6C5071BF430823448DB9BB796040E2679`
-- Evidence date represented in video: through September 2, 2026 (nine cycles)
+- SHA-256: `FD9C1B8D6179913FA4CF31B18AF985D0C1A1786D9AD4FD8667375B1C9A551454`
+- Evidence date represented in video: through September 3, 2026
+- Status: final live-demo-first position-lifecycle cut
 
-The video is a presentation artifact. It includes sanitized authorized and
-abstention examples to explain policy behavior; it does not claim an authorized
-case was filled on the dedicated competition account.
+The video combines cursor-driven recordings of the public judge deployment with
+real code and genuine test output. Sanitized and simulated examples are labelled
+as such; it does not claim an authorized case was filled on the dedicated
+competition account.
 
 ## Latest local connected cycle
 

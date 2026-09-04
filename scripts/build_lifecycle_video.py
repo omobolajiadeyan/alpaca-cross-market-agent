@@ -181,6 +181,8 @@ STATE_MACHINE_HTML = flow_card(
     accent_index=3,
 )
 
+BRAND_MARK_SVG = """<svg viewBox="0 0 72 72" aria-hidden="true"><g fill="none" stroke-linecap="round" stroke-width="3"><path d="M5 10 C22 10 23 31 34 35" stroke="#19b5d8" opacity=".55"/><path d="M5 20 C20 20 25 32 34 35" stroke="#19b5d8" opacity=".72"/><path d="M5 30 C20 30 26 34 34 35" stroke="#72d4e8"/><path d="M5 42 C20 42 26 38 34 37" stroke="#72d4e8"/><path d="M5 52 C20 52 25 40 34 37" stroke="#19b5d8" opacity=".72"/><path d="M5 62 C22 62 23 41 34 37" stroke="#19b5d8" opacity=".55"/><path d="M42 36 H67" stroke="#19b5d8" stroke-width="4"/></g><path d="M38 29 L45 36 L38 43 L31 36 Z" fill="#071d49" stroke="#72d4e8" stroke-width="2.5"/><circle cx="38" cy="36" r="2.6" fill="#f6b84a"/><circle cx="67" cy="36" r="2.7" fill="#72d4e8"/></svg>"""
+
 
 TITLE_HTML = f"""<!doctype html><html><head><meta charset="utf-8">{FONT_HEAD}
 <style>
@@ -192,15 +194,17 @@ body {{ width:1920px; height:1080px; background:#071d49;
 .ring {{ position:absolute; width:520px; height:520px; border:80px solid #19b5d8;
   border-radius:50%; opacity:.9; right:-220px; top:-180px; }}
 .brand {{ font-family:'Manrope',sans-serif; font-weight:800; font-size:64px;
-  letter-spacing:-.03em; margin-bottom:28px; z-index:1; }}
-.brand .mark {{ color:#19b5d8; margin-right:14px; }}
+  letter-spacing:-.03em; margin-bottom:20px; z-index:1; display:flex;align-items:center;gap:18px; }}
+.brand svg {{ width:92px;height:92px; }}
+.headline {{font-family:'Manrope',sans-serif;font-size:34px;color:#72d4e8;font-weight:700;z-index:1;}}
 .eyebrow {{ font-family:'Manrope',sans-serif; font-size:16px; letter-spacing:.16em;
   color:#72d4e8; font-weight:700; margin-bottom:24px; z-index:1; }}
 .presenter {{ font-size:18px; color:#b9dced; z-index:1; margin-top:36px; }}
 </style></head><body>
 <div class="ring"></div>
 <div class="eyebrow">DECISION AND POSITION-LIFECYCLE INTELLIGENCE</div>
-<div class="brand"><span class="mark">&#9670;</span>CROSSSIGNAL</div>
+<div class="brand">{BRAND_MARK_SVG}<span>CROSSSIGNAL</span></div>
+<div class="headline">Markets disagree. We verify the trade.</div>
 <div class="presenter">Omobolaji Adeyan &middot; Alpaca AI Trading Agents Hackathon &middot; Paper trading only</div>
 </body></html>"""
 
@@ -214,8 +218,8 @@ body {{ width:1920px; height:1080px; background:#071d49;
 .ring {{ position:absolute; width:520px; height:520px; border:80px solid #19b5d8;
   border-radius:50%; opacity:.9; right:-220px; top:-180px; }}
 .brand {{ font-family:'Manrope',sans-serif; font-weight:800; font-size:60px;
-  letter-spacing:-.03em; margin-bottom:26px; z-index:1; }}
-.brand .mark {{ color:#19b5d8; margin-right:14px; }}
+  letter-spacing:-.03em; margin-bottom:26px; z-index:1;display:flex;align-items:center;gap:18px; }}
+.brand svg {{ width:86px;height:86px; }}
 .tagline {{ font-size:26px; color:#d7e7f0; max-width:1000px; line-height:1.5;
   margin-bottom:44px; z-index:1; }}
 .links {{ display:flex; gap:64px; z-index:1; margin-bottom:36px; }}
@@ -226,8 +230,8 @@ body {{ width:1920px; height:1080px; background:#071d49;
 .presenter {{ font-size:16px; color:#b9dced; z-index:1; }}
 </style></head><body>
 <div class="ring"></div>
-<div class="brand"><span class="mark">&#9670;</span>CROSSSIGNAL</div>
-<div class="tagline">Entry, governed. Exit, proven.</div>
+<div class="brand">{BRAND_MARK_SVG}<span>CROSSSIGNAL</span></div>
+<div class="tagline">Markets disagree. We verify the trade.<br>Entry governed. Exit proven.</div>
 <div class="links">
   <div class="link-block"><div class="link-label">Live Application</div><div class="link-value">crosssignal-ai-agent.streamlit.app</div></div>
   <div class="link-block"><div class="link-label">Source Code</div><div class="link-value">github.com/omobolajiadeyan/alpaca-cross-market-agent</div></div>

@@ -4,6 +4,7 @@ import html
 import json
 import sys
 from datetime import datetime
+from pathlib import Path
 
 if sys.platform == "win32":
     # Live agent code paths (AlpacaTools, etc.) print checkmark characters
@@ -26,9 +27,11 @@ from config import (ALLOW_PAPER_EXECUTION, PUBLIC_DEMO_MODE, REQUIRE_LIVE_DATA,
 from security.controls import security_posture
 
 
+ASSET_DIR = Path(__file__).resolve().parent / "assets"
+
 st.set_page_config(
     page_title="CrossSignal — AI Macro Trading Agent",
-    page_icon="◈",
+    page_icon=str(ASSET_DIR / "crosssignal-logo-mark.png"),
     layout="wide",
     initial_sidebar_state="collapsed",
 )
@@ -36,31 +39,34 @@ st.set_page_config(
 st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap');
-:root { --ink:#071d49; --muted:#53657d; --canvas:#fff; --ice:#f2f7fb; --cyan:#19b5d8; --blue:#003b70; --navy:#071d49; --line:#d5e0e9; }
+:root { --ink:#071d49; --muted:#53657d; --canvas:#f4f7fb; --surface:#fff; --ice:#edf4f8; --cyan:#19b5d8; --light-cyan:#72d4e8; --blue:#003b70; --navy:#031126; --line:#d5e0e9; --amber:#f6b84a; }
 .stApp { background:var(--canvas); color:var(--ink); font-family:'DM Sans',sans-serif; }
 [data-testid="stHeader"] { background:transparent; }
 .block-container { max-width:1280px; padding-top:1.2rem; padding-bottom:4rem; overflow-x:hidden; }
 h1,h2,h3 { font-family:'Manrope',sans-serif !important; letter-spacing:-.04em !important; }
-.nav { display:flex; justify-content:space-between; align-items:center; padding:.75rem 0 1.2rem; border-bottom:1px solid var(--line); }
-.brand { font:800 1.1rem Manrope; letter-spacing:-.04em; }.brand-mark { color:var(--cyan); margin-right:.45rem; }
+.nav { display:flex; justify-content:space-between; align-items:center; padding:.55rem 0 1rem; border-bottom:1px solid var(--line); }
+.brand-lockup{display:flex;align-items:center;gap:.65rem}.brand-lockup svg{width:42px;height:42px}.brand-name{font:800 1.05rem Manrope;letter-spacing:-.035em}.brand-sub{display:block;color:var(--muted);font-size:.6rem;letter-spacing:.1em;margin-top:.08rem}
 .nav-note { color:var(--muted); font-size:.82rem; }
-.hero { margin:1.5rem 0 0; padding:4.5rem 4rem; background:var(--navy); color:#fff; position:relative; overflow:hidden; }
-.hero:after { content:''; position:absolute; width:380px; height:380px; border:70px solid var(--cyan); border-radius:50%; right:-180px; top:-155px; opacity:.9; }
+.hero { margin:1.5rem 0 0; padding:3.6rem 3.7rem; background:radial-gradient(circle at 88% 18%,#0b4262 0,transparent 30%),linear-gradient(125deg,#031126,#071d49); color:#fff; position:relative; overflow:hidden; display:grid;grid-template-columns:minmax(0,1.65fr) minmax(270px,.75fr);gap:3rem;align-items:center;border-radius:18px 18px 0 0; }
+.hero:after { content:''; position:absolute; width:500px; height:500px; border:1px solid rgba(114,212,232,.25); border-radius:50%; right:-245px; top:-180px; box-shadow:0 0 0 55px rgba(25,181,216,.035),0 0 0 120px rgba(25,181,216,.025); }
 .eyebrow { display:inline-block; border-left:3px solid var(--cyan); padding:.1rem 0 .1rem .75rem; font-size:.72rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:#b9dced; }
-.hero h1 { font-size:clamp(3rem,6vw,6rem); line-height:.95; max-width:900px; margin:1.4rem 0 1.5rem; position:relative; z-index:1; }
+.hero h1 { font-size:clamp(2.8rem,5vw,5.3rem); line-height:.96; max-width:820px; margin:1.25rem 0 1.35rem; position:relative; z-index:1; }
 .hero h1 em { color:#72d4e8; font-style:normal; }
 .hero-copy { max-width:680px; color:#d7e7f0; font-size:1.12rem; line-height:1.65; position:relative; z-index:1; }
-.proof-grid { display:grid; grid-template-columns:repeat(3,1fr); background:var(--ice); border-bottom:1px solid var(--line); margin:0 0 3.5rem; }
+.hero-status{position:relative;z-index:2;background:rgba(1,12,29,.74);border:1px solid rgba(114,212,232,.26);border-radius:14px;padding:1.25rem;backdrop-filter:blur(8px)}
+.hero-status-label{color:#9bcbd9;font-size:.65rem;letter-spacing:.13em;text-transform:uppercase;font-weight:700}.hero-verdict{font:800 2rem Manrope;color:var(--amber);margin:.4rem 0 1rem}.hero-row{display:flex;justify-content:space-between;gap:1rem;border-top:1px solid rgba(255,255,255,.1);padding:.72rem 0;color:#d7e7f0;font-size:.78rem}.hero-row strong{color:#fff;text-align:right}
+.proof-grid { display:grid; grid-template-columns:repeat(4,1fr); background:var(--surface); border:1px solid var(--line);border-top:0; margin:0 0 2.2rem;border-radius:0 0 18px 18px;overflow:hidden;box-shadow:0 18px 44px rgba(7,29,73,.08); }
 .proof { padding:1.65rem 2rem; border-right:1px solid var(--line); }.proof:last-child{border-right:0}.proof b { display:block; font:700 1.2rem Manrope; margin-bottom:.35rem; }.proof span { color:var(--muted); font-size:.88rem; }
+.judge-route{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:0 0 2.1rem}.route-step{background:#fff;border:1px solid var(--line);border-radius:12px;padding:1rem 1.15rem}.route-step i{font-style:normal;display:inline-grid;place-items:center;width:26px;height:26px;border-radius:50%;background:var(--navy);color:#fff;font-weight:700;font-size:.75rem;margin-right:.55rem}.route-step b{font:700 .92rem Manrope}.route-step span{display:block;color:var(--muted);font-size:.78rem;margin:.55rem 0 0 2.1rem;line-height:1.45}
 .section-label { color:#007fa8; font-size:.72rem; font-weight:700; letter-spacing:.12em; text-transform:uppercase; }
-.card { background:#fff; border:1px solid var(--line); border-radius:2px; padding:1.4rem; height:100%; box-shadow:0 6px 18px rgba(7,29,73,.04); }
+.card { background:#fff; border:1px solid var(--line); border-radius:12px; padding:1.4rem; height:100%; box-shadow:0 8px 24px rgba(7,29,73,.05); }
 .status-live,.status-fallback,.status-neutral { display:inline-block; padding:.27rem .55rem; border-radius:99px; font-size:.68rem; font-weight:700; text-transform:uppercase; }
 .status-live { background:#dff8e8;color:#17653b }.status-fallback {background:#fff0cc;color:#8a5600}.status-neutral{background:#e8f2f8;color:#315b75}
 .thesis { background:var(--blue); color:#fff; padding:2rem; border-left:5px solid var(--cyan); margin:1rem 0; }
 .thesis p { color:#d7e7f0; line-height:1.65; }.thesis .confidence { color:#72d4e8; font:700 .8rem Manrope; }
-div.stButton > button { border-radius:2px; border:0; background:var(--blue); color:white; font-weight:700; min-height:3rem; }
+div.stButton > button { border-radius:9px; border:0; background:var(--blue); color:white; font-weight:700; min-height:3rem; }
 div.stButton > button:hover { background:var(--navy); color:#fff; }
-[data-testid="stMetric"] { background:#fff; border:1px solid var(--line); border-top:3px solid var(--cyan); border-radius:2px; padding:1rem; }
+[data-testid="stMetric"] { background:#fff; border:1px solid var(--line); border-top:3px solid var(--cyan); border-radius:10px; padding:1rem; }
 .footer { border-top:1px solid var(--line); margin-top:4rem; padding-top:1.5rem; color:var(--muted); font-size:.78rem; }
 [data-testid="stTabs"] [data-baseweb="tab-list"] { gap:.25rem; overflow-x:auto; scrollbar-width:none; }
 [data-testid="stTabs"] [data-baseweb="tab"] { white-space:nowrap; min-width:max-content; }
@@ -68,13 +74,13 @@ div.stButton > button:hover { background:var(--navy); color:#fff; }
 button:focus-visible,[role="tab"]:focus-visible { outline:3px solid rgba(25,181,216,.45)!important; outline-offset:2px; }
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
 @media(max-width:900px){
-  .block-container{padding:1rem 1.25rem 3rem}.proof-grid{grid-template-columns:1fr}.proof{border-right:0;border-bottom:1px solid var(--line)}
-  .hero{padding:3.25rem 2rem}.hero:after{width:250px;height:250px;right:-160px;top:-120px}.hero h1{font-size:clamp(2.6rem,11vw,4.4rem)}
+  .block-container{padding:1rem 1.25rem 3rem}.proof-grid{grid-template-columns:repeat(2,1fr)}.proof:nth-child(2){border-right:0}.judge-route{grid-template-columns:1fr}
+  .hero{padding:3.25rem 2rem;grid-template-columns:1fr}.hero:after{width:250px;height:250px;right:-160px;top:-120px}.hero h1{font-size:clamp(2.6rem,11vw,4.4rem)}
   .nav-note{display:none}.card{margin-bottom:.5rem}
 }
 @media(max-width:520px){
   .block-container{padding:.7rem .85rem 2rem}.hero{margin-top:1rem;padding:2.5rem 1.25rem}.hero-copy{font-size:1rem}
-  .proof{padding:1.25rem}.nav{padding:.5rem 0 1rem}[data-testid="stMetric"]{padding:.75rem}
+  .proof-grid{grid-template-columns:1fr}.proof{padding:1.25rem;border-right:0;border-bottom:1px solid var(--line)}.nav{padding:.5rem 0 1rem}[data-testid="stMetric"]{padding:.75rem}
   h1{font-size:2.25rem!important}h2{font-size:1.65rem!important}.footer{line-height:1.6}
 }
 </style>
@@ -84,6 +90,11 @@ button:focus-visible,[role="tab"]:focus-visible { outline:3px solid rgba(25,181,
 def badge(status):
     kind = 'live' if status == 'live' else ('fallback' if status == 'fallback' else 'neutral')
     return f'<span class="status-{kind}">{status}</span>'
+
+
+def brand_mark_svg() -> str:
+    """Inline mark keeps the public header crisp without an external request."""
+    return """<svg viewBox="0 0 72 72" aria-hidden="true"><g fill="none" stroke-linecap="round" stroke-width="3"><path d="M5 10 C22 10 23 31 34 35" stroke="#19b5d8" opacity=".55"/><path d="M5 20 C20 20 25 32 34 35" stroke="#19b5d8" opacity=".72"/><path d="M5 30 C20 30 26 34 34 35" stroke="#72d4e8"/><path d="M5 42 C20 42 26 38 34 37" stroke="#72d4e8"/><path d="M5 52 C20 52 25 40 34 37" stroke="#19b5d8" opacity=".72"/><path d="M5 62 C22 62 23 41 34 37" stroke="#19b5d8" opacity=".55"/><path d="M42 36 H67" stroke="#19b5d8" stroke-width="4"/></g><path d="M38 29 L45 36 L38 43 L31 36 Z" fill="#071d49" stroke="#72d4e8" stroke-width="2.5"/><circle cx="38" cy="36" r="2.6" fill="#f6b84a"/><circle cx="67" cy="36" r="2.7" fill="#72d4e8"/></svg>"""
 
 
 def fmt(value, suffix=""):
@@ -189,26 +200,41 @@ logger = AuditLogger()
 dashboard = judge_dashboard() if PUBLIC_DEMO_MODE else logger.get_dashboard_data()
 broker_mutations_enabled = ALLOW_PAPER_EXECUTION and not PUBLIC_DEMO_MODE
 
-st.markdown('<div class="nav"><div class="brand"><span class="brand-mark">◈</span>CROSSSIGNAL</div><div class="nav-note">BUILT BY OMOBOLAJI E ADEYAN · ALPACA PAPER TRADING</div></div>', unsafe_allow_html=True)
+st.markdown(
+    f'<div class="nav"><div class="brand-lockup">{brand_mark_svg()}<div><div class="brand-name">CROSSSIGNAL</div><span class="brand-sub">AUDITABLE OPTIONS INTELLIGENCE</span></div></div><div class="nav-note">BUILT BY OMOBOLAJI E ADEYAN · ALPACA PAPER TRADING</div></div>',
+    unsafe_allow_html=True,
+)
 
 if PUBLIC_DEMO_MODE:
     st.info("PUBLIC JUDGE MODE — Read-only sanitized replay derived from a verified Alpaca paper workflow. Values are historical demonstration evidence, not live quotes. Broker access and order submission are disabled.")
 
-st.markdown("""
+latest_contract_row = (dashboard.get('contracts') or [{}])[0]
+latest_contract = latest_contract_row.get('contract', {})
+latest_verdict = latest_contract.get('authorization', 'NO DECISION')
+latest_id = latest_contract.get('contract_id', 'Pending')
+latest_reasons = latest_contract.get('authorization_reasons') or ['No failed gate recorded.']
+latest_reason = html.escape(str(latest_reasons[0]))
+binding_control = str(latest_reasons[0]).split(':', 1)[-1].strip().title()
+deployment_mode = 'READ-ONLY REPLAY' if PUBLIC_DEMO_MODE else 'CONTROLLED LOCAL MODE'
+
+st.markdown(f"""
 <div class="hero">
-  <span class="eyebrow">Decision intelligence for cross-market trading</span>
-  <h1>See the repricing.<br><em>Act with precision.</em></h1>
-  <p class="hero-copy">CrossSignal turns fragmented market information into an evidence-backed macro decision—with transparent sources, governed risk and an auditable Alpaca paper-trading workflow.</p>
+  <div><span class="eyebrow">Six markets · one governed decision</span>
+  <h1>Markets disagree.<br><em>We verify the trade.</em></h1>
+  <p class="hero-copy">CrossSignal converts conflicts across equities, credit, rates and volatility into defined-risk Alpaca options decisions—and proves why each trade entered, exited or was refused.</p></div>
+  <aside class="hero-status"><div class="hero-status-label">Latest sealed decision</div><div class="hero-verdict">{html.escape(str(latest_verdict))}</div><div class="hero-row"><span>Contract</span><strong>{html.escape(str(latest_id))}</strong></div><div class="hero-row"><span>Binding control</span><strong title="{latest_reason}">{html.escape(binding_control)}</strong></div><div class="hero-row"><span>Deployment</span><strong>{deployment_mode}</strong></div></aside>
 </div>
 <div class="proof-grid">
-  <div class="proof"><b>6 live lenses</b><span>One synchronized macro state instead of a single-market signal.</span></div>
-  <div class="proof"><b>Defined risk</b><span>Every options structure is capped and preflighted before submission.</span></div>
-  <div class="proof"><b>Self-scoring</b><span>Past forecasts are checked against subsequent market outcomes.</span></div>
+  <div class="proof"><b>6 market lenses</b><span>One synchronized macro state.</span></div>
+  <div class="proof"><b>15 execution checks</b><span>One failure blocks submission.</span></div>
+  <div class="proof"><b>4 exit rules</b><span>Profit, loss, time and expiry.</span></div>
+  <div class="proof"><b>59 tests</b><span>Verified safety and lifecycle behaviour.</span></div>
 </div>
+<div class="judge-route"><div class="route-step"><i>1</i><b>Run the replay</b><span>See six sources become one governed candidate.</span></div><div class="route-step"><i>2</i><b>Inspect the refusal</b><span>Trace the exact gate that produced ABSTAIN.</span></div><div class="route-step"><i>3</i><b>Verify the lifecycle</b><span>Follow a clearly labelled illustrative spread from entry policy to exit.</span></div></div>
 """, unsafe_allow_html=True)
 
-case_file, live_lab, overview, track_record, readiness, security_tab, methodology = st.tabs([
-    "Decision case", "Run agent", "Executive overview", "Track record", "Readiness", "Security", "Methodology"
+overview, live_lab, case_file, track_record, readiness, security_tab, methodology = st.tabs([
+    "Executive overview", "Run agent", "Decision case", "Track record", "Readiness", "Security", "Methodology"
 ])
 
 with case_file:
@@ -418,7 +444,10 @@ with overview:
     b_statuses = [row['status'] for row in dashboard['trades']]
     c.metric("Submitted cycles", b_statuses.count('submitted'))
     hit = dashboard['track_record']['average_hit_rate']
-    d.metric("Forecast hit rate", f"{hit:.0%}" if hit is not None else "Pending")
+    if dashboard.get('fixture'):
+        d.metric("Evidence scope", "Illustrative replay", help="Not competition-account performance")
+    else:
+        d.metric("Forecast hit rate", f"{hit:.0%}" if hit is not None else "Pending")
 
 with live_lab:
     st.markdown('<p class="section-label">Controlled paper environment</p>', unsafe_allow_html=True)
@@ -494,7 +523,10 @@ with track_record:
     x, y, z = st.columns(3)
     x.metric("Scored theses", track['theses_scored'])
     y.metric("Pending evaluation", track['theses_pending'])
-    z.metric("Average hit rate", f"{track['average_hit_rate']:.0%}" if track['average_hit_rate'] is not None else "—")
+    if dashboard.get('fixture'):
+        z.metric("Performance status", "Illustrative only", help="No competition-account P&L claim")
+    else:
+        z.metric("Average hit rate", f"{track['average_hit_rate']:.0%}" if track['average_hit_rate'] is not None else "—")
     thesis_rows = []
     for row in dashboard['theses']:
         thesis_rows.append({'time': row['timestamp'], 'thesis': row['thesis'],
@@ -518,15 +550,21 @@ with track_record:
     )
     lifecycle = dashboard.get('position_performance', {})
     life_a, life_b, life_c, life_d = st.columns(4)
-    life_a.metric("Managed positions", sum(lifecycle.get('by_status', {}).values()))
-    life_b.metric("Closed", lifecycle.get('closed_positions', 0))
-    life_c.metric("Realized P&L", f"${lifecycle.get('realized_pnl', 0):,.2f}")
-    win_rate = lifecycle.get('win_rate')
-    life_d.metric("Lifecycle win rate", f"{win_rate:.0%}" if win_rate is not None else "Pending")
     if dashboard.get('fixture'):
-        st.caption(
-            "Lifecycle metrics shown in replay mode are illustrative and are "
-            "not Alpaca account results."
+        life_a.metric("Evidence type", "Simulation")
+        life_b.metric("Lifecycle cases", lifecycle.get('closed_positions', 0))
+        life_c.metric("Triggered exit", "Take profit")
+        life_d.metric("Sealed exit rules", "4")
+    else:
+        life_a.metric("Managed positions", sum(lifecycle.get('by_status', {}).values()))
+        life_b.metric("Closed", lifecycle.get('closed_positions', 0))
+        life_c.metric("Realized P&L", f"${lifecycle.get('realized_pnl', 0):,.2f}")
+        win_rate = lifecycle.get('win_rate')
+        life_d.metric("Lifecycle win rate", f"{win_rate:.0%}" if win_rate is not None else "Pending")
+    if dashboard.get('fixture'):
+        st.warning(
+            "SIMULATED LIFECYCLE REPLAY — This demonstrates policy and state transitions. "
+            "It is not broker P&L or competition-account performance."
         )
     position_rows = []
     for item in dashboard.get('positions', []):
@@ -571,13 +609,13 @@ with readiness:
         ('One-page write-up', 'Met', 'AI logic, risk gates and Alpaca infrastructure documented in submission/'),
         ('Hackathon cover image', 'Met', 'Final 16:9 cover is versioned in assets/'),
         ('Participant enrollment and team', 'Met', 'Authenticated event dashboard shows Omobolaji Adeyan and team CrossSignal'),
-        ('lablab submission form', 'Missing', 'Complete on lablab.ai before the deadline, including the dedicated account ID'),
+        ('lablab submission form', 'Submitted', 'User confirmed submission with the dedicated account ID'),
     ]
     readiness_df = pd.DataFrame(requirements, columns=['Requirement', 'Status', 'Evidence / next action'])
     st.dataframe(readiness_df, width='stretch', hide_index=True)
     completed = sum(status == 'Met' for _, status, _ in requirements)
     st.progress(completed / len(requirements), text=f'{completed} of {len(requirements)} requirements fully met')
-    st.info('The software requirements are substantially complete. External proof and final submission assets remain intentionally marked incomplete.')
+    st.success('Submission completed. This page now serves as the public, read-only judge evidence experience.')
 
 with security_tab:
     st.markdown('<p class="section-label">NIST-aligned risk management</p>', unsafe_allow_html=True)

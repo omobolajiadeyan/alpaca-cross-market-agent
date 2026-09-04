@@ -1,50 +1,53 @@
-# CrossSignal — final upload package
+![CrossSignal](https://raw.githubusercontent.com/omobolajiadeyan/alpaca-cross-market-agent/main/assets/crosssignal-logo-lockup-light.png)
 
-## Upload these files
+# CrossSignal — final submission package
 
-1. `CrossSignal-Cover.png` — 16:9 cover image
-2. `CrossSignal-Submission-Video.mp4` — replace with the new position-lifecycle recording before upload
-3. `CrossSignal-Hackathon-Pitch-Final.pdf` — eight-slide presentation
-4. `CrossSignal-One-Page-Writeup.pdf` — required one-page technical write-up
+CrossSignal is an auditable cross-market options agent. It converts disagreement
+across equities, credit, rates and volatility into defined-risk Alpaca paper
+decisions, then manages every eligible spread under exit rules sealed at entry.
 
-## Paste into the submission form
+## Primary judge assets
 
-Use `SUBMISSION_FORM_COPY.md` for the project title, descriptions, tags, URLs,
-account ID, and disclosure.
+1. `CrossSignal-Cover.png` — final 16:9 branded cover.
+2. `CrossSignal-Submission-Video.mp4` — final 3:46 live-demo-first walkthrough.
+3. `CrossSignal-Hackathon-Pitch-Final.pdf` — eight-slide presentation.
+4. `CrossSignal-One-Page-Writeup.pdf` — required one-page technical write-up.
 
-Required paper account ID: `PA3PDTUDIXDU`
+The video is the current position-lifecycle cut. It shows the public judge
+replay, six market lenses, the binding ABSTAIN gate, three-spread construction,
+the illustrative lifecycle demonstration, real source code and the verified
+59-test suite. It does not predate position management and does not need to be
+replaced.
 
-## Supplemental judge evidence
+## Links and account
 
-- `JUDGE_NO_TRADE_MEMO.md`
-- `CrossSignal-Competitive-Research-and-Enhancement-Report.pdf`
-- `Latest-Run-Evidence.json`
-- `CHECKSUMS.sha256`
-- `CrossSignal-Hackathon-Pitch-Final.pptx` if an editable deck is useful
-
-## App public-access check
-
-An earlier automated check flagged the Streamlit demo as requiring a login.
-Re-verified 2026-09-03 via three independent methods (curl with a real cookie
-jar and browser user-agent, and 10+ real headless-Chromium page loads during
-video rendering, all of which reached "PUBLIC JUDGE MODE" content directly):
-the app is genuinely public. The earlier flag was almost certainly a naive
-fetcher tripping Streamlit's bot-detection interstitial, not a real access
-problem. Still worth a manual private-window check before submitting, but this
-is not a blocker.
+- Judge demo: <https://crosssignal-ai-agent.streamlit.app>
+- Source: <https://github.com/omobolajiadeyan/alpaca-cross-market-agent>
+- Alpaca paper account: `PA3PDTUDIXDU`
+- Evidence Watch: <https://github.com/omobolajiadeyan/alpaca-cross-market-agent/actions/runs/33805502192>
 
 ## Evidence boundary
 
-The code, dashboard, deck, write-up, and submission copy now include governed
-take-profit, stop-loss, maximum-hold, and pre-expiry exits. The existing video
-predates that feature and must be replaced using `FINAL_VIDEO_SCRIPT.md`; do not
-upload the old video as the final representation of the project. The dedicated
-account has zero orders and zero positions, so the submission makes no P&L
-claim. The dashboard lifecycle example is illustrative policy evidence, not a
-competition-account fill.
+The dedicated $100,000 competition account had zero orders, zero positions and
+therefore no P&L to claim at the submission cutoff. Connected cycles abstained
+because adversarial confidence or executable-liquidity evidence failed fixed
+thresholds. CrossSignal did not weaken those controls to manufacture a trade.
 
-The final monitor also reconciles registered legs with Alpaca, rejects stale
-quote timestamps, identifies each atomic exit attempt with a deterministic
-client order ID, exposes realized lifecycle metrics, and provides an independent
-new-entry kill switch. These are reliability controls; they do not change the
-cross-market signal objective.
+The public dashboard contains a sanitized decision replay and a clearly marked
+simulated lifecycle scenario. Those values demonstrate policy and state
+transitions; they are not broker fills or competition-account performance.
+
+## Supplemental evidence
+
+- `Latest-Run-Evidence.json` — secret-free evidence and exact video metadata.
+- `JUDGE_NO_TRADE_MEMO.md` — concise explanation of zero orders.
+- `REQUIREMENTS-AUDIT.md` — requirement-by-requirement review.
+- `FINAL_VIDEO_SCRIPT.md` — narration and scene evidence map.
+- `CHECKSUMS.sha256` — integrity hashes for every packaged file.
+- `CrossSignal-Competitive-Research-and-Enhancement-Report.pdf` — design research.
+
+## Safety
+
+No credential, `.env`, local database, raw broker response or private order ID
+is included. The public application and cloud Evidence Watch are read-only.
+Broker mutation requires the Alpaca paper endpoint and explicit local switches.

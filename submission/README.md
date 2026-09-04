@@ -1,6 +1,10 @@
+![CrossSignal](../assets/crosssignal-logo-lockup-light.png)
+
 # CrossSignal final submission assets
 
-Start with `FINAL-PACKAGE-README.md` in the `final-package` directory.
+The authoritative upload bundle is
+`CrossSignal-Final-Submission-Package.zip`. Its unpacked source directory is
+`CrossSignal-Final-Submission-Package/`.
 
 Primary files:
 

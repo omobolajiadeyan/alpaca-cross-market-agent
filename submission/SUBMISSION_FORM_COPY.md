@@ -4,25 +4,25 @@
 
 CrossSignal: Auditable Cross-Market Options AI
 
-## Short Description - 159/255 characters
+## Short Description — 174/255 characters
 
-CrossSignal detects cross-market mispricing, governs Alpaca options entries, and manages each paper spread with auditable profit, loss, time, and expiry exits.
+CrossSignal turns conflicts across rates, credit, equities and volatility into defined-risk Alpaca options decisions—and proves why each trade entered, exited or was refused.
 
-## Long Description - 1,917/2,000 characters; 265 words
+## Long Description — 1,860/2,000 characters; 258 words
 
-Most trading agents optimize for producing a signal. CrossSignal produces a defensible decision and manages it through exit.
+Markets often disagree before they reprice. Most trading agents choose one signal and act. CrossSignal verifies whether the disagreement is real, executable and worth expressing through options—then manages the position through exit.
 
-The agent synchronizes six lenses: equity volatility, Treasury yields, credit, realized volatility, rate expectations, and options positioning. Code ranks cross-market disagreements. Claude creates a structured thesis; an adversarial pass identifies counterarguments, missing evidence, invalidation, and a confidence penalty.
+The agent synchronizes six lenses: equity volatility, Treasury yields, credit, realized volatility, rate expectations and options positioning. Deterministic code ranks the disagreements. Claude proposes a structured thesis; a separate adversarial pass identifies counterarguments, missing evidence, invalidation and a confidence penalty.
 
-Approved signals become defined-risk SPY, HYG, and TLT vertical spreads. Before an Alpaca order, controls verify confidence, live data, maximum loss, buying power, diversification, Greeks, stress, liquidity, bid-ask quality, and drawdown. Claude cannot contact the broker or override a failed gate.
+Approved signals map to defined-risk SPY, HYG and TLT vertical spreads. Before an Alpaca order, code verifies live data, confidence, maximum loss, buying power, diversification, Greeks, stress, liquidity, bid-ask quality and drawdown. Claude cannot contact the broker or override a failed gate.
 
-Each spread stores four exit rules: take 50% of maximum profit, stop at 50% of defined maximum loss, exit after five trading days, or close two days before expiry. Before an atomic multi-leg close, the monitor reconciles broker legs and rejects stale quotes. An atomic claim, deterministic client order ID, and persisted state prevent duplicate exits. A kill switch can pause entries without disabling management of open positions.
+Every eligible spread stores four exit rules: take 50% of maximum profit, stop at 50% of defined maximum loss, exit after five trading days, or close two days before expiry. The monitor reconciles broker legs, rejects stale quotes and closes both legs atomically. A deterministic client order ID and persisted EXIT_PENDING state prevent duplicate exits.
 
-Each cycle seals its evidence, prediction, invalidation, risk result, and portfolio in a SHA-256 Decision Contract before the outcome. Forecasts are later scored against inverse and cash counterfactuals.
+Each decision is sealed with its evidence, prediction, invalidation and risk result in a SHA-256 Decision Contract. Forecasts are later compared with inverse and cash counterfactuals.
 
-Alpaca's official MCP server provides market data, option snapshots, Greeks, account state, paper orders, valuation, and reconciliation. Mutations require the paper endpoint and explicit local switches; the public app and GitHub automation are read-only.
+Alpaca's official MCP server supplies market data, option snapshots, Greeks, account state, paper orders and reconciliation. The public app and GitHub Evidence Watch are read-only.
 
-The fresh $100,000 competition account currently has no orders or positions, so CrossSignal makes no P&L claim. Recent cycles honestly abstained when confidence, liquidity, or bid-ask evidence failed fixed thresholds instead of weakening controls to manufacture a trade.
+The fresh $100,000 competition account had zero orders or positions at the submission cutoff, so CrossSignal makes no P&L claim. It abstained when confidence or executable-liquidity evidence failed fixed thresholds instead of weakening controls to manufacture a trade.
 
 ## Categories
 

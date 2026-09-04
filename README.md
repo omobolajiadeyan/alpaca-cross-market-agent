@@ -1,14 +1,21 @@
 # CrossSignal
 
-![CrossSignal hackathon cover](assets/crosssignal-hackathon-cover.png)
+![CrossSignal — markets disagree, we verify the trade](assets/crosssignal-hackathon-cover.png)
 
-> Markets disagree. We trade the gap.
+> Markets disagree. We verify the trade.
 
 **Created by Omobolaji E Adeyan**
 
 **Live judge demo:** <https://crosssignal-ai-agent.streamlit.app>
 
-CrossSignal is an auditable cross-market macro agent built for the **Alpaca AI Trading Agents Hackathon**. It synchronizes six market lenses, asks Claude to identify incomplete repricing, constructs a defined-risk SPY/HYG/TLT options portfolio, preflights every leg through Alpaca's official MCP server, and manages every submitted spread through a persisted exit policy.
+CrossSignal converts disagreement across equities, credit, rates and volatility
+into defined-risk Alpaca options decisions. It proves why each trade entered,
+exited or was refused.
+
+Built for the **Alpaca AI Trading Agents Hackathon**, it synchronizes six market
+lenses, asks Claude to identify incomplete repricing, constructs a defined-risk
+SPY/HYG/TLT options portfolio, preflights every leg through Alpaca's official
+MCP server, and manages every submitted spread through a persisted exit policy.
 
 The differentiator is accountability: every thesis stores the market snapshot that produced it and is later scored against subsequent market data. The dashboard distinguishes live, proxy, and fallback values instead of presenting synthetic certainty.
 

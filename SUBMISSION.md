@@ -1,7 +1,10 @@
-# CrossSignal hackathon submission kit
+![CrossSignal](assets/crosssignal-logo-lockup-light.png)
+
+# CrossSignal hackathon submission record
 
 **Creator:** Omobolaji E Adeyan  
 **Challenge:** Alpaca AI Trading Agents Hackathon — Options Alpha Agents  
+**Submitted:** September 4, 2026
 **Deadline:** September 4, 2026 at 10:00 AM CDT
 
 ## Submission position
@@ -60,25 +63,24 @@ or fabricate P&L for the competition.
 - Judge demo: <https://crosssignal-ai-agent.streamlit.app>
 - Repository: <https://github.com/omobolajiadeyan/alpaca-cross-market-agent>
 - Dedicated Alpaca paper account ID: `PA3PDTUDIXDU`
-- Selected video: `CrossSignal-Submission-Video.mp4` (4:30, 1920×1080, position-lifecycle cut per `submission/FINAL_VIDEO_SCRIPT.md`, AI-narrated via edge-tts — no time to record a human voice-over before the deadline)
+- Selected video: `CrossSignal-Submission-Video.mp4` (3:46.768, 1920×1080, live-demo-first position-lifecycle cut per `submission/FINAL_VIDEO_SCRIPT.md`)
 - Slide deck: `CrossSignal-Hackathon-Pitch-Final.pdf`
 - One-page write-up: `CrossSignal-One-Page-Writeup.pdf`
 - Latest secret-free evidence: `Latest-Run-Evidence.json`
 
-## Stop-ship checklist
+## Submission completion record
 
 - [x] **Streamlit app public access re-verified 2026-09-03.** An earlier
   automated check flagged a login redirect; re-checked via curl with a real
   cookie jar/browser user-agent and 10+ real headless-Chromium loads during
   video rendering, all reaching "PUBLIC JUDGE MODE" directly. Not a blocker —
   still worth a manual private-window glance before submitting.
-- [ ] Enter account ID `PA3PDTUDIXDU` in the lablab submission form.
-- [ ] Upload the selected 4:30 position-lifecycle video, cover, PDF deck, and one-page PDF.
-- [ ] Add the public GitHub URL and demo URL.
-- [ ] Paste the prepared short and long descriptions from
+- [x] Enter account ID `PA3PDTUDIXDU` in the lablab submission form.
+- [x] Upload the selected 3:46 position-lifecycle video, cover, PDF deck, and one-page PDF.
+- [x] Add the public GitHub URL and demo URL.
+- [x] Paste the prepared short and long descriptions from
   `submission/SUBMISSION_FORM_COPY.md`.
-- [ ] Submit before September 4, 2026 at 10:00 AM CDT.
+- [x] Submit before September 4, 2026 at 10:00 AM CDT.
 
-Do not wait for or force a trade. If the form supports later edits, a normal
-market-hours cycle may be run after 8:30 AM CDT, but only a gate-approved order
-belongs in the record.
+No trade was forced for presentation purposes. Only a gate-approved paper order
+belongs in the evidence record.

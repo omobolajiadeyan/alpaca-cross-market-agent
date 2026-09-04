@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import html
+import base64
 import re
 import subprocess
 from pathlib import Path
@@ -13,6 +14,7 @@ SOURCE = ROOT / "submission" / "research" / "report-source.md"
 OUTPUT_DIR = SOURCE.parent
 HTML_OUTPUT = OUTPUT_DIR / "CrossSignal-Competitive-Research-and-Enhancement-Report.html"
 PDF_OUTPUT = OUTPUT_DIR / "CrossSignal-Competitive-Research-and-Enhancement-Report.pdf"
+LOGO = ROOT / "assets" / "crosssignal-logo-lockup-light.png"
 
 
 def inline(text: str) -> str:
@@ -80,6 +82,7 @@ def render_markdown(source: str) -> str:
 
 def main() -> None:
     content = render_markdown(SOURCE.read_text(encoding="utf-8"))
+    logo_data = base64.b64encode(LOGO.read_bytes()).decode("ascii")
     document = f"""<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><title>CrossSignal Competitive Research</title>
 <style>
@@ -87,11 +90,13 @@ def main() -> None:
 * {{ box-sizing: border-box; }}
 body {{ color:#172238; font:10pt/1.43 'Segoe UI',Arial,sans-serif; margin:0; }}
 body::before {{ content:''; position:fixed; top:-0.65in; left:-0.68in; right:-0.68in;
-height:0.16in; background:#d79a32; }}
+height:0.16in; background:#19b5d8; }}
+.brand-header {{ display:flex; justify-content:flex-end; margin:0 0 10pt; }}
+.brand-header img {{ width:1.85in; height:auto; }}
 h1,h2,h3 {{ color:#102747; font-family:'Segoe UI Semibold','Segoe UI',sans-serif;
 page-break-after:avoid; }}
 .report-title {{ font-size:27pt; line-height:1.08; margin:0 0 18pt; padding-top:8pt;
-border-bottom:3px solid #d79a32; padding-bottom:14pt; }}
+border-bottom:3px solid #19b5d8; padding-bottom:14pt; }}
 h2 {{ font-size:16pt; margin:19pt 0 7pt; border-bottom:1px solid #ccd5e2; padding-bottom:3pt; }}
 h3 {{ font-size:11.5pt; margin:13pt 0 4pt; color:#24517b; }}
 p {{ margin:0 0 7pt; orphans:3; widows:3; }}
@@ -105,8 +110,8 @@ tr {{ page-break-inside:avoid; }}
 th {{ color:white; background:#173a62; text-align:left; padding:5px 6px; }}
 td {{ border:1px solid #cbd5e1; vertical-align:top; padding:5px 6px; }}
 tr:nth-child(even) td {{ background:#f3f6f9; }}
-h2:first-of-type + p {{ border-left:4px solid #d79a32; background:#f7f4ec; padding:9pt 11pt; }}
-</style></head><body>{content}</body></html>"""
+h2:first-of-type + p {{ border-left:4px solid #19b5d8; background:#eff8fb; padding:9pt 11pt; }}
+</style></head><body><div class="brand-header"><img alt="CrossSignal" src="data:image/png;base64,{logo_data}"></div>{content}</body></html>"""
     HTML_OUTPUT.write_text(document, encoding="utf-8")
 
     edge_candidates = (

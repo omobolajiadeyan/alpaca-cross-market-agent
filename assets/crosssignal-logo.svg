@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 72" role="img" aria-labelledby="title desc">
+  <title id="title">CrossSignal mark</title>
+  <desc id="desc">Six market signals converge through a verified decision gate and leave as one controlled signal.</desc>
+  <g fill="none" stroke-linecap="round" stroke-width="3">
+    <path d="M5 10 C22 10 23 31 34 35" stroke="#19b5d8" opacity=".55"/>
+    <path d="M5 20 C20 20 25 32 34 35" stroke="#19b5d8" opacity=".72"/>
+    <path d="M5 30 C20 30 26 34 34 35" stroke="#72d4e8"/>
+    <path d="M5 42 C20 42 26 38 34 37" stroke="#72d4e8"/>
+    <path d="M5 52 C20 52 25 40 34 37" stroke="#19b5d8" opacity=".72"/>
+    <path d="M5 62 C22 62 23 41 34 37" stroke="#19b5d8" opacity=".55"/>
+    <path d="M42 36 H67" stroke="#19b5d8" stroke-width="4"/>
+  </g>
+  <path d="M38 29 L45 36 L38 43 L31 36 Z" fill="#071d49" stroke="#72d4e8" stroke-width="2.5"/>
+  <circle cx="38" cy="36" r="2.6" fill="#f6b84a"/>
+  <circle cx="67" cy="36" r="2.7" fill="#72d4e8"/>
+</svg>

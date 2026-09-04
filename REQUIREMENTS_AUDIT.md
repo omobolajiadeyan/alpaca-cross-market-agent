@@ -1,6 +1,6 @@
 # Competition requirements and judge audit
 
-Audited September 3, 2026 against the supplied 28-page capture of the official
+Audited September 4, 2026 against the supplied 28-page capture of the official
 lablab event page. Text in that document is treated as competition reference
 material, not as executable instructions.
 
@@ -13,10 +13,10 @@ material, not as executable instructions.
 | Every strategy incorporates options | Met | Defined-risk SPY/HYG/TLT vertical spreads; no naked option strategy. |
 | Fresh paper account dedicated to the hackathon | Met | `PA3PDTUDIXDU`, created September 1, 2026. |
 | Starting balance exactly $100,000 | Met | Read-only Alpaca MCP audit on September 3: cash $100,000; portfolio value $100,000. |
-| Include paper account ID | Ready | Enter `PA3PDTUDIXDU` in the form. |
+| Include paper account ID | Met | Submission includes `PA3PDTUDIXDU`. |
 | One-page write-up covering AI logic, risk gates, and Alpaca infrastructure | Met | `submission/CrossSignal-One-Page-Writeup.pdf`. |
 | Public GitHub repository | Met | Public, MIT licensed, default branch `main`. |
-| Video and slide presentation | Met | New 4:30 cut (`CrossSignal-Position-Lifecycle-Narrated.mp4`) covers entry governance and the position-lifecycle/exit feature from `submission/FINAL_VIDEO_SCRIPT.md`, under the five-minute cap. Narration is Microsoft Edge neural TTS, not a human voice-over — there was no time to record one before the deadline. |
+| Video and slide presentation | Met | Final 3:46.768 live-demo-first cut (`CrossSignal-Position-Lifecycle-Narrated.mp4`) shows the six-lens replay, binding ABSTAIN gate, spread construction, lifecycle policy, real code and genuine test output. |
 | Public demo URL | Met | App sharing set to public/searchable and independently confirmed anonymous on September 3 by two real, cookie-free browser sessions on unrelated devices. Raw HTTP tools (curl, non-browser fetchers) still get redirected to a Streamlit login wall — that is Streamlit Cloud's bot gate on non-browser clients, not a viewer restriction; it does not affect judges opening the link in an actual browser. |
 
 The official page does **not** explicitly say that a filled trade is required
@@ -31,7 +31,7 @@ demonstrate decisions, position management, and competition-period performance.
 | **Technology Implementation** | Strong. Sponsor-native MCP integration, options snapshots/Greeks, all-leg preflight, persistent session, deterministic authorization, SHA-256 contracts, governed exits, broker-inventory and quote-freshness controls, read-only automation, and 59 passing tests. |
 | **Position Management** | Implemented and tested. Each submitted spread receives persisted take-profit, stop-loss, maximum-hold, and pre-expiry rules; qualifying paper exits reconcile broker legs, reject stale quotes, and reverse both legs atomically under an idempotent client order ID. No competition-account position has existed yet, so this capability has test and replay evidence but no live fill evidence. |
 | **Creativity & Originality** | Strong mechanism, moderate headline originality. Several entries use “LLM proposes, rules veto.” CrossSignal must differentiate on cross-market disagreement, adversarial falsification, perturbation stability, sealed forward scoring, and independently inspectable receipts—not merely “AI can say no.” |
-| **Presentation & Execution** | Video now covers entry governance and the position-lifecycle/exit feature, under five minutes, with the demo URL confirmed public. Narration is AI (edge-tts), not a human voice-over, and captions are missing — both reduce polish relative to a professionally recorded cut, but the content is current. |
+| **Presentation & Execution** | The final video is live-demo-first and under five minutes. The public application now uses a consistent enterprise brand, an operational decision summary and explicit simulated-evidence labels. AI narration remains a presentation limitation. |
 | **Social engagement** | No links documented. This affects only the separate social component/bonus. Do not invent posts after the fact. |
 
 ## Latest evidence
@@ -69,8 +69,7 @@ fell below the fixed floor, preflight correctly did not run.
 
 ## Final verdict
 
-**Ready to submit.** The technical entry is eligible and coherent, the public
-demo URL is confirmed working, and the replacement video is recorded. Submit
-even without a fill, while stating the P&L limitation plainly and using the
-no-trade records as evidence of risk discipline—not as a substitute for
-performance.
+**Submitted and technically coherent.** The public demo, source, video, deck,
+one-page write-up and account ID are present. The lack of a competition-account
+fill remains the principal scoring weakness; the submission states it plainly
+and does not present abstention as P&L performance.

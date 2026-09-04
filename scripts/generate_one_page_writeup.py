@@ -13,6 +13,7 @@ from pptx.util import Inches, Pt
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "submission" / "CrossSignal-One-Page-Writeup.pptx"
+LOGO_MARK = ROOT / "assets" / "crosssignal-logo-mark.png"
 NAVY = RGBColor(7, 29, 73)
 CYAN = RGBColor(25, 181, 216)
 MUTED = RGBColor(69, 84, 105)
@@ -59,8 +60,11 @@ def build():
     banner.fill.solid()
     banner.fill.fore_color.rgb = NAVY
     banner.line.color.rgb = NAVY
-    box(slide, "CROSSSIGNAL", 0.45, 0.28, 3.2, 0.38, 23, WHITE, True)
-    box(slide, "An auditable cross-market options agent", 0.47, 0.72, 4.4, 0.25, 11, RGBColor(174, 226, 238), False)
+    if LOGO_MARK.exists():
+        slide.shapes.add_picture(str(LOGO_MARK), Inches(0.36), Inches(0.18),
+                                 Inches(0.72), Inches(0.72))
+    box(slide, "CROSSSIGNAL", 1.08, 0.28, 3.2, 0.38, 23, WHITE, True)
+    box(slide, "AUDITABLE OPTIONS INTELLIGENCE", 1.1, 0.72, 4.4, 0.25, 9.5, RGBColor(174, 226, 238), False)
     box(slide, "Omobolaji E Adeyan", 6.0, 0.32, 2.0, 0.25, 10.5, WHITE, True)
     box(slide, "Alpaca paper: PA3PDTUDIXDU", 5.35, 0.68, 2.65, 0.22, 9, RGBColor(174, 226, 238), False)
 

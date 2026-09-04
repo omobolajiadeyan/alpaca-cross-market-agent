@@ -1,6 +1,6 @@
 {
-  "schema": "crosssignal-submission-evidence-1.0",
-  "prepared_at": "2026-09-03T23:35:00Z",
+  "schema": "crosssignal-submission-evidence-1.1",
+  "prepared_at": "2026-09-04T00:00:00-05:00",
   "creator": "Omobolaji E Adeyan",
   "competition_account": {
     "id": "PA3PDTUDIXDU",
@@ -56,15 +56,23 @@
   },
   "video": {
     "filename": "CrossSignal-Submission-Video.mp4",
-    "duration_seconds": 295.923,
+    "source_filename": "CrossSignal-Position-Lifecycle-Narrated.mp4",
+    "duration_seconds": 226.767667,
     "resolution": "1920x1080",
-    "sha256": "1FE57FF6973C8ACED2984B5619804CA6C5071BF430823448DB9BB796040E2679",
-    "evidence_cutoff": "2026-09-02"
+    "sha256": "FD9C1B8D6179913FA4CF31B18AF985D0C1A1786D9AD4FD8667375B1C9A551454",
+    "evidence_cutoff": "2026-09-03",
+    "status": "final live-demo-first cut"
+  },
+  "presentation": {
+    "brand_system": "CrossSignal convergence mark and institutional navy/cyan palette",
+    "cover": "CrossSignal-Cover.png",
+    "public_demo_mode": "read-only",
+    "lifecycle_replay": "illustrative policy demonstration; not broker fill evidence"
   },
   "limitations": [
     "No competition-account orders or positions; no P&L claim.",
-    "Video predates the tenth local cycle and accurately says nine cycles.",
     "Credit and positioning inputs are explicitly labeled proxies.",
+    "The public lifecycle scenario is illustrative, not broker performance.",
     "Outcome evidence remains pending until sealed horizons mature."
   ]
 }
