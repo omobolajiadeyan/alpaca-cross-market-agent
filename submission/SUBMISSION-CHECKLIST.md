@@ -2,9 +2,9 @@
 
 # CrossSignal submission record
 
-**Creator:** Omobolaji E Adeyan  
-**Track:** Options Alpha Agents  
-**Status:** Submitted  
+**Creator:** Omobolaji E Adeyan
+**Track:** Options Alpha Agents
+**Status:** Submitted
 **Alpaca paper account:** `PA3PDTUDIXDU`
 
 ## Submitted assets

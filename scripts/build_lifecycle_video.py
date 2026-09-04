@@ -584,20 +584,22 @@ def capture_live_segment(browser, action_fn, target_duration: float, out_mp4: Pa
             record_video_dir=vdir, record_video_size={"width": 1920, "height": 1080},
         )
         page = context.new_page()
-        page.goto(PUBLIC_SITE_URL, wait_until="domcontentloaded", timeout=60_000)
-        page.get_by_text("PUBLIC JUDGE MODE", exact=False).wait_for(timeout=30_000)
-        # Streamlit renders skeleton placeholders first and fills real data in
-        # a moment later; without this, the recording captures gray shimmer
-        # boxes instead of the actual numbers.
-        page.get_by_text("Decision intelligence scorecard", exact=False) \
-            .wait_for(timeout=15_000)
-        page.wait_for_timeout(4000)
-        page.evaluate(CURSOR_INIT_JS)
-        page.wait_for_timeout(400)
+        try:
+            page.goto(PUBLIC_SITE_URL, wait_until="domcontentloaded", timeout=60_000)
+            page.get_by_text("PUBLIC JUDGE MODE", exact=False).wait_for(timeout=30_000)
+            # Wait on content in the current default overview tab. Individual
+            # action functions select their own tabs after the app is ready.
+            page.get_by_text("A complete decision, not another signal", exact=False) \
+                .wait_for(timeout=15_000)
+            page.wait_for_timeout(4000)
+            page.evaluate(CURSOR_INIT_JS)
+            page.wait_for_timeout(400)
 
-        action_fn(page, target_duration)
-
-        context.close()
+            action_fn(page, target_duration)
+        finally:
+            # Closing the context flushes Playwright's WebM writer. Without
+            # this guard, a failed selector can leave the file locked on Windows.
+            context.close()
         recorded = next(Path(vdir).glob("*.webm"))
         subprocess.run([
             ffmpeg, "-y", "-i", str(recorded),
