@@ -8,6 +8,11 @@
 
 **Live judge demo:** <https://crosssignal-ai-agent.streamlit.app>
 
+**Final submission evidence:** [video record](submission/EVIDENCE_RECORDING.md) ·
+[pitch deck](submission/CrossSignal-Hackathon-Pitch-Final.pdf) ·
+[one-page write-up](submission/CrossSignal-One-Page-Writeup.pdf) ·
+[submission checklist](submission/SUBMISSION-CHECKLIST.md)
+
 CrossSignal converts disagreement across equities, credit, rates and volatility
 into defined-risk Alpaca options decisions. It proves why each trade entered,
 exited or was refused.
@@ -18,6 +23,10 @@ SPY/HYG/TLT options portfolio, preflights every leg through Alpaca's official
 MCP server, and manages every submitted spread through a persisted exit policy.
 
 The differentiator is accountability: every thesis stores the market snapshot that produced it and is later scored against subsequent market data. The dashboard distinguishes live, proxy, and fallback values instead of presenting synthetic certainty.
+
+The final narrated MP4 was uploaded through the competition submission portal.
+GitHub tracks its script, review record, duration, and SHA-256 receipt rather
+than duplicating the compiled video binary in source control.
 
 ## SIGNAL accountability protocol
 

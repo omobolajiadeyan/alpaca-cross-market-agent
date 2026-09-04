@@ -2,9 +2,11 @@
 
 # CrossSignal final submission assets
 
-The authoritative upload bundle is
-`CrossSignal-Final-Submission-Package.zip`. Its unpacked source directory is
-`CrossSignal-Final-Submission-Package/`.
+The local upload bundle is `CrossSignal-Final-Submission-Package.zip`, generated
+from the versioned sources by `scripts/build_final_package.py`. The assembled
+ZIP, unpacked duplicate directory, and compiled MP4 remain outside Git because
+they are delivery artifacts; the submission portal received the final video.
+`EVIDENCE_RECORDING.md` records its exact duration and SHA-256 checksum.
 
 Primary files:
 
