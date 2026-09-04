@@ -42,12 +42,13 @@ st.markdown("""
 :root { --ink:#071d49; --body:#263f58; --muted:#465d73; --canvas:#f3f6fa; --surface:#fff; --ice:#eaf1f6; --cyan:#079fc4; --light-cyan:#72d4e8; --blue:#003b70; --navy:#031126; --line:#c9d7e2; --amber:#f6b84a; }
 .stApp { background:var(--canvas); color:var(--ink); font-family:'DM Sans',sans-serif; }
 [data-testid="stHeader"] { background:transparent; }
+[data-testid="stToolbar"],.stAppDeployButton,[data-testid="stMainMenu"]{display:none!important}
 .block-container { max-width:1380px; padding-top:.75rem; padding-bottom:4rem; overflow-x:hidden; }
 h1,h2,h3 { font-family:'Manrope',sans-serif !important; letter-spacing:-.04em !important; }
 .stMarkdown p,.stMarkdown li { color:var(--body); line-height:1.65; }
 .nav { display:flex; justify-content:space-between; align-items:center; padding:.5rem 0 .8rem; border-bottom:1px solid var(--line); }
 .brand-lockup{display:flex;align-items:center;gap:.65rem}.brand-lockup svg{width:42px;height:42px}.brand-name{font:800 1.05rem Manrope;letter-spacing:-.035em}.brand-sub{display:block;color:var(--muted);font-size:.6rem;letter-spacing:.1em;margin-top:.08rem}
-.nav-note { color:var(--muted); font-size:.78rem; font-weight:600; }
+.nav-actions{display:flex;align-items:center;gap:.75rem}.nav-note { color:var(--muted); font-size:.78rem; font-weight:600; }.nav-link{border:1px solid #b8cad8;border-radius:8px;padding:.45rem .65rem;color:var(--blue)!important;text-decoration:none;font-size:.7rem;font-weight:800;letter-spacing:.04em}.nav-link:hover{background:var(--navy);border-color:var(--navy);color:#fff!important}
 .hero { margin:1rem 0 0; padding:2rem 2.25rem; background:radial-gradient(circle at 88% 18%,#0b4262 0,transparent 30%),linear-gradient(125deg,#031126,#071d49); color:#fff; position:relative; overflow:hidden; display:grid;grid-template-columns:minmax(0,1.65fr) minmax(270px,.72fr);gap:2rem;align-items:center;border-radius:16px 16px 0 0; }
 .hero:after { content:''; position:absolute; width:360px; height:360px; border:1px solid rgba(114,212,232,.25); border-radius:50%; right:-185px; top:-150px; box-shadow:0 0 0 42px rgba(25,181,216,.035),0 0 0 90px rgba(25,181,216,.025); }
 .eyebrow { display:inline-block; border-left:3px solid var(--cyan); padding:.1rem 0 .1rem .75rem; font-size:.72rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:#b9dced; }
@@ -189,7 +190,7 @@ dashboard = judge_dashboard() if PUBLIC_DEMO_MODE else logger.get_dashboard_data
 broker_mutations_enabled = ALLOW_PAPER_EXECUTION and not PUBLIC_DEMO_MODE
 
 st.markdown(
-    f'<div class="nav"><div class="brand-lockup">{brand_mark_svg()}<div><div class="brand-name">CROSSSIGNAL</div><span class="brand-sub">AUDITABLE OPTIONS INTELLIGENCE</span></div></div><div class="nav-note">BUILT BY OMOBOLAJI E ADEYAN · ALPACA PAPER TRADING</div></div>',
+    f'<div class="nav"><div class="brand-lockup">{brand_mark_svg()}<div><div class="brand-name">CROSSSIGNAL</div><span class="brand-sub">AUDITABLE OPTIONS INTELLIGENCE</span></div></div><div class="nav-actions"><div class="nav-note">BUILT BY OMOBOLAJI E ADEYAN · ALPACA PAPER TRADING</div><a class="nav-link" href="https://github.com/omobolajiadeyan/alpaca-cross-market-agent" target="_blank" rel="noopener">VIEW SOURCE</a></div></div>',
     unsafe_allow_html=True,
 )
 
