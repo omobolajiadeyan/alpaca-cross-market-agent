@@ -520,7 +520,7 @@ with readiness:
         ('Working browser prototype', 'Met', 'Judge-facing application with safe preview mode'),
         ('Public GitHub repository', 'Met', 'Published at github.com/omobolajiadeyan/alpaca-cross-market-agent'),
         ('Dedicated new Alpaca paper account', 'Met', 'PA3PDTUDIXDU, created 2026-09-01, $100,000 starting balance'),
-        ('Filled trade on the dedicated account', 'Pending', 'Nine live cycles across 2026-09-01/02 correctly abstained (closest miss: 54% confidence vs a 55% floor, 5 of 6 gates passed); no fill yet -- required for P&L judging'),
+        ('Filled trade on the dedicated account', 'Pending', 'Ten live cycles across 2026-09-01/02/03 correctly abstained (closest miss: 54% confidence vs a 55% floor, 5 of 6 gates passed); no fill yet -- required for P&L judging'),
         ('Forward-scored thesis evidence', 'Info', 'Earlier scored theses predate the dedicated account and are historical evidence only'),
         ('Hosted public application URL', 'Met', 'Public judge app is deployed at crosssignal-ai-agent.streamlit.app'),
         ('Scheduled cloud Evidence Watch', 'Ready', 'Read-only workflow is implemented; connected runs require encrypted repository secrets'),

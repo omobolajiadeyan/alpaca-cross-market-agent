@@ -1,61 +1,76 @@
-# Hackathon submission kit
+# CrossSignal hackathon submission kit
 
-**Creator and presenter:** Omobolaji E Adeyan
+**Creator:** Omobolaji E Adeyan  
+**Challenge:** Alpaca AI Trading Agents Hackathon — Options Alpha Agents  
+**Deadline:** September 4, 2026 at 10:00 AM CDT
 
-## Short description
+## Submission position
 
-CrossSignal puts every AI trade under oath: it quantifies cross-market disagreements, challenges and stress-tests the thesis, seals a falsifiable prediction, executes through Alpaca MCP, and proves whether the intelligence—not luck—created value.
+CrossSignal is eligible on the documented technical requirements: it is an
+autonomous options agent, uses Alpaca's official MCP server and Trading API,
+runs only against a fresh $100,000 paper account, and includes a one-page
+description of its AI logic, risk gates, and Alpaca infrastructure.
 
-## The 30-second pitch
+The material competitive weakness is **P&L Performance**. The dedicated account
+currently has $100,000 cash, $100,000 portfolio value, no open positions, and no
+orders. This is not an eligibility failure, but it gives judges no realized P&L
+to score. Do not disguise that limitation.
 
-Most trading agents stare at one chart and forget yesterday's prediction. CrossSignal treats markets as a connected system. It reads six live lenses, uses Claude to identify which market has not finished repricing, maps that view into capped-risk Alpaca options spreads, and exposes every source, risk gate, order response, and later forecast score in one dashboard.
+## Judge-ready pitch
 
-## Five-minute video outline
+Most agents optimize for producing a trade. CrossSignal optimizes for producing
+a defensible decision. It synchronizes six market lenses, quantifies the
+strongest cross-market disagreement, asks Claude to propose and then attack a
+thesis, tests stability under bounded perturbations, constructs defined-risk
+options spreads, and gives deterministic code final authority. Every decision
+is sealed before the outcome and later scored.
 
-- **0:00–0:25 — Problem:** markets transmit information at different speeds; single-market agents miss the disagreement.
-- **0:25–0:55 — Product:** show the landing screen and the observe → reason → govern loop.
-- **0:55–2:15 — Decision replay:** compare the authorized and abstention cases through the same four-part scorecard.
-- **2:15–3:00 — Live evidence:** show a sealed contract from the dedicated hackathon account (e.g. `CS-20260901-4B6D4392`), its secret-free receipt, and zero broker mutations.
-- **3:00–3:30 — Alpaca:** show MCP-backed market reads and the governed paper-order lifecycle recorded in the ledger.
-- **3:30–4:05 — Accountability:** show the stored market snapshot, sealed horizon, and pending-versus-matured outcome evidence.
-- **4:05–4:35 — Business:** research and risk copilot for active options traders and small investment teams; SaaS plus broker/infrastructure partnerships.
-- **4:35–5:00 — Close:** show 43 passing tests, the public demo, and the next step toward longer walk-forward validation.
+## Why the latest cycles did not trade
 
-## Slide deck
+Two September 3 records show different layers of the same policy working:
 
-1. Markets disagree. We trade the gap.
-2. Problem: fragmented signals and unaccountable AI decisions.
-3. Solution: six lenses, one thesis, one governed workflow.
-4. Live product screenshots.
-5. Architecture and Alpaca integration.
-6. Safety and auditability.
-   Show the NIST-aligned Security tab, public read-only boundary, threat-to-control rationale, and residual risks.
-7. Target user and business model.
-8. Evidence, limitations, and roadmap.
+- **Local connected cycle — `CS-20260903-FE01A097`:** signal quality 82.4 and
+  stability 90%, with all feeds sourced live. Claude's adversarial review found
+  that the “cheap volatility” claim relied on a short, non-standard local IV
+  history while IV was already 1.26× realized volatility. It cut confidence
+  from 68% to 53%. The hard minimum is 55%, so the cycle stopped before option
+  preflight and sent no order.
+- **Unattended Evidence Watch — `CS-20260903-5C194F65`:** confidence cleared at
+  56%, all six base gates passed, and all six proposed option legs had Greeks.
+  Preflight then found zero displayed daily volume on the weakest leg and a
+  maximum relative bid-ask spread of 93.33%, against limits of 10 contracts and
+  25%. Only 13 of 15 checks passed. This was after the regular options session,
+  so refusing non-executable quotes was the correct decision.
 
-## Before submitting
+This is stronger than saying “the score was low.” The agent found evidence that
+the hypothesis or the executable market was not reliable enough. It did not
+round confidence upward, loosen risk limits, queue an after-hours options order,
+or fabricate P&L for the competition.
 
-- [x] Register/enroll on lablab.ai and verify the published event requirements.
-- [x] Publish the secret-scanned GitHub repository during the official event window: <https://github.com/omobolajiadeyan/alpaca-cross-market-agent>.
-- [x] Create a brand-new Alpaca paper account dedicated to this hackathon: `PA3PDTUDIXDU`, $100,000 starting balance, created 2026-09-01 (a reused account is explicitly ineligible for judging).
-- [ ] Capture at least one successful fill **on the dedicated account** (three spreads filled 2026-08-25 were on a prior account and do not count toward this).
-- [ ] Verify order status and position in Alpaca; capture the filled workflow in the demo.
-- [x] Show preliminary forward-scored outcomes and clearly label the five-day evaluation horizon and sample-size limitation.
-- [x] Deploy the credential-free Streamlit judge application: <https://crosssignal-ai-agent.streamlit.app>.
-- [x] Add the final 16:9 cover image (`assets/crosssignal-hackathon-cover.png`).
-- [x] Create the final eight-slide presentation in editable PowerPoint and PDF formats (refreshed 2026-09-02: 46 tests, contract `CS-20260902-BF9B142D`, dedicated account `PA3PDTUDIXDU`).
-- [x] Write the one-page write-up covering AI logic, risk gates, and Alpaca infrastructure (`submission/ONE_PAGE_WRITEUP.md`).
-- [ ] Add application URL, repository URL, video, PDF deck, one-page write-up, and the Alpaca account ID to lablab.ai.
-- [x] Test the public URL in a private browser window.
-- [ ] Submit before the deadline and reserve time for judge Q&A.
+## Final assets
 
-## Evidence recording
+- Judge demo: <https://crosssignal-ai-agent.streamlit.app>
+- Repository: <https://github.com/omobolajiadeyan/alpaca-cross-market-agent>
+- Dedicated Alpaca paper account ID: `PA3PDTUDIXDU`
+- Selected video: `CrossSignal-Submission-Video.mp4` (4:49, 1920×1080, all ten cycles including today's)
+- Slide deck: `CrossSignal-Hackathon-Pitch-Final.pdf`
+- One-page write-up: `CrossSignal-One-Page-Writeup.pdf`
+- Latest secret-free evidence: `Latest-Run-Evidence.json`
 
-Use [`submission/EVIDENCE_RECORDING.md`](submission/EVIDENCE_RECORDING.md) for
-the credential-free capture command, exact shot list, timed narration, and final
-privacy checklist. The automation records only the sanitized public replay with
-broker mutations forcibly disabled.
+## Stop-ship checklist
 
-Use [`submission/FINAL_VIDEO_SCRIPT.md`](submission/FINAL_VIDEO_SCRIPT.md) as
-the final presenter script. It includes the exact application clicks, verified
-cloud evidence, code/repository proof, security language, and a 4:45 timeline.
+- [x] **Streamlit app public access re-verified 2026-09-03.** An earlier
+  automated check flagged a login redirect; re-checked via curl with a real
+  cookie jar/browser user-agent and 10+ real headless-Chromium loads during
+  video rendering, all reaching "PUBLIC JUDGE MODE" directly. Not a blocker —
+  still worth a manual private-window glance before submitting.
+- [ ] Enter account ID `PA3PDTUDIXDU` in the lablab submission form.
+- [ ] Upload the selected 4:49 video, cover, PDF deck, and one-page PDF.
+- [ ] Add the public GitHub URL and demo URL.
+- [ ] Paste the prepared short and long descriptions from
+  `submission/SUBMISSION_FORM_COPY.md`.
+- [ ] Submit before September 4, 2026 at 10:00 AM CDT.
+
+Do not wait for or force a trade. If the form supports later edits, a normal
+market-hours cycle may be run after 8:30 AM CDT, but only a gate-approved order
+belongs in the record.

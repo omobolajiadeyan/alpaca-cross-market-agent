@@ -1,81 +1,69 @@
 # CrossSignal — One-Page Technical Write-Up
 
-**Alpaca account:** PA3PDTUDIXDU (paper, $100,000 starting balance, created 2026-09-01)
-**Repository:** github.com/omobolajiadeyan/alpaca-cross-market-agent
+**Creator:** Omobolaji E Adeyan  
+**Alpaca paper account:** `PA3PDTUDIXDU` — fresh account, $100,000 starting balance  
+**Repository:** <https://github.com/omobolajiadeyan/alpaca-cross-market-agent>  
+**Demo:** <https://crosssignal-ai-agent.streamlit.app>
 
-## AI logic
+## Strategy and AI logic
 
-CrossSignal runs the **SIGNAL protocol**, a six-step pipeline that separates
-pattern-recognition (Claude) from decision authority (deterministic code):
+CrossSignal is an autonomous, cross-market options agent built to answer a
+question most trading systems skip: **does a promising signal deserve execution?**
+It synchronizes six lenses—equity implied volatility, Treasury curve, credit,
+realized volatility, rate expectations, and options positioning. A deterministic
+engine ranks three cross-market disagreements and selects the strongest case.
+Claude then produces a structured thesis, proposed repricing direction, rationale,
+and confidence. A separate adversarial Claude review must identify the strongest
+counterargument, missing evidence, alternative explanation, invalidation condition,
+and a confidence adjustment. Claude proposes and critiques; it never receives
+broker authority.
 
-1. **Observe** — Alpaca's Trading API and MCP server supply SPY options
-   snapshots, HYG/LQD/IEF bars, and Treasury par yields. Every value is
-   labeled live, computed, proxied, or fallback; none are silently faked.
-2. **Quantify disagreement** — a deterministic engine scores three candidate
-   cross-market anomalies (equity fear vs. credit, implied vs. realized vol,
-   rate expectations vs. credit) and picks the strongest as the case to
-   reason about. Claude never picks the case; the math does.
-3. **Synthesize** — Claude (`claude-sonnet-5`) proposes a structured thesis,
-   direction, and confidence from the six-lens snapshot.
-4. **Falsify** — a second Claude call acts as an adversarial reviewer,
-   returning the strongest counterargument, missing evidence, and a
-   confidence penalty. This is a genuine critique step, not decoration: in
-   testing, it correctly flagged a duration-mismatch artifact in the credit
-   proxy and a mislabeled rate-direction field, both real methodological
-   weaknesses, and adjusted confidence accordingly.
-5. **Stress-test stability** — ten bounded perturbations (±1–2% on implied
-   vol, ±10% on put/call ratio, ±10bps on the credit proxy) nudge the input
-   data and re-run the disagreement engine. A conclusion that doesn't
-   survive realistic noise is marked unstable.
-6. **Seal** — the market snapshot, thesis, falsification, stability result,
-   and risk assessment are hashed with SHA-256 into a Decision Contract
-   *before* any broker call, so the record can't be edited after the
-   outcome is known.
+The SIGNAL protocol then applies ten bounded input perturbations to test whether
+the selected disagreement survives plausible measurement noise. Before any order,
+the complete market snapshot, thesis, challenge, stability result, portfolio,
+prediction horizon, and invalidation rule are sealed into a SHA-256 Decision
+Contract. Later evaluation compares the precommitted direction with inverse and
+cash counterfactuals instead of rewriting the story after the result.
 
-## Risk gates
+## Risk gates and options construction
 
-No trade reaches the broker without passing all of the following,
-independent of Claude's confidence:
+Signals map only to defined-risk two-leg vertical spreads in SPY, HYG, and TLT.
+No naked options are permitted. Deterministic base gates require complete
+structure, total proposed maximum loss no greater than $1,500, post-challenge
+confidence of at least 55%, sufficient buying power, cross-market diversification,
+and zero fallback feeds when live data is required. All proposed legs are then
+preflighted before the first order. The execution gate checks portfolio delta,
+vega, theta, margin utilization, minimum option volume, maximum relative bid-ask
+spread, daily and maximum drawdown, and Greeks coverage. One failed required gate
+produces an explicit `ABSTAIN`; thresholds cannot be relaxed by the language model.
 
-- **Structure** — thesis, trade legs, confidence, and loss fields present
-- **Maximum defined loss** — proposed loss ≤ `$1,500` portfolio cap
-- **Signal confidence** — post-falsification confidence ≥ 55%
-- **Buying power** — sufficient margin for the proposed spreads
-- **Cross-market diversification** — legs span distinct instruments
-- **Live-data integrity** — zero fallback feeds when `REQUIRE_LIVE_DATA=true`
-- **Execution risk gate** (pre-submission) — net delta/vega/theta limits,
-  margin utilization, option liquidity, bid-ask quality, and daily/max
-  drawdown, computed from real Alpaca option Greeks snapshots
-- **Portfolio preflight** — every leg is priced against live quotes before
-  the first order is allowed
+## Alpaca infrastructure and safety boundary
 
-Any single failure blocks submission and the cycle logs an explicit
-`ABSTAIN`, not a silent skip.
+Alpaca's official MCP server is held in one persistent stdio session for market
+data, account state, options snapshots and Greeks, orders, positions, and
+reconciliation. Mutations are rejected unless the endpoint is exactly Alpaca's
+paper URL and local execution authorization is enabled. The public Streamlit demo
+is credential-free and read-only. GitHub Evidence Watch runs unattended with
+broker mutations hard-disabled and exports only secret-free evidence artifacts.
 
-## Alpaca infrastructure
+## Submission evidence and honest limitation
 
-- **MCP server**: all market data, account state, and order execution route
-  through the official `alpaca-mcp-server`, held as one persistent stdio
-  session rather than a new subprocess per call.
-- **Paper endpoint enforcement**: broker mutations are rejected unless the
-  base URL is exactly `https://paper-api.alpaca.markets` — a live endpoint
-  cannot execute even by misconfiguration.
-- **Instruments**: SPY, HYG, TLT — all three traded exclusively as
-  defined-risk two-leg vertical spreads (debit or credit), never naked
-  single-leg options.
-- **Explicit authorization**: paper execution requires both
-  `ALLOW_PAPER_EXECUTION=true` locally and passing every gate above; the
-  public Streamlit demo runs in a separate credential-free mode that cannot
-  reach the broker at all.
+On September 3, local contract `CS-20260903-FE01A097` found an 82.4/100
+equity-fear-versus-credit disagreement with 90% perturbation stability. The
+adversarial review challenged the “cheap vol” framing: the IV percentile came
+from a short local history, the put/call value was a narrow ATM proxy, and IV was
+already 1.26× realized volatility. Confidence fell from 68% to 53%, below the
+fixed 55% floor, so no preflight or order occurred.
 
-## Status at submission
+The latest unattended contract, `CS-20260903-5C194F65`, cleared confidence at
+56% and all six base gates, but option preflight passed only 13 of 15 checks:
+minimum displayed volume was 0 versus 10 required, and the widest relative
+bid-ask spread was 93.33% versus a 25% maximum. Greeks coverage was 6/6 and
+defined maximum loss was $464, but execution quality was unacceptable—especially
+after the regular options session—so it abstained.
 
-As of Sep 2, nine live cycles against the dedicated account have correctly
-identified real cross-market disagreement (score ~82/100, stability
-100%/10) but abstained each time — either on signal confidence just under
-threshold after genuine adversarial review, thin option liquidity, or a
-live-data gap in options-volume positioning. The closest cycle cleared
-five of six deterministic gates and missed the 55% confidence floor by a
-single point (54%). We treat this as the system working as designed:
-refusing marginal evidence is the point, not a shortfall. Live cycles
-continue through the submission window.
+The dedicated account currently has $100,000 cash, no positions, and no orders.
+Therefore CrossSignal has no competition-account P&L to claim; that is a judging
+weakness, not an eligibility failure. The evidence shows that the agent did not
+force a paper trade, queue an after-hours options order, or weaken controls to
+manufacture performance.

@@ -1,169 +1,98 @@
-# CrossSignal final video script
+# CrossSignal final video — reviewed submission cut
 
-**Target length:** 4 minutes 45 seconds  
-**Presenter:** Omobolaji E Adeyan  
-**Application:** <https://crosssignal-ai-agent.streamlit.app>  
-**Repository:** <https://github.com/omobolajiadeyan/alpaca-cross-market-agent>
+**Selected asset:** `CrossSignal-Submission-Video.mp4`  
+**Source file:** `recording-output/CrossSignal-Submission-Narrated.mp4`  
+**Runtime:** 4:49  
+**Format:** 1920×1080, H.264 video, AAC audio, en-US-AndrewNeural narration  
+**SHA-256:** `59AA76D2D18354CAC8E7298DEE49C0EDC7DAAA856740705BDDC5A250A16CD342`
 
-Record at 1920×1080. Use your real voice. Keep browser zoom between 100% and
-110%, close unrelated tabs, disable notifications, and never show `.env`, GitHub
-Secrets, account identifiers, or raw order identifiers.
+This supersedes the earlier September 2 cut. The video now says **ten live
+cycles** and its evidence table includes the September 3 tenth cycle
+(contract `CS-20260903-FE01A097`) alongside the first nine.
 
-## Before recording
+## Narration and scene order
 
-1. Open the public application in a clean browser window.
-2. Open the repository in a second window at `README.md`.
-3. Open the successful Evidence Watch run:
-   <https://github.com/omobolajiadeyan/alpaca-cross-market-agent/actions/runs/33453756881>.
-4. Keep the final deck available for the opening and closing frames.
-5. Confirm the public application visibly says **PUBLIC JUDGE MODE**.
-6. Do not enable paper execution or show local credentials.
+### Opening
 
-## 0:00–0:25 — Personal opening and problem
+> What if the smartest thing an AI trading agent could do was say no? I'm
+> Omobolaji Adeyan, and this is CrossSignal.
 
-**Show:** Slide 1 or the application hero. If possible, place a small webcam
-frame in one corner for the first 15 seconds.
+### Problem
 
-**Say:**
+> Most trading agents are designed to find opportunities and execute quickly.
+> But a strong signal alone does not make a trade safe. The market may be
+> unstable, spreads may be too wide, liquidity may be insufficient, or different
+> indicators may conflict. A single model can overlook that and still place the
+> trade. That's a reliability problem: how does an autonomous agent prove a trade
+> was justified before it acts?
 
-> Hello, I’m Omobolaji E Adeyan, and this is CrossSignal. Markets rarely reprice
-> at the same speed. Equity options may signal fear while credit remains calm,
-> or rate expectations may move before another market responds. Most trading
-> agents produce a signal. CrossSignal proves whether that signal deserves
-> authorization.
+### Solution and architecture
 
-## 0:25–0:55 — Explain the product
+> CrossSignal is a decision-control system for Alpaca trading. Claude proposes a
+> structured thesis from six synchronized market lenses. Independent,
+> deterministic checks verify opportunity strength, stability under realistic
+> noise, and execution quality before anything moves. Each produces its own score
+> and evidence—not one blended confidence number.
 
-**Show:** Landing hero and the three cards: **6 live lenses**, **Defined risk**,
-and **Self-scoring**. Slowly scroll to the navigation tabs.
+### Deterministic authorization
 
-**Say:**
+> A trade is authorized only when every required threshold is met. If one
+> critical check fails, or the evidence is incomplete, the system abstains
+> automatically. Uncertainty becomes an explicit, logged decision instead of an
+> accidental trade. That logic lives in code, not in a prompt.
 
-> CrossSignal synchronizes six market lenses: equity volatility, the Treasury
-> curve, credit, realized volatility, rate expectations, and positioning. Claude
-> synthesizes the disagreement, but deterministic code controls construction,
-> risk, broker access, and scoring. Every input records provenance, and every
-> options structure has defined maximum loss.
+### Dedicated-account evidence
 
-## 0:55–1:25 — Show the end-to-end process
+> CrossSignal uses Alpaca's official MCP server for market data, account state,
+> and paper execution. Against a fresh, dedicated $100,000 Alpaca paper account,
+> it sealed a Decision Contract with SHA-256 before the outcome was known. The
+> disagreement was real and stable, but the execution evidence was incomplete.
+> Verdict: abstain.
 
-**Show:** Select **Methodology**. Point to the SIGNAL protocol or process flow.
+### Repeated live cycles
 
-**Say:**
+> Not one cherry-picked example — ten live cycles, the same real edge scored
+> again and again, each honestly refused for its own inspectable reason.
+> Never forced. Never gamed.
 
-> The workflow is the SIGNAL accountability protocol. It verifies source
-> integrity, quantifies cross-market inconsistency, challenges the thesis with a
-> falsification pass, perturbs the inputs to test stability, seals a prediction
-> contract before broker access, and later scores the outcome. Abstention is a
-> successful policy result when the evidence or execution quality is inadequate.
+### Public replay, courtroom, and scorecard
 
-## 1:25–2:15 — Decision courtroom and scorecard
+> The credential-free replay exposes the disagreement engine, stability test,
+> and execution gate independently. The courtroom reconstructs the allegation,
+> cross-examination, and judgment from evidence known at decision time, then
+> seals the result so it cannot be edited after the fact.
 
-**Show:** Select **Decision case**. Start with the `AUTHORIZED` replay. Show the
-four scorecard metrics and the Decision Replay courtroom. Then change the
-selector to the `ABSTAIN` case.
+### Abstention and authorization contrast
 
-**Say:**
+> In the abstention example, signal and stability pass but option liquidity does
+> not. No order is sent and nothing needs recovery. In the contrasting authorized
+> replay, all thresholds clear and CrossSignal seals the scores, rules, and
+> evidence into a receipt a judge can verify independently.
 
-> This is the Decision Replay courtroom. It reconstructs only information known
-> at decision time. Instead of one vague confidence number, CrossSignal separates
-> signal quality, decision stability, execution quality, and matured outcome
-> evidence. Here is an authorized case where every deterministic gate passed.
-> The same policy also produces this abstention case when execution evidence is
-> insufficient. The model does not get to talk its way around a failed gate.
+### Cloud automation and repository proof
 
-## 2:15–2:45 — Tamper evidence and honest evaluation
+> CrossSignal also runs unattended in GitHub Actions with broker mutations
+> disabled. The public repository contains the full implementation and automated
+> tests; it is not a mock-up.
 
-**Show:** In **Decision case**, scroll through the proof chain. Briefly show the
-SHA-256 seal, predetermined verdict, and counterfactual table.
+### Close
 
-**Say:**
+> CrossSignal is a verification layer between a proposal and execution. Claude
+> never touches the broker directly. Its job is to determine whether enough
+> reliable evidence exists to act. I'm Omobolaji Adeyan. Thank you.
 
-> Before any paper submission, the market snapshot, prediction, invalidation,
-> risk assessment, and portfolio are sealed with SHA-256. Later evaluation
-> compares the agent direction with inverse and cash proxies. Unsupported words
-> are explicitly unscoreable; they are never silently treated as bearish or as
-> a wrong prediction. This behavior is covered by regression tests.
+## Critical video audit
 
-## 2:45–3:15 — Alpaca integration and paper evidence
-
-**Show:** Select **Executive overview**, then **Track record**. Show the
-execution ledger and the filled historical replay. Do not imply that the public
-fixture is live.
-
-**Say:**
-
-> Alpaca’s official MCP server is the market and paper-execution backbone. It
-> provides stock and options data, Greeks, account state, news context, and the
-> multi-leg order lifecycle. A verified market-hours workflow recorded three
-> filled multi-leg paper spreads on August twenty-fifth. This public view is a
-> sanitized historical replay, so judges can inspect the lifecycle without
-> receiving broker credentials.
-
-## 3:15–3:45 — Live cloud evidence
-
-**Show:** Switch to the successful GitHub **Evidence Watch** run. Show the green
-job steps and its summary. Do not open GitHub Secrets or raw logs.
-
-**Say:**
-
-> CrossSignal also runs autonomously in GitHub Actions without laptop
-> babysitting. This connected Evidence Watch sealed contract
-> CS-20260901-A97D5090. Signal quality was eighty-eight, stability was one
-> hundred, and five of six current checks passed. The system correctly abstained
-> and generated a secret-free receipt. Broker mutations remained disabled for
-> the entire cloud run.
-
-## 3:45–4:15 — Security boundary
-
-**Show:** Return to the application and select **Security**. Point to paper
-endpoint, public execution, live-data requirement, and credential isolation.
-
-**Say:**
-
-> Safety is architectural, not prompt-based. Claude cannot call Alpaca directly.
-> Every mutation passes an independent authorization guard and the exact Alpaca
-> paper endpoint is required. News is untrusted context, fallback data fails
-> closed, public execution is disabled, and recovery requires explicit approval.
-> The threat model is aligned to selected NIST AI RMF and SSDF practices without
-> claiming NIST certification.
-
-## 4:15–4:35 — Engineering proof and differentiation
-
-**Show:** Repository README, then the green test workflow. Briefly highlight
-`agent/signal_protocol.py`, `tools/alpaca_tools.py`, and `tests/` in the
-repository tree; do not perform a dense code walkthrough.
-
-**Say:**
-
-> The public repository contains the complete implementation, not a mock-up.
-> Thirty-nine automated tests pass in GitHub. The differentiator is the closed
-> accountability loop: observe, challenge, govern, seal, execute, reconcile, and
-> learn. CrossSignal makes every decision inspectable before and after the
-> outcome.
-
-## 4:35–4:45 — Close
-
-**Show:** Final slide with the public application and repository URLs. Return
-your webcam frame if available.
-
-**Say:**
-
-> CrossSignal does not merely recommend a trade. It proves whether the trade
-> deserves authorization. I’m Omobolaji E Adeyan. Thank you.
-
-## Recording checklist
-
-- Final runtime is no more than five minutes.
-- Your name is spoken and visible.
-- Both application and repository URLs are readable.
-- `PUBLIC JUDGE MODE` remains visible when describing replay evidence.
-- Authorized and abstention cases are both shown.
-- The successful Evidence Watch run is shown, not an older failed run.
-- Historical fills are called verified paper evidence, not current live orders.
-- No profitability guarantee or investment-performance claim is made.
-- No secret, `.env`, account number, email, notification, or unrelated tab is visible.
-- Captions are enabled and manually corrected for Alpaca, CrossSignal, Claude,
-  SIGNAL, SHA-256, and Omobolaji E Adeyan.
-- Export as 1920×1080 H.264 MP4, under 300 MB.
-- Watch the complete export once before uploading.
+- Passes the official five-minute limit with 10.7 seconds to spare.
+- Clearly explains the problem and the mechanism, then demonstrates abstention
+  and a contrasting authorized replay.
+- Shows app, code, evidence, dashboard, cloud automation, and public repository.
+- Correctly avoids claiming dedicated-account P&L.
+- The authorized case is a sanitized demonstration, not a dedicated-account fill.
+- No subtitle stream or burned-in captions — deliberate: an earlier captioned
+  cut covered the live application UI and was judged more distracting than
+  helpful, so captions were dropped by explicit choice, not an oversight.
+- The visible presenter credit reads "Omobolaji Adeyan" (no middle initial),
+  matching the presenter's own choice for the on-screen title/closing cards;
+  written submission materials additionally use the full "Omobolaji E Adeyan."
+  Not a competition-rule issue either way.

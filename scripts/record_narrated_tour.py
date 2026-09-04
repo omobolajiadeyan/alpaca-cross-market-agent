@@ -261,13 +261,13 @@ EVIDENCE_SCENE_HTML = r"""<!doctype html>
   <div class="titlebar"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div>
     <span class="filename">trading_audit.db &mdash; sealed decision contract</span></div>
   <div class="wrap">
-    <div class="eyebrow reveal" id="r-eyebrow">LIVE EVIDENCE &middot; DEDICATED HACKATHON ACCOUNT &middot; NOT A DEMO</div>
+    <div class="eyebrow reveal" id="r-eyebrow">CONNECTED EVIDENCE &middot; DEDICATED HACKATHON ACCOUNT &middot; AFTER REGULAR SESSION</div>
     <div class="row reveal" id="r-account">
       <div class="field"><div class="label">ALPACA ACCOUNT</div><div class="value mono">Dedicated hackathon account (ID withheld) &middot; $100,000 &middot; created 2026-09-01</div></div>
     </div>
     <div class="row reveal" id="r-contract">
-      <div class="field"><div class="label">CONTRACT</div><div class="value mono">CS-20260901-4B6D4392</div></div>
-      <div class="field"><div class="label">SEALED</div><div class="value mono">2026-09-01 15:42:53 UTC</div></div>
+      <div class="field"><div class="label">CONTRACT</div><div class="value mono">CS-20260903-FE01A097</div></div>
+      <div class="field"><div class="label">SEALED</div><div class="value mono">2026-09-03 23:15:09 UTC</div></div>
     </div>
     <div class="hr"></div>
     <div class="scorecard">
@@ -280,7 +280,7 @@ EVIDENCE_SCENE_HTML = r"""<!doctype html>
       <div class="tag">ABSTAIN</div>
       <div class="reasons" id="reasons-text"></div>
     </div>
-    <div class="hash reveal" id="r-hash">SHA-256 4b6d43922b73cc9c0bf27da835cafc6811cdc10c6f5bfa5808c75e33df71a5b3</div>
+    <div class="hash reveal" id="r-hash">SHA-256 fe01a097876fa3f9fce20e449f9d9ef523a911375db384ffe91091ecf6c4e94e</div>
   </div>
   <script>
     function show(id) { document.getElementById(id).classList.add('in'); }
@@ -311,15 +311,64 @@ EVIDENCE_SCENE_HTML = r"""<!doctype html>
     setTimeout(() => show('r-account'), 250);
     setTimeout(() => show('r-contract'), 550);
     setTimeout(() => countUp('num-signal', 'metric-signal', 82, 650), 950);
-    setTimeout(() => countUp('num-stability', 'metric-stability', 100, 650), 1500);
-    setTimeout(() => countUp('num-execution', 'metric-execution', 67, 650), 2050);
+    setTimeout(() => countUp('num-stability', 'metric-stability', 90, 650), 1500);
+    setTimeout(() => countUp('num-execution', 'metric-execution', 83, 650), 2050);
     setTimeout(() => show('metric-outcome'), 2700);
     setTimeout(() => show('r-verdict'), 3000);
     setTimeout(() => typeText('reasons-text',
-      'required market data not fully live · adjusted confidence below 55% · deterministic risk assessment failed',
+      'all feeds sourced live · adversarial confidence 53% below 55% · no option order sent',
       18), 3100);
     setTimeout(() => show('r-hash'), 5900);
   </script>
+</body></html>
+"""
+
+CYCLE_HISTORY_SCENE_HTML = r"""<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+  * { box-sizing: border-box; margin:0; padding:0; }
+  body { width:1920px; height:1080px; background:#0b1220;
+    font-family: 'Cascadia Code', 'Consolas', monospace;
+    display:flex; flex-direction:column; color:#c9d6ef; }
+  .titlebar { height:52px; background:#0f1a2e; display:flex; align-items:center;
+    padding:0 24px; gap:10px; border-bottom:1px solid #1c2b47; }
+  .dot { width:13px; height:13px; border-radius:50%; }
+  .r{background:#ff5f57}.y{background:#febc2e}.g{background:#28c840}
+  .filename { margin-left:20px; color:#7891b8; font-size:16px; }
+  .wrap { padding:36px 56px; }
+  .eyebrow { color:#4fd2ef; font-size:16px; letter-spacing:.12em; font-weight:700; margin-bottom:22px; }
+  table { width:100%; border-collapse:collapse; font-size:16px; }
+  th { text-align:left; color:#7891b8; font-size:12px; letter-spacing:.06em;
+    font-weight:600; padding:6px 14px 10px; border-bottom:1px solid #1c2b47; }
+  td { padding:11px 14px; border-bottom:1px solid #16223a; color:#dbe6f5; }
+  tr:last-child td { border-bottom:none; }
+  .mono { font-family:'Cascadia Code',monospace; color:#4fc1e9; }
+  .num { text-align:right; font-variant-numeric:tabular-nums; }
+  .tag { display:inline-block; background:#2a1a0f; color:#febc2e; border:1px solid #5a3a1a;
+    border-radius:4px; padding:2px 10px; font-size:12px; font-weight:700; letter-spacing:.04em; }
+  .why { color:#9fb2cc; font-size:14px; }
+  .foot { margin-top:20px; color:#5d7099; font-size:13px; }
+</style></head>
+<body>
+  <div class="titlebar"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div>
+    <span class="filename">trading_audit.db &mdash; every cycle, in order</span></div>
+  <div class="wrap">
+    <div class="eyebrow">TEN CONNECTED CYCLES &middot; NOT CHERRY-PICKED &middot; DEDICATED HACKATHON ACCOUNT</div>
+    <table>
+      <tr><th>Date</th><th>Time (UTC)</th><th class="num">Signal</th><th class="num">Stability</th><th>Verdict</th><th>Why it abstained</th></tr>
+      <tr><td>Sep 1</td><td class="mono">15:06</td><td class="num">82.2</td><td class="num">100%</td><td><span class="tag">ABSTAIN</span></td><td class="why">Confidence below 55% &middot; live-data gap</td></tr>
+      <tr><td>Sep 1</td><td class="mono">15:08</td><td class="num">82.1</td><td class="num">100%</td><td><span class="tag">ABSTAIN</span></td><td class="why">Confidence below 55% &middot; live-data gap</td></tr>
+      <tr><td>Sep 1</td><td class="mono">15:18</td><td class="num">81.9</td><td class="num">100%</td><td><span class="tag">ABSTAIN</span></td><td class="why">Confidence below 55% &middot; live-data gap</td></tr>
+      <tr><td>Sep 1</td><td class="mono">15:26</td><td class="num">81.9</td><td class="num">100%</td><td><span class="tag">ABSTAIN</span></td><td class="why">Confidence below 55% &middot; live-data gap</td></tr>
+      <tr><td>Sep 1</td><td class="mono">15:42</td><td class="num">81.8</td><td class="num">100%</td><td><span class="tag">ABSTAIN</span></td><td class="why">Confidence below 55% &middot; live-data gap</td></tr>
+      <tr><td>Sep 2</td><td class="mono">16:56</td><td class="num">82.6</td><td class="num">100%</td><td><span class="tag">ABSTAIN</span></td><td class="why">Confidence below 55% &middot; live-data gap</td></tr>
+      <tr><td>Sep 2</td><td class="mono">17:13</td><td class="num">82.7</td><td class="num">100%</td><td><span class="tag">ABSTAIN</span></td><td class="why">Confidence at 51% &middot; just under threshold</td></tr>
+      <tr><td>Sep 2</td><td class="mono">17:16</td><td class="num">82.6</td><td class="num">100%</td><td><span class="tag">ABSTAIN</span></td><td class="why">Thin option liquidity on one proposed leg</td></tr>
+      <tr><td>Sep 2</td><td class="mono">17:26</td><td class="num">82.3</td><td class="num">100%</td><td><span class="tag">ABSTAIN</span></td><td class="why">Confidence at 54% &middot; missed by one point</td></tr>
+      <tr><td>Sep 3</td><td class="mono">23:15</td><td class="num">82.4</td><td class="num">90%</td><td><span class="tag">ABSTAIN</span></td><td class="why">Confidence at 53% &middot; different leading signal</td></tr>
+    </table>
+    <div class="foot">Same real market edge, ten times over &mdash; 82&ndash;83 disagreement, never below 90% stability. Ten different, inspectable reasons to refuse. Zero forced. Zero gamed.</div>
+  </div>
 </body></html>
 """
 
@@ -388,7 +437,7 @@ CURSOR_INIT_JS = """
 """
 
 TITLE_BEAT = ("open_title", "What if the smartest thing an AI trading agent "
-              "could do was say no? I'm Omobolaji Adeyan, and this is "
+              "could do was say no? I'm Omobolaji E Adeyan, and this is "
               "CrossSignal.")
 PROBLEM_BEAT = ("problem_scene", "Most trading agents are designed to find "
                 "opportunities and execute quickly. But a strong signal "
@@ -429,10 +478,17 @@ EVIDENCE_BEAT = ("evidence_scene", "CrossSignal runs on Alpaca's official "
                   "fresh, dedicated hundred-thousand-dollar Alpaca "
                   "account, CrossSignal sealed this exact contract, "
                   "hashed with SHA-256 before the outcome was known. The "
-                  "disagreement engine scored this real, the stability "
-                  "test held across ten perturbations, but the execution "
-                  "risk gate found the evidence incomplete. Verdict: "
-                  "abstain.")
+                  "disagreement scored eighty-two point four and stability "
+                  "held in nine of ten perturbations. But the adversarial "
+                  "review cut confidence from sixty-eight to fifty-three "
+                  "percent, below the fixed fifty-five percent gate. The "
+                  "cycle ran after the regular session. Verdict: abstain, "
+                  "with no option order sent.")
+CYCLE_HISTORY_BEAT = ("cycle_history_scene", "Not one cherry-picked "
+                       "example — ten connected cycles, all sealed in order. "
+                       "The latest rejected a plausible thesis after a real "
+                       "counterargument exposed weak evidence. Never forced. "
+                       "Never gamed.")
 
 BEATS = [
     ("open_live", "Now the same governed process, live and "
@@ -462,13 +518,13 @@ BEATS = [
      "checks, still correctly abstained, every step green, no laptop "
      "required."),
     ("repo_proof", "None of this is a mock-up. The public repository "
-     "holds the complete implementation — forty-three automated tests, "
+     "holds the complete implementation — forty-six automated tests, "
      "the same checks you've been watching, open for anyone to read."),
     ("close", "CrossSignal isn't another strategy for predicting whether "
      "prices rise or fall. It's a verification layer that sits between a "
      "proposal and execution — and Claude never touches the broker "
      "directly. Its only job: decide whether there's enough reliable "
-     "evidence to act. I'm Omobolaji Adeyan. Thank you."),
+     "evidence to act. I'm Omobolaji E Adeyan. Thank you."),
 ]
 
 GITHUB_EVIDENCE_PNG = ROOT / "recording-output" / "assets" / "github_evidence_watch.png"
@@ -812,7 +868,7 @@ def main() -> int:
         # without any manual re-timing.
         durations: dict[str, float] = {}
         audio_paths: dict[str, Path] = {}
-        for beat_id, narration in [TITLE_BEAT, PROBLEM_BEAT, ARCHITECTURE_BEAT, CODE_BEAT, TERMINAL_BEAT, EVIDENCE_BEAT, *BEATS]:
+        for beat_id, narration in [TITLE_BEAT, PROBLEM_BEAT, ARCHITECTURE_BEAT, CODE_BEAT, TERMINAL_BEAT, EVIDENCE_BEAT, CYCLE_HISTORY_BEAT, *BEATS]:
             audio = temp / f"{beat_id}.mp3"
             override = find_real_voice_override(beat_id)
             if override:
@@ -864,10 +920,12 @@ def main() -> int:
                 architecture_png = temp / "architecture_scene.png"
                 code_png = temp / "code_scene.png"
                 closing_png = temp / "closing_scene.png"
+                cycle_history_png = temp / "cycle_history_scene.png"
                 render_scene_png(browser, PROBLEM_SCENE_HTML, problem_png)
                 render_scene_png(browser, ARCHITECTURE_SCENE_HTML, architecture_png)
                 render_scene_png(browser, CODE_SCENE_HTML, code_png)
                 render_scene_png(browser, CLOSING_SCENE_HTML, closing_png)
+                render_scene_png(browser, CYCLE_HISTORY_SCENE_HTML, cycle_history_png)
 
                 # Terminal (typing effect) and evidence (count-up/reveal) have
                 # their own JS animations -- record them as real video, not a
@@ -920,11 +978,13 @@ def main() -> int:
         closing_clip = temp / "closing.mp4"
         github_evidence_clip = temp / "github_evidence.mp4"
         repo_proof_clip = temp / "repo_proof.mp4"
+        cycle_history_clip = temp / "cycle_history.mp4"
         build_static_clip(ffmpeg, problem_png, problem_clip, durations["problem_scene"])
         build_static_clip(ffmpeg, architecture_png, architecture_clip, durations["architecture_scene"])
         build_static_clip(ffmpeg, code_png, code_clip, durations["code_scene"])
         build_static_clip(ffmpeg, closing_png, closing_clip, durations["close"])
         build_static_clip(ffmpeg, GITHUB_EVIDENCE_PNG, github_evidence_clip, durations["cloud_evidence"])
+        build_static_clip(ffmpeg, cycle_history_png, cycle_history_clip, durations["cycle_history_scene"])
         build_static_clip(ffmpeg, GITHUB_REPO_PNG, repo_proof_clip, durations["repo_proof"])
 
         # Trim the recording's own blank lead-in (page load/render), not just
@@ -949,7 +1009,7 @@ def main() -> int:
         video_manifest.write_text(
             f"file '{title_card}'\nfile '{problem_clip}'\nfile '{architecture_clip}'\n"
             f"file '{code_clip}'\nfile '{terminal_clip}'\n"
-            f"file '{evidence_clip}'\nfile '{recorded_mp4}'\n"
+            f"file '{evidence_clip}'\nfile '{cycle_history_clip}'\nfile '{recorded_mp4}'\n"
             f"file '{github_evidence_clip}'\nfile '{repo_proof_clip}'\n"
             f"file '{closing_clip}'\n"
         )
@@ -975,6 +1035,7 @@ def main() -> int:
             f"file '{audio_paths['code_scene']}'\n",
             f"file '{audio_paths['terminal_scene']}'\n",
             f"file '{audio_paths['evidence_scene']}'\n",
+            f"file '{audio_paths['cycle_history_scene']}'\n",
         ]
         manifest_lines += [f"file '{clip}'\n" for clip in audio_clips]
         manifest = temp / "audio_manifest.txt"
@@ -1049,7 +1110,8 @@ def main() -> int:
                                  (ARCHITECTURE_BEAT[1], durations["architecture_scene"]),
                                  (CODE_BEAT[1], durations["code_scene"]),
                                  (TERMINAL_BEAT[1], durations["terminal_scene"]),
-                                 (EVIDENCE_BEAT[1], durations["evidence_scene"])]
+                                 (EVIDENCE_BEAT[1], durations["evidence_scene"]),
+                                 (CYCLE_HISTORY_BEAT[1], durations["cycle_history_scene"])]
             caption_segments += [(text, durations[beat_id]) for beat_id, text in BEATS]
             srt_path = temp / "captions.srt"
             build_captions_srt(caption_segments, srt_path)
